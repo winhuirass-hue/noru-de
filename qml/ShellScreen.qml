@@ -27,15 +27,31 @@ ScreenWindow {
     title: "Lomiri Shell"
 
     property int screenIndex: -1
-    readonly property bool primary: {
+
+    property bool primary: {
         // If this is the only screen then it's the primary one
         if (Screens.count === 1)
             return true;
 
-        if (deviceConfiguration.category == "phone" && Screens.count > 1 && screenIndex === 1)
-            return true;
+        const thisFormFactor = screenWindow.screen.formFactor;
+        if (deviceConfiguration.category === "tablet") {
+            // Set the primary screen to the tablet screen
+            if (thisFormFactor === Screen.Tablet)
+                return true;
 
-        return (Screens.count > 1 && screenIndex === 0)
+            // Set non-tablet screens to not be the primary screen
+            return false;
+        } else if (deviceConfiguration.category === "phone") {
+            // Set the primary screen not be the phone screen
+            if (thisFormFactor === Screen.Phone)
+                return false;
+
+            // Set the primary screen to the screen that is not a phone
+            return true
+        }
+
+        // Set the primary screen to the first screen by default
+        return (screenIndex === 0);
     }
 
     DeviceConfiguration {
@@ -48,7 +64,7 @@ ScreenWindow {
         height: screenWindow.height
 
         sourceComponent: {
-            if (deviceConfiguration.category == "phone" && Screens.count > 1 && screenIndex === 0) {
+            if (deviceConfiguration.category == "phone" && Screens.count > 1 && screenWindow.screen.formFactor === Screen.Phone) {
                 return disabledScreenComponent;
             }
             return shellComponent;
