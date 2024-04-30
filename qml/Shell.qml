@@ -255,8 +255,16 @@ StyledItem {
         objectName: "physicalKeysMapper"
 
         onPowerKeyLongPressed: dialogs.showPowerDialog();
-        onVolumeDownTriggered: volumeControl.volumeDown();
-        onVolumeUpTriggered: volumeControl.volumeUp();
+        onVolumeDownTriggered: {
+            if (Powerd.status === Powerd.On || callManager.hasCalls) {
+                volumeControl.volumeDown();
+            }
+        }
+        onVolumeUpTriggered: {
+            if (Powerd.status === Powerd.On || callManager.hasCalls) {
+                volumeControl.volumeUp();
+            }
+        }
         onScreenshotTriggered: itemGrabber.capture(shell);
     }
 
