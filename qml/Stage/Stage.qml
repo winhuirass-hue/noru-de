@@ -54,6 +54,7 @@ FocusScope {
     property real rightEdgePushProgress: 0
     property Item availableDesktopArea
     property PanelState panelState
+    property alias sideStageWidth: sideStage.panelWidth
 
     // Whether outside forces say that the Stage may have focus
     property bool allowInteractivity
