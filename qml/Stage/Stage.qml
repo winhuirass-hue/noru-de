@@ -1703,7 +1703,7 @@ FocusScope {
                             itemScale: spreadMaths.targetScale
                             scaleToPreviewSize: spreadItem.stackHeight
                             scaleToPreviewProgress: 1
-                            hasDecoration: root.mode === "windowed"
+                            hasDecoration: root.mode === "windowed" && !appDelegate.fullscreen
                             shadowOpacity: spreadMaths.shadowOpacity
                             showHighlight: spreadItem.highlightedIndex === index
                             darkening: spreadItem.highlightedIndex >= 0
@@ -1847,8 +1847,8 @@ FocusScope {
                         name: "maximized"; when: appDelegate.maximized && !appDelegate.minimized
                         PropertyChanges {
                             target: appDelegate;
-                            requestedX: root.availableDesktopArea.x;
-                            requestedY: 0;
+                            windowedX: root.availableDesktopArea.x;
+                            windowedY: 0;
                             visuallyMinimized: false;
                             visuallyMaximized: true
                         }
@@ -1874,7 +1874,7 @@ FocusScope {
                             requestedHeight: appContainer.height
                             restoreEntryValues: false
                         }
-                        PropertyChanges { target: decoratedWindow; hasDecoration: false }
+                        PropertyChanges { target: decoratedWindow; hasDecoration: false; restoreEntryValues: false }
                     },
                     State {
                         name: "normal";
@@ -1911,8 +1911,12 @@ FocusScope {
                             target: appDelegate
                             windowedX: root.availableDesktopArea.x
                             windowedY: root.availableDesktopArea.y
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height
+                        }
+                        PropertyChanges {
+                            target: appDelegate
+                            restoreEntryValues: false
+                            requestedWidth: root.availableDesktopArea.width / 2
+                            requestedHeight: root.availableDesktopArea.height
                         }
                     },
                     State {
@@ -1930,8 +1934,12 @@ FocusScope {
                             target: appDelegate
                             windowedX: root.availableDesktopArea.x
                             windowedY: root.availableDesktopArea.y
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height / 2
+                        }
+                        PropertyChanges {
+                            target: appDelegate
+                            restoreEntryValues: false
+                            requestedWidth: root.availableDesktopArea.width / 2
+                            requestedHeight: root.availableDesktopArea.height / 2
                         }
                     },
                     State {
@@ -1949,8 +1957,12 @@ FocusScope {
                             target: appDelegate
                             windowedX: root.availableDesktopArea.x
                             windowedY: root.availableDesktopArea.y + (root.availableDesktopArea.height / 2)
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height / 2
+                        }
+                        PropertyChanges {
+                            target: appDelegate
+                            restoreEntryValues: false
+                            requestedWidth: root.availableDesktopArea.width / 2
+                            requestedHeight: root.availableDesktopArea.height / 2
                         }
                     },
                     State {
@@ -1967,7 +1979,11 @@ FocusScope {
                         PropertyChanges {
                             target: appDelegate
                             windowedX: root.availableDesktopArea.x; windowedY: windowedY
-                            windowedWidth: root.availableDesktopArea.width; windowedHeight: windowedHeight
+                        }
+                        PropertyChanges {
+                            target: appDelegate
+                            restoreEntryValues: false
+                            requestedWidth: root.availableDesktopArea.width; requestedHeight: requestedHeight
                         }
                     },
                     State {
@@ -1976,7 +1992,11 @@ FocusScope {
                         PropertyChanges {
                             target: appDelegate
                             windowedX: windowedX; windowedY: root.availableDesktopArea.y
-                            windowedWidth: windowedWidth; windowedHeight: root.availableDesktopArea.height
+                        }
+                        PropertyChanges {
+                            target: appDelegate
+                            restoreEntryValues: false
+                            requestedWidth: requestedWidth; requestedHeight: root.availableDesktopArea.height
                         }
                     },
                     State {
@@ -1987,8 +2007,8 @@ FocusScope {
                             opacity: 0;
                             visuallyMinimized: true
                             visuallyMaximized: false
-                            x: -appDelegate.width / 2
-                            y: root.height / 2
+                            windowedX: -appDelegate.width / 2
+                            windowedY: root.height / 2 //TODO
                         }
                     }
                 ]
@@ -2063,8 +2083,7 @@ FocusScope {
                         SequentialAnimation {
                             ScriptAction { script: { fakeRectangle.stop(); } }
                             PropertyAction { target: appDelegate; property: "visuallyMaximized" }
-                            PropertyAction { target: appDelegate; property: "visuallyMinimized" }
-                            LomiriNumberAnimation { target: appDelegate; properties: "x,y,scale,opacity"; duration: priv.animationDuration }
+                            LomiriNumberAnimation { target: appDelegate; properties: "windowedX,windowedY,scale,opacity"; duration: priv.animationDuration }
                             PropertyAction { target: appDelegate; property: "visuallyMinimized" }
                         }
                     },
@@ -2074,8 +2093,8 @@ FocusScope {
                         SequentialAnimation {
                             PropertyAction { target: appDelegate; property: "visuallyMinimized,z" }
                             ParallelAnimation {
-                                LomiriNumberAnimation { target: appDelegate; properties: "x"; from: -appDelegate.width / 2; duration: priv.animationDuration }
-                                LomiriNumberAnimation { target: appDelegate; properties: "y,opacity"; duration: priv.animationDuration }
+                                LomiriNumberAnimation { target: appDelegate; properties: "x, windowedX"; from: -appDelegate.width / 2; duration: priv.animationDuration }
+                                LomiriNumberAnimation { target: appDelegate; properties: "y, windowedY,opacity"; duration: priv.animationDuration }
                                 LomiriNumberAnimation { target: appDelegate; properties: "scale"; from: 0; duration: priv.animationDuration }
                             }
                             PropertyAction { target: appDelegate; property: "visuallyMaximized" }
