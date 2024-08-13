@@ -1274,6 +1274,40 @@ FocusScope {
                     minimumY: root.availableDesktopArea.y
                 }
 
+                function updateWindowState(_mirState, _animate = false) {
+                    if (_mirState == Mir.MinimizedState) {
+                        appDelegate.minimize(_animate);
+                    } else if (_mirState == Mir.MaximizedState) {
+                        appDelegate.maximize(_animate);
+                    } else if (_mirState == Mir.VertMaximizedState) {
+                        appDelegate.maximizeVertically(_animate);
+                    } else if (_mirState == Mir.HorizMaximizedState) {
+                        appDelegate.maximizeHorizontally(_animate);
+                    } else if (_mirState == Mir.MaximizedLeftState) {
+                        appDelegate.maximizeLeft(_animate);
+                    } else if (_mirState == Mir.MaximizedRightState) {
+                        appDelegate.maximizeRight(_animate);
+                    } else if (_mirState == Mir.MaximizedTopLeftState) {
+                        appDelegate.maximizeTopLeft(_animate);
+                    } else if (_mirState == Mir.MaximizedTopRightState) {
+                        appDelegate.maximizeTopRight(_animate);
+                    } else if (_mirState == Mir.MaximizedBottomLeftState) {
+                        appDelegate.maximizeBottomLeft(_animate);
+                    } else if (_mirState == Mir.MaximizedBottomRightState) {
+                        appDelegate.maximizeBottomRight(_animate);
+                    } else if (_mirState == Mir.RestoredState) {
+                        if (appDelegate.fullscreen && appDelegate.prevWindowState != WindowStateStorage.WindowStateRestored
+                                && appDelegate.prevWindowState != WindowStateStorage.WindowStateNormal) {
+                            model.window.requestState(WindowStateStorage.toMirState(appDelegate.prevWindowState));
+                        } else {
+                            appDelegate.restore(_animate);
+                        }
+                    } else if (_mirState == Mir.FullscreenState) {
+                        appDelegate.prevWindowState = appDelegate.windowState;
+                        appDelegate.windowState = WindowStateStorage.WindowStateFullscreen;
+                    }
+                }
+
                 Connections {
                     target: model.window
                     onFocusedChanged: {
@@ -1286,37 +1320,7 @@ FocusScope {
                         appDelegate.activate();
                     }
                     onStateChanged: {
-                        if (value == Mir.MinimizedState) {
-                            appDelegate.minimize();
-                        } else if (value == Mir.MaximizedState) {
-                            appDelegate.maximize();
-                        } else if (value == Mir.VertMaximizedState) {
-                            appDelegate.maximizeVertically();
-                        } else if (value == Mir.HorizMaximizedState) {
-                            appDelegate.maximizeHorizontally();
-                        } else if (value == Mir.MaximizedLeftState) {
-                            appDelegate.maximizeLeft();
-                        } else if (value == Mir.MaximizedRightState) {
-                            appDelegate.maximizeRight();
-                        } else if (value == Mir.MaximizedTopLeftState) {
-                            appDelegate.maximizeTopLeft();
-                        } else if (value == Mir.MaximizedTopRightState) {
-                            appDelegate.maximizeTopRight();
-                        } else if (value == Mir.MaximizedBottomLeftState) {
-                            appDelegate.maximizeBottomLeft();
-                        } else if (value == Mir.MaximizedBottomRightState) {
-                            appDelegate.maximizeBottomRight();
-                        } else if (value == Mir.RestoredState) {
-                            if (appDelegate.fullscreen && appDelegate.prevWindowState != WindowStateStorage.WindowStateRestored
-                                    && appDelegate.prevWindowState != WindowStateStorage.WindowStateNormal) {
-                                model.window.requestState(WindowStateStorage.toMirState(appDelegate.prevWindowState));
-                            } else {
-                                appDelegate.restore();
-                            }
-                        } else if (value == Mir.FullscreenState) {
-                            appDelegate.prevWindowState = appDelegate.windowState;
-                            appDelegate.windowState = WindowStateStorage.WindowStateFullscreen;
-                        }
+                        appDelegate.updateWindowState(value, true)
                     }
                 }
 
@@ -1351,6 +1355,7 @@ FocusScope {
                             policy = stagedFullscreenPolicy
                         }
                         window.requestState(policy.applyPolicy(state, surface.shellChrome));
+                        appDelegate.updateWindowState(window.state, false)
                     }
                 }
 
