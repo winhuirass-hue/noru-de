@@ -340,12 +340,17 @@ StyledItem {
                                                        ? "phone"
                                                        : shell.usageScenario
 
-            mode: usageScenario == "phone" || usageScenario == "tablet"
-                     ? Screen.width / 2 >= stage.sideStageWidth
-                        || Screen.height / 2 >= stage.sideStageWidth
-                            ? "stagedWithSideStage"
-                            : "staged"
-                     : "windowed"
+            mode: {
+                if (usageScenario == "phone" || usageScenario == "tablet") {
+                    if (Screen.width / 2 >= stage.sideStageWidth || Screen.height / 2 >= stage.sideStageWidth) {
+                        return "stagedWithSideStage"
+                    }
+
+                    return "staged"
+                }
+
+                return "windowed"
+            }
 
             shellOrientation: shell.orientation
             shellOrientationAngle: shell.orientationAngle
