@@ -175,7 +175,7 @@ StyledItem {
     readonly property bool atDesktop: topLevelSurfaceList && greeter && topLevelSurfaceList.count === 0 && !greeter.active
 
     onAtDesktopChanged: {
-        if (atDesktop && stage) {
+        if (atDesktop && stage && !stage.workspaceEnabled) {
             stage.closeSpread();
         }
     }
@@ -332,6 +332,8 @@ StyledItem {
             rightEdgePushProgress: rightEdgeBarrier.progress
             availableDesktopArea: availableDesktopAreaItem
             launcherLeftMargin: launcher.visibleWidth
+            launcherLockedVisible: launcher.lockedVisible
+            topPanelHeight: panel.panelHeight
 
             property string usageScenario: shell.usageScenario === "phone" || greeter.hasLockedApp
                                                        ? "phone"
@@ -550,6 +552,24 @@ StyledItem {
         z: 10
 
         anchors.fill: parent
+
+        SwipeArea {
+            objectName: "fullscreenSwipeDown"
+            enabled: panel.state === "offscreen"
+            direction: SwipeArea.Downwards
+            immediateRecognition: false
+            height: units.gu(2)
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            onDraggingChanged: {
+                if (dragging) {
+                    panel.temporarilyShow()
+                }
+            }
+        }
 
         Panel {
             id: panel

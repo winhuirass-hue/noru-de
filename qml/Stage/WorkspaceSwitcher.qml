@@ -29,6 +29,8 @@ Item {
 
     property var screensProxy: Screens.createProxy();
     property string background
+    property bool launcherLockedVisible: false
+    property real topPanelHeight
 
     readonly property alias active: d.active
 
@@ -48,11 +50,34 @@ Item {
         show();
         d.nextScreen();
     }
+    function showLeftMoveApp(appSurface) {
+        d.currentAppSurface = appSurface
+        show();
+        d.previousWorkspace();
+    }
+    function showRightMoveApp(appSurface) {
+        d.currentAppSurface = appSurface
+        show();
+        d.nextWorkspace();
+    }
+    function showUpMoveApp(appSurface) {
+        d.currentAppSurface = appSurface
+        show();
+        d.previousScreen();
+    }
+    function showDownMoveApp(appSurface) {
+        d.currentAppSurface = appSurface
+        show();
+        d.nextScreen();
+    }
 
     function show() {
         hideTimer.stop();
         d.altPressed = true;
         d.ctrlPressed = true;
+        if (d.currentAppSurface) {
+            d.shiftPressed = true;
+        }
         d.active = true;
         d.shown = true;
         focus = true;
@@ -69,6 +94,8 @@ Item {
         property bool shown: false
         property bool altPressed: false
         property bool ctrlPressed: false
+        property bool shiftPressed: false
+        property var currentAppSurface: null
 
         property int rowHeight: root.height - units.gu(4)
 
@@ -123,9 +150,17 @@ Item {
         case Qt.Key_Control:
             d.ctrlPressed = false;
             break;
+        case Qt.Key_Shift:
+            d.shiftPressed = false;
+            break;
         }
 
-        if (!d.altPressed && !d.ctrlPressed) {
+        if (!d.altPressed && !d.ctrlPressed && !d.shiftPressed) {
+            if (d.currentAppSurface) {
+                let _workspace = screensProxy.get(d.highlightedScreenIndex).workspaces.get(d.highlightedWorkspaceIndex)
+                WorkspaceManager.moveSurfaceToWorkspace(d.currentAppSurface, _workspace);
+                d.currentAppSurface = null
+            }
             d.active = false;
             hideTimer.start();
             focus = false;
@@ -188,6 +223,8 @@ Item {
                         selectedIndex: d.highlightedScreenIndex == index ? d.highlightedWorkspaceIndex : -1
 
                         workspaceModel: model.screen.workspaces
+                        launcherLockedVisible: root.launcherLockedVisible
+                        topPanelHeight: root.topPanelHeight
                     }
                 }
             }

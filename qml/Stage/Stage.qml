@@ -108,6 +108,8 @@ FocusScope {
     }
 
     property int launcherLeftMargin : 0
+    property bool launcherLockedVisible: false
+    property real topPanelHeight
 
     Binding {
         target: topLevelSurfaceList
@@ -314,6 +316,43 @@ FocusScope {
         }
     }
 
+    GlobalShortcut {
+        id: moveAppShowWorkspaceSwitcherShortcutLeft
+        shortcut: Qt.AltModifier|Qt.ControlModifier|Qt.ShiftModifier|Qt.Key_Left
+        active: !workspaceSwitcher.active && root.workspaceEnabled && root.focusedAppDelegate
+        onTriggered: {
+            root.focus = true;
+            workspaceSwitcher.showLeftMoveApp(root.focusedAppDelegate.surface)
+        }
+    }
+    GlobalShortcut {
+        id: moveAppShowWorkspaceSwitcherShortcutRight
+        shortcut: Qt.AltModifier|Qt.ControlModifier|Qt.ShiftModifier|Qt.Key_Right
+        active: !workspaceSwitcher.active && root.workspaceEnabled && root.focusedAppDelegate
+        onTriggered: {
+            root.focus = true;
+            workspaceSwitcher.showRightMoveApp(root.focusedAppDelegate.surface)
+        }
+    }
+    GlobalShortcut {
+        id: moveAppShowWorkspaceSwitcherShortcutUp
+        shortcut: Qt.AltModifier|Qt.ControlModifier|Qt.ShiftModifier|Qt.Key_Up
+        active: !workspaceSwitcher.active && root.workspaceEnabled && root.focusedAppDelegate
+        onTriggered: {
+            root.focus = true;
+            workspaceSwitcher.showUpMoveApp(root.focusedAppDelegate.surface)
+        }
+    }
+    GlobalShortcut {
+        id: moveAppShowWorkspaceSwitcherShortcutDown
+        shortcut: Qt.AltModifier|Qt.ControlModifier|Qt.ShiftModifier|Qt.Key_Down
+        active: !workspaceSwitcher.active && root.workspaceEnabled && root.focusedAppDelegate
+        onTriggered: {
+            root.focus = true;
+            workspaceSwitcher.showDownMoveApp(root.focusedAppDelegate.surface)
+        }
+    }
+
     QtObject {
         id: priv
         objectName: "DesktopStagePrivate"
@@ -461,7 +500,7 @@ FocusScope {
     Binding {
         target: panelState
         property: "decorationsVisible"
-        value: mode == "windowed" && priv.focusedAppDelegate && priv.focusedAppDelegate.maximized && !root.spreadShown
+        value: mode == "windowed" && priv.focusedAppDelegate !== null && priv.focusedAppDelegate.maximized && !root.spreadShown
     }
 
     Binding {
@@ -712,6 +751,8 @@ FocusScope {
             visible: workspaceEnabled ? opacity > 0 : false
             enabled: workspaceEnabled
             mode: root.mode
+            launcherLockedVisible: root.launcherLockedVisible
+            topPanelHeight: root.topPanelHeight
             onCloseSpread: priv.goneToSpread = false;
         }
 
@@ -854,7 +895,7 @@ FocusScope {
 
             onDropped: {
                 drop.source.appDelegate.saveStage(ApplicationInfoInterface.MainStage);
-                drop.source.appDelegate.focus = true;
+                drop.source.appDelegate.activate();
             }
             keys: "SideStage"
         }
@@ -866,6 +907,7 @@ FocusScope {
             height: appContainer.height
             x: appContainer.width - width
             visible: false
+            showHint: !priv.sideStageDelegate
             Behavior on opacity { LomiriNumberAnimation {} }
             z: {
                 if (!priv.mainStageItemId) return 0;
@@ -915,7 +957,7 @@ FocusScope {
                 onDropped: {
                     if (drop.keys == "MainStage") {
                         drop.source.appDelegate.saveStage(ApplicationInfoInterface.SideStage);
-                        drop.source.appDelegate.focus = true;
+                        drop.source.appDelegate.activate();
                     }
                 }
                 drag {
@@ -1421,8 +1463,6 @@ FocusScope {
                             rightEdgeFocusAnimation.targetX = appDelegate.stage == ApplicationInfoInterface.SideStage ? sideStage.x : 0
                             rightEdgeFocusAnimation.start()
                         }
-                    } else if (state == "windowedRightEdge" || state == "windowed") {
-                        activate();
                     } else {
                         focusAnimation.start()
                     }
@@ -2221,6 +2261,8 @@ FocusScope {
         height: units.gu(20)
         width: root.width - units.gu(8)
         background: root.background
+        launcherLockedVisible: root.launcherLockedVisible
+        topPanelHeight: root.topPanelHeight
         onActiveChanged: {
             if (!active) {
                 appContainer.focus = true;
@@ -2358,6 +2400,13 @@ FocusScope {
             // If we're dragging to the sidestage.
             if (!sideStage.shown) {
                 sideStage.show();
+            }
+        }
+
+        onDropped: {
+            // Hide side stage if the app drag was cancelled
+            if (!priv.sideStageDelegate) {
+                sideStage.hide();
             }
         }
 
