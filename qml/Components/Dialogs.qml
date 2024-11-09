@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.12
+import QtQuick 2.15
 import QtQuick.Window 2.2
 import QtMir.Application 0.1
 import Lomiri.Session 0.1
@@ -47,7 +47,7 @@ MouseArea {
     Connections {
         target: topLevelSurfaceList
 
-        onClosedAllWindows: {
+        function onClosedAllWindows() {
             doOnClosedAllWindows();
         }
     }
@@ -305,7 +305,7 @@ MouseArea {
     Connections {
         target: root.lomiriSessionService
 
-        onLogoutRequested: {
+        function onLogoutRequested() {
             // Display a dialog to ask the user to confirm.
             if (!dialogLoader.active) {
                 dialogLoader.sourceComponent = logoutDialogComponent;
@@ -314,12 +314,12 @@ MouseArea {
             }
         }
 
-        onShutdownRequested: {
+        function onShutdownRequested() {
             // Display a dialog to ask the user to confirm.
             showPowerDialog();
         }
 
-        onRebootRequested: {
+        function onRebootRequested() {
             // Display a dialog to ask the user to confirm.
 
             // display a combined reboot/shutdown dialog, sadly the session indicator calls rather the "Reboot()" method
@@ -328,7 +328,7 @@ MouseArea {
             showPowerDialog();
         }
 
-        onLogoutReady: {
+        function onLogoutReady() {
             doOnClosedAllWindows = function(lomiriSessionService) {
                 return function() {
                     Qt.quit();
