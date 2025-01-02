@@ -216,6 +216,7 @@ StyledItem {
             anchors.fill: parent
             objectName: "interactiveArea"
 
+            enabled: !notifySwipeButtonLoader.active
             drag.target: !fullscreen ? notification : undefined
             drag.axis: Drag.XAxis
             drag.minimumX: -notification.width
