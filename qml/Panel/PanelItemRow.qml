@@ -177,6 +177,17 @@ Item {
             bottom: parent.bottom
         }
 
+        header: Item{
+            width: extDisplayConfiguration.screenСurvatureRadius
+            height: row.height
+        }
+
+        footer: Item{
+            width: extDisplayConfiguration.screenСurvatureRadius
+            height: row.height
+        }
+
+
         // TODO: make this better
         // when the width changes, the highlight will lag behind due to animation, so we need to disable the animation
         // and adjust the highlight X immediately.

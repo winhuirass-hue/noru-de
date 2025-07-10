@@ -113,3 +113,8 @@ bool DeviceConfig::supportsMultiColorLed() const
 {
     return m_info->contains("supportsMultiColorLed");
 }
+
+QString DeviceConfig::getProp(QString prop, QString defaultValue) const
+{
+    return QString::fromStdString(m_info->get(prop.toStdString(), defaultValue.toStdString()));
+}
