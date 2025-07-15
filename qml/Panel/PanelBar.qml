@@ -90,6 +90,10 @@ Item {
         d.scrollOffset = d.scrollOffset + scrollAmmout;
     }
 
+    function recalculateItems() {
+        row.recalculateItems();
+    }
+
     QtObject {
         id: d
         property var initialItem
@@ -175,9 +179,48 @@ Item {
         anchors.fill: parent
         clip: expanded || row.width > rowContainer.width
 
+        PanelItemRow {
+            id: row
+            objectName: "panelItemRow"
+            lightMode: root.lightMode
+            anchors.fill: parent
+            // Compensate for the Flickable rotation (ie, counter-rotate)
+            rotation: root.alignment != Qt.AlignRight ? 0 : 180
+
+            lateralPosition: {
+                if (root.lateralPosition == -1) return -1;
+
+                var mapped = root.mapToItem(row, root.lateralPosition, 0);
+                return Math.min(Math.max(mapped.x, 0), row.width);
+            }
+
+            onCurrentItemChanged: {
+                if (!currentItem) d.initialItem = undefined;
+                else if (!d.initialItem) d.initialItem = currentItem;
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.expanded
+                propagateComposedEvents: true
+                onClicked: {
+                    console.log("indicator clicked");
+                    row.selectItemAt(mouse.x);
+                    mouse.accepted = false;
+                    //d.alignIndicators();
+                }
+                onPressed: {
+                    console.log("indicator clicked");
+                    row.selectItemAt(mouse.x);
+                    mouse.accepted = false;
+                }
+            }
+        }
+
         Flickable {
             id: flickable
             objectName: "flickable"
+            visible: false
 
             // we rotate it because we want the Flickable to align its content item
             // on the right instead of on the left
@@ -202,39 +245,7 @@ Item {
                 }
             }
 
-            PanelItemRow {
-                id: row
-                objectName: "panelItemRow"
-                lightMode: root.lightMode
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                }
-
-                // Compensate for the Flickable rotation (ie, counter-rotate)
-                rotation: root.alignment != Qt.AlignRight ? 0 : 180
-
-                lateralPosition: {
-                    if (root.lateralPosition == -1) return -1;
-
-                    var mapped = root.mapToItem(row, root.lateralPosition, 0);
-                    return Math.min(Math.max(mapped.x, 0), row.width);
-                }
-
-                onCurrentItemChanged: {
-                    if (!currentItem) d.initialItem = undefined;
-                    else if (!d.initialItem) d.initialItem = currentItem;
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    enabled: root.expanded
-                    onClicked: {
-                        row.selectItemAt(mouse.x);
-                        d.alignIndicators();
-                    }
-                }
-            }
+            
 
         }
     }

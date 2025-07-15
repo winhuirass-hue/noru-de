@@ -18,9 +18,9 @@ ifeq ($(shell dpkg-vendor --derives-from Ubuntu && echo yes),yes)
 	CONFIGURE_OPTS += -DENABLE_UBUNTU_ACCOUNTSSERVICE=ON
 endif
 
-ifneq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
+# ifneq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 	CONFIGURE_OPTS += "-DNO_TESTS=ON"
-endif
+# endif
 
 %:
 	dh $@ --parallel --fail-missing --with python3,migrations
@@ -65,7 +65,7 @@ endif
 
 # use private lib directories
 override_dh_makeshlibs:
-	dh_makeshlibs -Nlomiri-private -Nlomiri-tests
+	dh_makeshlibs -Nlomiri-private # -Nlomiri-tests
 
 override_dh_shlibdeps:
 	# Some mock libraries link against liblightdm-qt5-3.so which we want to

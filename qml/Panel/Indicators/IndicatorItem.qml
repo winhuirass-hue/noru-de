@@ -36,6 +36,11 @@ IndicatorDelegate {
         if (!selected) return theme.palette.disabled.backgroundText;
         return theme.palette.normal.backgroundText;
     }
+        
+    Behavior on x {
+        enabled: expanded
+        NumberAnimation { duration: LomiriAnimation.SnapDuration }
+    }
 
     implicitWidth: mainItems.width
 
