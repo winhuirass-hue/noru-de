@@ -36,11 +36,14 @@ FocusScope {
     property bool interactive
     property int surfaceOrientationAngle: 0
     property bool isPromptSurface: false
+    property var stage : null
     // FIME - dont export, use interactive property. Need to fix qtmir to handle consumesInputChanged
     // to update surface activeFocus. See mock MirSurfaceItem.
     property alias consumesInput: surfaceItem.consumesInput
 
     property bool hadSurface: false
+
+    signal sizeChanged(size size)
 
     onSurfaceChanged: {
         // Not a binding because animations might remove the surface from the surfaceItem
@@ -78,6 +81,14 @@ FocusScope {
         enabled: root.interactive
         antialiasing: !root.interactive
         orientationAngle: root.surfaceOrientationAngle
+
+        Connections {
+            target: surfaceItem.surface
+            onSizeChanged: {
+                root.sizeChanged(value)
+            }
+        }
+        clip: stage && stage.mode === "windowed"
     }
 
     TouchGate {

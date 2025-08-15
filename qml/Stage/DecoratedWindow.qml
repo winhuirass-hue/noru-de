@@ -33,12 +33,14 @@ FocusScope {
     property alias application: applicationWindow.application
     property alias surface: applicationWindow.surface
     readonly property alias focusedSurface: applicationWindow.focusedSurface
+    readonly property alias supportsResize: applicationWindow.supportsResize
     property alias active: decoration.active
     readonly property alias title: applicationWindow.title
     property alias maximizeButtonShown: decoration.maximizeButtonShown
     property alias interactive: applicationWindow.interactive
     readonly property alias orientationChangesEnabled: applicationWindow.orientationChangesEnabled
     property alias windowControlButtonsVisible: decoration.windowControlButtonsVisible
+    property alias stage: applicationWindow.stage
     property PanelState panelState
 
     // Changing this will actually add/remove a decoration, meaning, requestedHeight will take the decoration into account.
@@ -81,6 +83,8 @@ FocusScope {
     readonly property Item clientAreaItem: applicationWindow
 
     property alias altDragEnabled: altDragHandler.enabled
+
+    property alias clipSurface: applicationWindow.clip
 
     property Item windowMargins
 
