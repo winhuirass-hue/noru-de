@@ -345,11 +345,23 @@ void DBusLomiriSessionService::Logout()
 
 void DBusLomiriSessionService::EndSession()
 {
-    const QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("com.lomiri.Upstart"),
-                                                            QStringLiteral("/com/lomiri/Upstart"),
-                                                            QStringLiteral("com.lomiri.Upstart0_6"),
-                                                            QStringLiteral("EndSession"));
-    QDBusConnection::sessionBus().asyncCall(msg);
+    // Validate logind session path exists
+    // TODO: Refactor this validation into a shared method to eliminate duplication
+    if (d->logindSessionPath.isEmpty()) {
+        qWarning() << "No logind session path available, cannot terminate session";
+        return;
+    }
+
+    // Use systemd-logind to terminate the session
+    QDBusMessage msg = QDBusMessage::createMethodCall(
+        LOGIN1_SERVICE,
+        d->logindSessionPath,
+        LOGIN1_SESSION_IFACE,
+        QStringLiteral("Terminate"));
+
+    QDBusConnection::systemBus().asyncCall(msg);
+
+    qDebug() << "Sent session termination request to systemd-logind";
 }
 
 bool DBusLomiriSessionService::CanHibernate() const
