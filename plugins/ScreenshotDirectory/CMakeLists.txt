@@ -1,9 +1,16 @@
-set(PLUGIN_SOURCES
+cmake_minimum_required(VERSION 3.17)
+project(ScreenshotDirectory-qml LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 REQUIRED COMPONENTS Qml Quick)
+
+qt_add_qml_module(ScreenshotDirectory-qml
+  URI  ScreenshotDirectory
+  VERSION 0.1
+  SOURCES
+  ScreenshotDirectory.h
   ScreenshotDirectory.cpp
-  plugin.cpp
 )
 
-add_library(ScreenshotDirectory-qml MODULE ${PLUGIN_SOURCES})
-target_link_libraries(ScreenshotDirectory-qml Qt5::Qml Qt5::Gui Qt5::Quick)
-
-add_lomiri_plugin(ScreenshotDirectory 0.1 ScreenshotDirectory TARGETS ScreenshotDirectory-qml)
+target_link_libraries(ScreenshotDirectory-qml
+  PRIVATE Qt6::Qml Qt6::Gui Qt6::Quick)
