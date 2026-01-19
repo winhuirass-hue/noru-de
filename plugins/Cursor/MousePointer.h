@@ -27,6 +27,7 @@
 
 class MousePointer : public MirMousePointerInterface {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(QQuickItem* confiningItem READ confiningItem WRITE setConfiningItem NOTIFY confiningItemChanged)
     Q_PROPERTY(int topBoundaryOffset READ topBoundaryOffset WRITE setTopBoundaryOffset NOTIFY topBoundaryOffsetChanged)
 
