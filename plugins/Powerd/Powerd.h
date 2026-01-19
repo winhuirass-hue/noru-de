@@ -23,10 +23,13 @@
 #include <gio/gio.h>
 #include <QtCore/QObject>
 #include <QtDBus/QDBusInterface>
+#include <qqmlintegration.h>
 
 class Powerd: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
 public:
