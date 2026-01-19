@@ -22,6 +22,7 @@
 #include <QString>
 #include <QStringList>
 #include <QVariant>
+#include <qqmlintegration.h>
 
 class AccountsServiceDBusAdaptor;
 class QDBusInterface;
@@ -29,6 +30,8 @@ class QDBusInterface;
 class AccountsService: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
     Q_PROPERTY (QString user
                 READ user
                 WRITE setUser

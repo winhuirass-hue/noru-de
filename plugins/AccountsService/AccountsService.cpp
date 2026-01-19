@@ -23,7 +23,7 @@
 #include <QDebug>
 
 #include <glib.h>
-#include <paths.h>
+#include "../../include/paths.h.in"
 
 #define IFACE_ACCOUNTS_USER          QStringLiteral("org.freedesktop.Accounts.User")
 #define IFACE_UBUNTU_INPUT           QStringLiteral("com.lomiri.AccountsService.Input")
