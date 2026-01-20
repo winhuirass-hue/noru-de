@@ -22,11 +22,14 @@
 #include <QFile>
 
 #include <linux/uinput.h>
+#include <qqmlintegration.h>
 
 
 class UInput : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
 public:
     enum Button {

@@ -1,7 +1,17 @@
-add_library(UInput-qml MODULE
-    plugin.cpp
-    uinput.cpp
+cmake_minimum_required(VERSION 3.21)
+project(UInput-qml LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt6 COMPONENTS Qml REQUIRED)
+
+file(GLOB SOURCES "*.cpp" "*.h")
+
+qt_add_qml_module(UInput-qml
+    URI UInput
+    VERSION 0.1
+    SOURCES ${SOURCES}
 )
 
-target_link_libraries(UInput-qml Qt5::Qml)
-add_lomiri_plugin(UInput 0.1 UInput TARGETS UInput-qml)
+target_link_libraries(UInput-qml PRIVATE Qt6::Qml)
+
