@@ -19,12 +19,15 @@
 
 #include <QObject>
 #include <QString>
+#include <qqmlintegration.h>
 
 class QDBusInterface;
 
 class SessionBroadcast: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
 public:
     explicit SessionBroadcast(QObject *parent = 0);
