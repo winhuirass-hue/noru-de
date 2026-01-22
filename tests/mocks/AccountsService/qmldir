@@ -1,3 +1,0 @@
-module AccountsService
-plugin MockAccountsService-qml
-typeinfo AccountsService.qmltypes
