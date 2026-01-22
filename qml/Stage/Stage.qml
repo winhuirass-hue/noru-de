@@ -134,7 +134,9 @@ FocusScope {
             // Alt Tab has been released, did we already go to spread?
             if (priv.goneToSpread) {
                 priv.goneToSpread = false;
-            } else {
+
+            // Don't do anything if we already went to the spread and it was closed outside of alt tabbing i.e. clicking an item from the spread
+            } else if (!priv.altTabWentToSpread) {
                 // No we didn't, do a quick alt-tab
                 if (appRepeater.count > 1) {
                     appRepeater.itemAt(1).activate();
@@ -142,6 +144,8 @@ FocusScope {
                     appRepeater.itemAt(0).activate(); // quick alt-tab to the only (minimized) window should still activate it
                 }
             }
+
+            priv.altTabWentToSpread = false;
         }
     }
 
@@ -152,6 +156,7 @@ FocusScope {
         onTriggered: {
             if (root.altTabPressed) {
                 priv.goneToSpread = true;
+                priv.altTabWentToSpread = true;
                 priv.altTabInProgress = true;
             }
         }
@@ -437,6 +442,7 @@ FocusScope {
         property var foregroundMaximizedAppDelegate: null // for stuff like drop shadow and focusing maximized app by clicking panel
 
         property bool altTabInProgress: false
+        property bool altTabWentToSpread: false
         property bool goneToSpread: false
         onGoneToSpreadChanged: if (!goneToSpread) altTabInProgress = false;
 
