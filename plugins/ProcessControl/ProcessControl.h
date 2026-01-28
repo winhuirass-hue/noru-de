@@ -22,11 +22,14 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QStringList>
+#include <qqmlintegration.h>
 
 class ProcessControlPrivate;
 class ProcessControl: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
     Q_PROPERTY(QStringList awakenProcesses READ awakenProcesses
                NOTIFY awakenProcessesChanged)
 
