@@ -18,10 +18,13 @@
 #define CONNECTIVITY_H
 
 #include <QObject>
+#include <qqmlintegration.h>
 
 class ModemConnectivity : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
     Q_DISABLE_COPY(ModemConnectivity)
 
 public:

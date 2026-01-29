@@ -1,10 +1,22 @@
-set(CONNECTIVITY_SOURCES
-    plugin.cpp
-    ModemConnectivity.cpp
+cmake_minimum_required(VERSION 3.24)
+project(ModemConnectivity LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt6 COMPONENTS Qml DBus Core REQUIRED)
+
+file(GLOB MODEM_CONNECTIVITY_FILES "*.h" "*.cpp")
+
+qt_add_qml_module(ModemConnectivity
+    URI Lomiri.ModemConnectivity
+    VERSION 0.1
+    SOURCES
+        ${MODEM_CONNECTIVITY_FILES}
 )
 
-add_library(ModemConnectivity MODULE ${CONNECTIVITY_SOURCES})
-
-target_link_libraries(ModemConnectivity Qt5::Qml Qt5::DBus Qt5::Core)
-
-add_lomiri_plugin(Lomiri.ModemConnectivity 0.1 Lomiri/ModemConnectivity TARGETS ModemConnectivity)
+target_link_libraries(ModemConnectivity
+    PRIVATE
+    Qt6::Qml
+    Qt6::DBus
+    Qt6::Core
+)
