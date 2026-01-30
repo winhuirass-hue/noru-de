@@ -3,11 +3,16 @@
 # Eventually this should be dropped in favor of the upstream
 # QInputInfo API.
 
-project(InputInfo)
+cmake_minimum_required(VERSION 3.24)
+project(InputInfo LANGUAGES CXX)
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Quick REQUIRED)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
+find_package(Qt6 COMPONENTS Core Quick Qml REQUIRED)
+
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUDEV REQUIRED libudev)
 pkg_check_modules(LIBEVDEV REQUIRED libevdev)
 
@@ -18,21 +23,19 @@ include_directories(
     ${LIBEVDEV_INCLUDE_DIRS}
 )
 
-set(InputInfo_SOURCES
-    plugin.cpp
-    qinputinfo.cpp
-    qdeclarativeinputdevicemodel.cpp
-    linux/qinputdeviceinfo_linux.cpp
-)
+file(GLOB INPUTINFO_FILES "*.h" "*.cpp" "linux/*.h" "linux/*.cpp")
 
-add_library(InputInfo SHARED
-    ${InputInfo_SOURCES}
+qt_add_qml_module(InputInfo
+    URI Lomiri.InputInfo
+    VERSION 0.1
+    SOURCES
+    ${INPUTINFO_FILES}
 )
 
 target_link_libraries(InputInfo
+    PRIVATE
     ${LIBUDEV_LDFLAGS}
     ${LIBEVDEV_LDFLAGS}
-    Qt5::Core Qt5::Qml Qt5::Quick
+    Qt6::Core Qt6::Quick Qt6::Qml
 )
 
-add_lomiri_plugin(Lomiri.InputInfo 0.1 Lomiri/InputInfo TARGETS InputInfo)
