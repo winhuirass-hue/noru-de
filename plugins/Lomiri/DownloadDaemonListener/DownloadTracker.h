@@ -26,10 +26,12 @@
 
 #include <QObject>
 #include <QDBusObjectPath>
+#include <qqmlintegration.h>
 
 class DownloadTracker : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_DISABLE_COPY(DownloadTracker)
     Q_PROPERTY(QString service READ service WRITE setService NOTIFY serviceChanged)
     Q_PROPERTY(QString dbusPath READ dbusPath WRITE setDbusPath NOTIFY dbusPathChanged)
