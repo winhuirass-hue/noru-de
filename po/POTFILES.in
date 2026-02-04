@@ -4,6 +4,16 @@ plugins/AccountsService/AccountsServiceDBusAdaptor.h
 plugins/AccountsService/AccountsService.h
 plugins/AccountsService/plugin.cpp
 plugins/AccountsService/plugin.h
+plugins/Aethercast/aethercast_helper.h
+plugins/Aethercast/dbus-shared.h
+plugins/Aethercast/displays.cpp
+plugins/Aethercast/displays.h
+plugins/Aethercast/plugin.cpp
+plugins/Aethercast/plugin.h
+plugins/BatteryMonitor/BatteryMonitor.cpp
+plugins/BatteryMonitor/BatteryMonitor.h
+plugins/BatteryMonitor/plugin.cpp
+plugins/BatteryMonitor/plugin.h
 plugins/Cursor/3rd_party/xcursor/xcursor.c
 plugins/Cursor/3rd_party/xcursor/xcursor.h
 plugins/Cursor/CursorImageInfo.cpp
@@ -165,6 +175,12 @@ plugins/Powerd/plugin.cpp
 plugins/Powerd/plugin.h
 plugins/Powerd/Powerd.cpp
 plugins/Powerd/Powerd.h
+plugins/ProcessControl/LocationWatcher.cpp
+plugins/ProcessControl/LocationWatcher.h
+plugins/ProcessControl/plugin.cpp
+plugins/ProcessControl/plugin.h
+plugins/ProcessControl/ProcessControl.cpp
+plugins/ProcessControl/ProcessControl.h
 plugins/ScreenshotDirectory/plugin.cpp
 plugins/ScreenshotDirectory/plugin.h
 plugins/ScreenshotDirectory/ScreenshotDirectory.cpp
@@ -300,8 +316,10 @@ qml/Components/FadingLabel.qml
 qml/Components/Flickable.qml
 qml/Components/flickableUtils.js
 qml/Components/FloatingFlickable.qml
+qml/Components/GestureAreaSizeHint.qml
 qml/Components/GridView.qml
 qml/Components/Handle.qml
+qml/Components/ImageResolver.qml
 qml/Components/InputMethod.qml
 qml/Components/ItemGrabber.qml
 qml/Components/ItemSnapshot.qml
@@ -321,6 +339,7 @@ qml/Components/PinLockscreen.qml
 qml/Components/PinPadButton.qml
 qml/Components/Rating.qml
 qml/Components/RatingStyle.qml
+qml/Components/RotateButton.qml
 qml/Components/ScrollCalculator.qml
 qml/Components/SearchHistoryModel/SearchHistoryModel.qml
 qml/Components/SharingPicker.qml
@@ -330,7 +349,6 @@ qml/Components/StandardAnimation.qml
 qml/Components/VirtualTouchPad.qml
 qml/Components/VolumeControl.qml
 qml/Components/Wallpaper.qml
-qml/Components/WallpaperResolver.qml
 qml/Components/WindowControlButtons.qml
 qml/Components/WrongPasswordAnimation.qml
 qml/Components/ZoomableImage.qml
@@ -803,6 +821,7 @@ tests/qmltests/Components/tst_DragHandle/SimpleButton.qml
 tests/qmltests/Components/tst_DragHandle/TopEdgeShowable.qml
 tests/qmltests/Components/tst_EdgeDragEvaluator.cpp
 tests/qmltests/Components/tst_EdgeDragEvaluator.qml
+tests/qmltests/Components/tst_ImageResolver.qml
 tests/qmltests/Components/tst_LazyImage/ImageControls.qml
 tests/qmltests/Components/tst_LazyImage.qml
 tests/qmltests/Components/tst_Lockscreen.qml
@@ -813,7 +832,6 @@ tests/qmltests/Components/tst_SharingPicker.qml
 tests/qmltests/Components/tst_Showable.qml
 tests/qmltests/Components/tst_VirtualTouchPad.qml
 tests/qmltests/Components/tst_Wallpaper.qml
-tests/qmltests/Components/tst_WallpaperResolver.qml
 tests/qmltests/Components/tst_ZoomableImage.qml
 tests/qmltests/EdgeBarrierControls.qml
 tests/qmltests/Greeter/TestView.qml

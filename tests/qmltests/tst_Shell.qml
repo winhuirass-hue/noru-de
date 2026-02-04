@@ -680,7 +680,8 @@ Rectangle {
             broadcastHomeSpy.clear();
 
             GSettingsController.setLifecycleExemptAppids([]);
-            GSettingsController.setPictureUri("");
+            GSettingsController.setBackgroundPictureUriShell("");
+            GSettingsController.setBackgroundPictureUriGreeter("");
         }
 
         function ensureInputMethodSurface() {
@@ -1070,7 +1071,7 @@ Rectangle {
         function test_surfaceLosesActiveFocusWhilePanelIsOpen() {
             loadShell("phone");
             swipeAwayGreeter();
-            var appDelegate = startApplication("dialer-app");
+            var appDelegate = startApplication("lomiri-dialer-app");
             var appSurface = appDelegate.surface;
             verify(appSurface);
 
@@ -1154,7 +1155,7 @@ Rectangle {
             var greeter = findChild(shell, "greeter");
 
             var appSurfaceId = topLevelSurfaceList.nextId;
-            var app = ApplicationManager.startApplication("dialer-app");
+            var app = ApplicationManager.startApplication("lomiri-dialer-app");
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             // Minimize the application we just launched
@@ -1163,7 +1164,7 @@ Rectangle {
             showGreeter();
 
             // The main point of this test
-            ApplicationManager.requestFocusApplication("dialer-app");
+            ApplicationManager.requestFocusApplication("lomiri-dialer-app");
             tryCompare(greeter, "shown", false);
             waitForRendering(greeter);
         }
@@ -1227,7 +1228,7 @@ Rectangle {
             waitUntilAppWindowIsFullyLoaded(cameraSurfaceId);
             tryCompare(panel, "fullscreenMode", true);
             var dialerSurfaceId = topLevelSurfaceList.nextId;
-            var dialerApp = ApplicationManager.startApplication("dialer-app");
+            var dialerApp = ApplicationManager.startApplication("lomiri-dialer-app");
             waitUntilAppWindowIsFullyLoaded(dialerSurfaceId);
             tryCompare(panel, "fullscreenMode", false);
             ApplicationManager.requestFocusApplication(cameraApp.appId);
@@ -1332,11 +1333,11 @@ Rectangle {
             var wallpaperResolver = findInvisibleChild(shell, "wallpaperResolver");
             var greeter = findChild(shell, "greeter");
             verify(!greeter.hasCustomBackground);
-            compare(wallpaperResolver.background, wallpaperResolver.defaultBackground);
+            compare(wallpaperResolver.resolvedImage, wallpaperResolver.defaultBackground);
 
             AccountsService.backgroundFile = Qt.resolvedUrl("../graphics/applicationIcons/dash.png");
             tryCompare(greeter, "hasCustomBackground", true);
-            tryCompare(wallpaperResolver, "background", AccountsService.backgroundFile);
+            tryCompare(wallpaperResolver, "resolvedImage", AccountsService.backgroundFile);
         }
 
         function test_tapOnRightEdgeReachesApplicationSurface() {
@@ -1462,7 +1463,7 @@ Rectangle {
             selectUser(data.user)
 
             var greeter = findChild(shell, "greeter")
-            var app = ApplicationManager.startApplication("dialer-app")
+            var app = ApplicationManager.startApplication("lomiri-dialer-app")
 
             confirmLoggedIn(data.loggedIn)
 
@@ -1510,8 +1511,8 @@ Rectangle {
             tryCompare(ApplicationManager, "focusedApplicationId", "lomiri-terminal-app");
 
             // start something else
-            ApplicationManager.startApplication("dialer-app");
-            tryCompare(ApplicationManager, "focusedApplicationId", "dialer-app");
+            ApplicationManager.startApplication("lomiri-dialer-app");
+            tryCompare(ApplicationManager, "focusedApplicationId", "lomiri-dialer-app");
 
             // terminal running in background, should get focused
             keyClick(Qt.Key_T, Qt.ControlModifier|Qt.AltModifier);
@@ -1606,7 +1607,7 @@ Rectangle {
             verify(desktopStage != null)
 
             var app1SurfaceId = topLevelSurfaceList.nextId;
-            var app1 = ApplicationManager.startApplication("dialer-app")
+            var app1 = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(app1SurfaceId);
 
             var app2SurfaceId = topLevelSurfaceList.nextId;
@@ -1923,7 +1924,7 @@ Rectangle {
             }
             tryCompare(stage, "state", "windowed")
 
-            tryCompare(ApplicationManager, "focusedApplicationId", "dialer-app")
+            tryCompare(ApplicationManager, "focusedApplicationId", "lomiri-dialer-app")
 
             keyRelease(Qt.Key_Alt);
         }
@@ -2017,7 +2018,7 @@ Rectangle {
             loadShell("desktop", 0);
 
             var appSurfaceId = topLevelSurfaceList.nextId;
-            var app = ApplicationManager.startApplication("dialer-app")
+            var app = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             var appContainer = findChild(shell, "appContainer");
@@ -2415,35 +2416,61 @@ Rectangle {
             return [
                 {tag: "color",
                  accounts: Qt.resolvedUrl("data:image/svg+xml,<svg><rect width='100%' height='100%' fill='#dd4814'/></svg>"),
-                 gsettings: "",
-                 output: Qt.resolvedUrl("data:image/svg+xml,<svg><rect width='100%' height='100%' fill='#dd4814'/></svg>")},
+                 gsettingsShell: "",
+                 gsettingsGreeter: "",
+                 outputShell: Qt.resolvedUrl("data:image/svg+xml,<svg><rect width='100%' height='100%' fill='#dd4814'/></svg>"),
+                 outputGreeter: Qt.resolvedUrl("data:image/svg+xml,<svg><rect width='100%' height='100%' fill='#dd4814'/></svg>")},
 
-                {tag: "empty", accounts: "", gsettings: "", output: "defaultBackground"},
+                {tag: "empty", accounts: "", gsettingsShell: "", gsettingsGreeter: "", outputShell: "defaultBackground", outputGreeter: "defaultBackground"},
 
                 {tag: "as-specified",
                  accounts: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
-                 gsettings: "",
-                 output: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
+                 gsettingsShell: "",
+                 gsettingsGreeter: "",
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
 
-                {tag: "gs-specified",
+                {tag: "gs-specified-same",
                  accounts: "",
-                 gsettings: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
-                 output: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png")},
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png")},
 
-                {tag: "both-specified",
+                {tag: "gs-specified-differing",
+                 accounts: "",
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
+
+                {tag: "both-specified-gs-same",
                  accounts: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
-                 gsettings: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
-                 output: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
+
+                {tag: "both-specified-gs-differing",
+                 accounts: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/black.png"),
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/blue.png")},
 
                 {tag: "invalid-as",
                  accounts: Qt.resolvedUrl("../data/lomiri/backgrounds/nope.png"),
-                 gsettings: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
-                 output: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png")},
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputShell: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png"),
+                 outputGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/red.png")},
 
                 {tag: "invalid-both",
                  accounts: Qt.resolvedUrl("../data/lomiri/backgrounds/nope.png"),
-                 gsettings: Qt.resolvedUrl("../data/lomiri/backgrounds/stillnope.png"),
-                 output: "defaultBackground"},
+                 gsettingsShell: Qt.resolvedUrl("../data/lomiri/backgrounds/stillnope.png"),
+                 gsettingsGreeter: Qt.resolvedUrl("../data/lomiri/backgrounds/stillnope.png"),
+                 outputShell: "defaultBackground",
+                 outputGreeter: "defaultBackground"},
             ]
         }
         function test_background(data) {
@@ -2452,17 +2479,36 @@ Rectangle {
             waitForRendering(shell);
 
             AccountsService.backgroundFile = data.accounts;
-            GSettingsController.setPictureUri(data.gsettings);
+            GSettingsController.setBackgroundPictureUriShell(data.gsettingsShell);
+            GSettingsController.setBackgroundPictureUriGreeter(data.gsettingsGreeter);
 
             var wallpaperResolver = findChild(shell, "wallpaperResolver");
-            if (data.output === "defaultBackground") {
-                tryCompare(wallpaperResolver, "background", wallpaperResolver.defaultBackground);
+
+            shellRect.mode = "shell"
+            verify(shell.mode === "shell");
+
+            if (data.outputShell === "defaultBackground") {
+                tryCompare(wallpaperResolver, "resolvedImage", wallpaperResolver.defaultBackground);
                 verify(!wallpaperResolver.hasCustomBackground);
             } else {
-                tryCompare(wallpaperResolver, "background", data.output);
+                tryCompare(wallpaperResolver, "resolvedImage", data.outputShell);
+                verify(wallpaperResolver.hasCustomBackground);
+            }
+
+            shellRect.mode = "greeter"
+            verify(shell.mode === "greeter");
+
+            if (data.outputGreeter === "defaultBackground") {
+                tryCompare(wallpaperResolver, "resolvedImage", wallpaperResolver.defaultBackground);
+                verify(!wallpaperResolver.hasCustomBackground);
+            } else {
+                tryCompare(wallpaperResolver, "resolvedImage", data.outputGreeter);
                 verify(wallpaperResolver.hasCustomBackground);
             }
         }
+
+/*
+        TODO: Until ayatana-greeter-session-broadcast is brought into the mix
 
         function test_greeterModeBroadcastsApp() {
             shellRect.mode = "greeter";
@@ -2502,6 +2548,7 @@ Rectangle {
             var coverPage = findChild(shell, "coverPage");
             tryCompare(coverPage, "showProgress", 0);
         }
+*/
 
         function test_greeterModeDispatchesURL() {
             shellRect.mode = "greeter";
@@ -2533,7 +2580,7 @@ Rectangle {
 
             // start some app
             var appSurfaceId = topLevelSurfaceList.nextId;
-            var app = ApplicationManager.startApplication("dialer-app");
+            var app = ApplicationManager.startApplication("lomiri-dialer-app");
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
             var appSurface = app.surfaceList.get(0);
 
@@ -2572,7 +2619,7 @@ Rectangle {
             tryCompare(app2Surface, "keymap", "fr");
 
             // focus our first app, make sure it also has the "fr" keymap
-            ApplicationManager.requestFocusApplication("dialer-app");
+            ApplicationManager.requestFocusApplication("lomiri-dialer-app");
             tryCompare(appSurface, "keymap", "fr");
 
             // switch to previous keymap, should be "cz+qwerty"
@@ -2606,7 +2653,7 @@ Rectangle {
             verify(panel);
 
             // start dialer, maximize it
-            var appDelegate = startApplication("dialer-app");
+            var appDelegate = startApplication("lomiri-dialer-app");
             verify(appDelegate);
 
             var maximizeButton = findChild(appDelegate, "maximizeWindowButton");
@@ -2667,7 +2714,7 @@ Rectangle {
             waitUntilAppWindowIsFullyLoaded(app2SurfaceId);
 
             var app1SurfaceId = topLevelSurfaceList.nextId;
-            var app1 = ApplicationManager.startApplication("dialer-app")
+            var app1 = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(app1SurfaceId);
 
             var countBeforeClose = topLevelSurfaceList.count;
@@ -2890,7 +2937,7 @@ Rectangle {
             swipeAwayGreeter();
 
             var app1SurfaceId = topLevelSurfaceList.nextId;
-            var app1 = ApplicationManager.startApplication("dialer-app")
+            var app1 = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(app1SurfaceId);
 
             var launcherDelegate1 = findChild(shell, "launcherDelegate1");
@@ -2952,7 +2999,7 @@ Rectangle {
             loadShell("desktop", 0);
 
             var appSurfaceId = topLevelSurfaceList.nextId;
-            var app = ApplicationManager.startApplication("dialer-app")
+            var app = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             // start dialer
@@ -2983,7 +3030,7 @@ Rectangle {
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             appSurfaceId = topLevelSurfaceList.nextId;
-            app = ApplicationManager.startApplication("dialer-app")
+            app = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             appSurfaceId = topLevelSurfaceList.nextId;
@@ -3000,7 +3047,7 @@ Rectangle {
             tryCompare(stage, "state", "spread");
 
             tryCompare(ApplicationManager, "count", 3);
-            tryCompareFunction(function() {return appRepeater.itemAt(spread.highlightedIndex).appId == "dialer-app"}, true);
+            tryCompareFunction(function() {return appRepeater.itemAt(spread.highlightedIndex).appId == "lomiri-dialer-app"}, true);
 
             // Close one app with Q while in spread
             keyClick(Qt.Key_Q);
@@ -3021,7 +3068,7 @@ Rectangle {
 
             // Now start the apps again
             appSurfaceId = topLevelSurfaceList.nextId;
-            app = ApplicationManager.startApplication("dialer-app");
+            app = ApplicationManager.startApplication("lomiri-dialer-app");
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             appSurfaceId = topLevelSurfaceList.nextId;
@@ -3053,7 +3100,7 @@ Rectangle {
             loadShell("desktop", 0);
 
             var appSurfaceId = topLevelSurfaceList.nextId;
-            var app = ApplicationManager.startApplication("dialer-app")
+            var app = ApplicationManager.startApplication("lomiri-dialer-app")
             waitUntilAppWindowIsFullyLoaded(appSurfaceId);
 
             // start dialer
@@ -3071,7 +3118,7 @@ Rectangle {
             tryCompare(appDelegate, "visible", true);
             tryCompare(appDelegate, "focus", true);
             tryCompare(topLevelSurfaceList.focusedWindow, "surface", appDelegate.surface);
-            tryCompare(topLevelSurfaceList.applicationAt(0), "appId", "dialer-app");
+            tryCompare(topLevelSurfaceList.applicationAt(0), "appId", "lomiri-dialer-app");
         }
 
         function test_touchMenuPosition_data() {
@@ -3127,7 +3174,7 @@ Rectangle {
             loadShell("desktop", 0);
 
             // start dialer
-            var appDelegate = startApplication("dialer-app")
+            var appDelegate = startApplication("lomiri-dialer-app")
             verify(appDelegate);
             tryCompare(appDelegate, "state", "normal");
 
@@ -3219,7 +3266,7 @@ Rectangle {
             loadShell("desktop", 0);
 
             var appDelegate = startApplication("gmail-webapp");
-            var appDelegate2 = startApplication("dialer-app");
+            var appDelegate2 = startApplication("lomiri-dialer-app");
 
             tryCompare(appDelegate2.surface, "activeFocus", true);
 

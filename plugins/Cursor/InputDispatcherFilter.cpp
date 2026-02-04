@@ -100,7 +100,7 @@ bool InputDispatcherFilter::eventFilter(QObject *o, QEvent *e)
                 } else if (newX <  screenRect.left()) { // left edge
                     Q_EMIT pushedLeftBoundary(currentScreen, qAbs(newX), me->buttons());
                     m_pushing = true;
-                } else if (newX >=  screenRect.right()) { // right edge
+                } else if (newX >= screenRect.right()) { // right edge
                     Q_EMIT pushedRightBoundary(currentScreen, newX - (screenRect.right() - 1), me->buttons());
                     m_pushing = true;
                 } else if (newY < screenRect.top() + pointer->topBoundaryOffset()) { // top edge
@@ -117,6 +117,28 @@ bool InputDispatcherFilter::eventFilter(QObject *o, QEvent *e)
             // Send the event
             QMouseEvent eCopy(me->type(), me->localPos(), newPos, me->button(), me->buttons(), me->modifiers());
             eCopy.setTimestamp(me->timestamp());
+            o->event(&eCopy);
+            return true;
+        }
+        // Adjust position for Wheel event the same way as mouse events
+        case QEvent::Wheel:
+        {
+            // if we don't have any pointers, filter all mouse events.
+            auto pointer = currentPointer();
+            if (!pointer || !pointer->window()) return true;
+
+            QWheelEvent* we = static_cast<QWheelEvent*>(e);
+
+            // Local position gives relative change of mouse pointer.
+            QPointF movement = we->position();
+
+            // Adjust the position
+            QPointF oldPos = pointer->window()->geometry().topLeft() + pointer->position();
+            QPointF newPos = adjustedPositionForMovement(oldPos, movement);
+
+            // Send the event
+            QWheelEvent eCopy(we->position(), newPos, we->pixelDelta(), we->angleDelta(), we->buttons(), we->modifiers(), we->phase(), we->inverted());
+            eCopy.setTimestamp(we->timestamp());
             o->event(&eCopy);
             return true;
         }

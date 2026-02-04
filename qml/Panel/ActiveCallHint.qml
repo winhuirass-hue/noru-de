@@ -26,16 +26,16 @@ Item {
     property bool greeterShown: false
 
     readonly property bool active: {
-        var application = ApplicationManager.findApplication("dialer-app");
+        var application = ApplicationManager.findApplication("lomiri-dialer-app");
 
         if (callManager.callIndicatorVisible) {
             // at the moment, callIndicatorVisible is only "valid" if dialer is in focus.
-            if (application && ApplicationManager.focusedApplicationId === "dialer-app") {
+            if (application && ApplicationManager.focusedApplicationId === "lomiri-dialer-app") {
                 // Don't show if application is still starting; might get a fleeting true/false.
                 return application.state !== ApplicationInfoInterface.Starting;
             }
         }
-        if (greeterShown || ApplicationManager.focusedApplicationId !== "dialer-app") {
+        if (greeterShown || ApplicationManager.focusedApplicationId !== "lomiri-dialer-app") {
             if (application) {
                 // Don't show if application is still starting; might get a fleeting true/false.
                 return application.state !== ApplicationInfoInterface.Starting && callManager.hasCalls;
@@ -44,7 +44,7 @@ Item {
         }
         return false;
     }
-    readonly property QtObject contactWatcher: _contactWatcher
+    readonly property QtObject contactWatcher: contactWatcherLoader.status == Loader.Ready ? contactWatcherLoader.item : null
     property int labelSwitchInterval: 6000
     implicitWidth: row.x + row.width
 
@@ -191,10 +191,18 @@ Item {
         }
     }
 
-    Telephony.ContactWatcher {
-        id: _contactWatcher
-        objectName: "contactWatcher"
-        phoneNumber: d.activeCall ? d.activeCall.phoneNumber : ""
+    Loader {
+        id: contactWatcherLoader
+        sourceComponent: callHint.active ? contactWatcherComp : null
+    }
+
+    Component {
+        id: contactWatcherComp
+        Telephony.ContactWatcher {
+            id: _contactWatcher
+            objectName: "contactWatcher"
+            phoneNumber: d.activeCall ? d.activeCall.phoneNumber : ""
+        }
     }
 
     QtObject {

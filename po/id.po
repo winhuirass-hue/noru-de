@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unity\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-06 08:14+0000\n"
-"PO-Revision-Date: 2023-12-06 00:23+0000\n"
-"Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
+"POT-Creation-Date: 2025-08-14 20:08+0000\n"
+"PO-Revision-Date: 2025-03-18 07:48+0000\n"
+"Last-Translator: Wachid Adi Nugroho <wachidadinugroho.maya@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/lomiri/lomiri/"
 "id/>\n"
 "Language: id\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.3-dev\n"
+"X-Generator: Weblate 5.11-dev\n"
 "X-Launchpad-Export-Date: 2016-11-23 06:35+0000\n"
 
 #: data/lomiri.desktop.in:4 qml/Components/KeyboardShortcutsOverlay.qml:55
@@ -26,31 +26,27 @@ msgstr "Lomiri"
 
 #: data/lomiri.desktop.in:5
 msgid "The converged Lomiri shell"
-msgstr ""
+msgstr "Konvergensi Lomiri shell"
 
 #: data/lomiri-greeter.desktop.in:4
 msgid "Lomiri Greeter"
-msgstr ""
+msgstr "Penyambut Lomiri"
 
 #: data/lomiri-greeter.desktop.in:5
 msgid "The converged Lomiri shell's Greeter"
-msgstr ""
+msgstr "Penyambut Konvergensi Lomiri shell"
 
 #: data/indicators-client.desktop.in:4
 msgid "Indicators Client"
-msgstr ""
+msgstr "Indikator Klien"
 
 #: data/indicators-client.desktop.in:5
 msgid "Application for testing the Indicators system"
-msgstr ""
-
-#: data/indicators-client.desktop.in:9
-msgid "NoDisplay=false"
-msgstr ""
+msgstr "Aplikasi untuk menguji sistem indikator"
 
 #: plugins/LightDM/Greeter.cpp:199
 msgid "Password: "
-msgstr "Sandi: "
+msgstr "Kata sandi: "
 
 #: plugins/LightDM/Greeter.cpp:214
 msgid "Username"
@@ -58,7 +54,7 @@ msgstr "Nama Pengguna"
 
 #: plugins/LightDM/Greeter.cpp:258
 msgid "Failed to authenticate"
-msgstr "Gagal Membuka kunci"
+msgstr "Gagal untuk mengautentikasi"
 
 #: plugins/LightDM/Greeter.cpp:260
 msgid "Invalid password, please try again"
@@ -72,11 +68,11 @@ msgstr "Masuk"
 msgid "Retry"
 msgstr "Coba lagi"
 
-#: plugins/LightDM/UsersModel.cpp:157
+#: plugins/LightDM/UsersModel.cpp:158
 msgid "Login"
 msgstr "Masuk"
 
-#: plugins/LightDM/UsersModel.cpp:165
+#: plugins/LightDM/UsersModel.cpp:166
 msgid "Guest Session"
 msgstr "Sesi tamu"
 
@@ -95,56 +91,56 @@ msgstr "Lepas pintasan"
 
 #: plugins/WindowManager/Screen.cpp:160
 msgid "Unknown"
-msgstr ""
+msgstr "Tidak Diketahui"
 
 #: plugins/WindowManager/Screen.cpp:162
 msgid "VGA"
-msgstr ""
+msgstr "VGA"
 
 #: plugins/WindowManager/Screen.cpp:166
 msgid "DVI"
-msgstr ""
+msgstr "DVI"
 
 #: plugins/WindowManager/Screen.cpp:168
 msgid "Composite"
-msgstr ""
+msgstr "Komposit"
 
 #: plugins/WindowManager/Screen.cpp:170
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: plugins/WindowManager/Screen.cpp:176
 msgid "Internal"
-msgstr ""
+msgstr "Internal"
 
 #: plugins/WindowManager/Screen.cpp:178
 msgid "Component"
-msgstr ""
+msgstr "Komponen"
 
 #: plugins/WindowManager/Screen.cpp:180
 msgid "DisplayPort"
-msgstr ""
+msgstr "DisplayPort"
 
 #: plugins/WindowManager/Screen.cpp:183
 msgid "HDMI"
-msgstr ""
+msgstr "HDMI"
 
 #: plugins/WindowManager/Screen.cpp:185
 msgid "TV"
-msgstr ""
+msgstr "TV"
 
 #: plugins/WindowManager/Screen.cpp:187
 msgid "Virtual"
-msgstr ""
+msgstr "Virtual"
 
 #: qml/Components/Dialogs.qml:176
 msgctxt "Title: Lock/Log out dialog"
 msgid "Log out"
-msgstr ""
+msgstr "Keluar"
 
 #: qml/Components/Dialogs.qml:177
 msgid "Are you sure you want to log out?"
-msgstr "Anda yakin ingin log keluar?"
+msgstr "Anda yakin ingin keluar?"
 
 #: qml/Components/Dialogs.qml:180
 msgctxt "Button: Lock the system"
@@ -154,7 +150,7 @@ msgstr "Kunci"
 #: qml/Components/Dialogs.qml:191
 msgctxt "Button: Log out from the system"
 msgid "Log Out"
-msgstr ""
+msgstr "Keluar"
 
 #: qml/Components/Dialogs.qml:199 qml/Components/Dialogs.qml:284
 #: qml/Greeter/GreeterView.qml:452 qml/Wizard/Pages/passcode-confirm.qml:32
@@ -182,7 +178,7 @@ msgstr "Ya"
 #: qml/Components/Dialogs.qml:243
 msgctxt "Title: Power off/Restart dialog"
 msgid "Power"
-msgstr ""
+msgstr "Daya"
 
 #: qml/Components/Dialogs.qml:244
 msgid ""
@@ -200,13 +196,11 @@ msgstr "Matikan daya"
 #: qml/Components/Dialogs.qml:263
 msgctxt "Button: Restart the system"
 msgid "Restart"
-msgstr "Booting ulang"
+msgstr "Mulai ulang"
 
 #: qml/Components/Dialogs.qml:276
-#, fuzzy
-#| msgid "Takes a screenshot."
 msgid "Screenshot"
-msgstr "Ambil tangkapan layar"
+msgstr "Tangkapan layar"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:41
 msgid "Keyboard Shortcuts"
@@ -214,258 +208,257 @@ msgstr "Pintasan papan ketik"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:62
 msgid "PrtScr"
-msgstr ""
+msgstr "PrtScr"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:67
 msgid "Takes a screenshot."
-msgstr "Ambil tangkapan layar"
+msgstr "Ambil tangkapan layar."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:75
 msgid "Alt + PrtScr"
-msgstr ""
+msgstr "Alt + PrtScr"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:80
 msgid "Takes a screenshot of the current window."
-msgstr ""
+msgstr "Ambil tangkapan layar dari jendela saat ini."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:88
 msgid "Super + Space"
-msgstr ""
+msgstr "Super + Spasi"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:93
 msgid "Switches to next keyboard layout."
-msgstr ""
+msgstr "Berganti ke tata letak papan ketik selanjutnya."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:101
 msgid "Super + Shift + Space"
-msgstr ""
+msgstr "Super + Shift + Spasi"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:106
 msgid "Switches to previous keyboard layout."
-msgstr ""
+msgstr "Berganti ke tata letak papan ketik sebelumnya."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:114
 msgid "Ctrl + Alt + T"
-msgstr ""
+msgstr "Ctrl + Alt + T"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:119
 msgid "Starts the Terminal application."
-msgstr ""
+msgstr "Memulai aplikasi Terminal."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:131
 msgid "Launcher"
-msgstr ""
+msgstr "Peluncur"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:138
 msgid "Super (Hold)"
-msgstr ""
+msgstr "Super (Tahan)"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:143
 msgid "Opens the launcher, displays shortcuts."
-msgstr ""
+msgstr "Buka peluncur, tampilkan pintasan."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:151
 msgid "Alt + F1"
-msgstr ""
+msgstr "Alt + F1"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:156
 msgid "Opens launcher keyboard navigation mode."
-msgstr ""
+msgstr "Buka peluncur mode navigasi papan ketik."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:164
 msgid "Super + Tab"
-msgstr ""
+msgstr "Super + Tab"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:169
 msgid "Switches applications via the launcher."
-msgstr ""
+msgstr "Berganti aplikasi melalui peluncur."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:177
 msgid "Super + 1 to 0"
-msgstr ""
+msgstr "Super + 1 sampai 0"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:182
 msgid "Same as clicking on a launcher icon."
-msgstr ""
+msgstr "Sama seperti mengklik pada ikon peluncur."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:190
 msgid "Super + A"
-msgstr ""
+msgstr "Super + A"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:195
 msgid "Opens the Application Drawer."
-msgstr ""
+msgstr "Buka Laci Aplikasi."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:211
 msgid "Switching"
-msgstr ""
+msgstr "Bertukar"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:218
 msgid "Alt + Tab"
-msgstr ""
+msgstr "Alt + Tab"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:223
 msgid "Switches between applications."
-msgstr ""
+msgstr "Bertukar antar aplikasi."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:231
 msgid "Super + W"
-msgstr ""
+msgstr "Super + W"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:236
 msgid "Opens the desktop spread."
-msgstr ""
+msgstr "Buka menyebar desktop."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:244
 msgid "Cursor Left or Right"
-msgstr ""
+msgstr "Kursor Kiri atau Kanan"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:249
 msgid "Moves the focus."
-msgstr ""
+msgstr "Pindahkan fokus."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:261
 msgid "Windows"
-msgstr ""
+msgstr "Jendela-jendela"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:268
 msgid "Ctrl + Super + D"
-msgstr ""
+msgstr "Ctrl + Super + D"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:273
 msgid "Minimizes all windows."
-msgstr ""
+msgstr "Minimalkan semua jendela."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:281
 msgid "Ctrl + Super + Up"
-msgstr ""
+msgstr "Ctrl + Super + Atas"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:286
 msgid "Maximizes the current window."
-msgstr ""
+msgstr "Maksimalkan jendela saat ini."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:294
 msgid "Ctrl + Super + Down"
-msgstr ""
+msgstr "Ctrl + Super + Bawah"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:299
 msgid "Minimizes or restores the current window."
-msgstr ""
+msgstr "Minimalkan atau kembalikan jendela saat ini."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:307
 msgid "Ctrl + Super + Left or Right"
-msgstr ""
+msgstr "Ctrl + Super + Kiri atau Kanan"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:312
 msgid "Semi-maximizes the current window."
-msgstr ""
+msgstr "Semi-maksimalkan jendela saat ini."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:320
 msgid "Alt + F4"
-msgstr ""
+msgstr "Alt + F4"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:325
 msgid "Closes the current window."
-msgstr ""
+msgstr "Tutup jendela saat ini."
 
-#: qml/Components/Lockscreen.qml:214 qml/Greeter/GreeterView.qml:472
+#: qml/Components/Lockscreen.qml:223 qml/Greeter/GreeterView.qml:472
 msgid "Return to Call"
 msgstr "Kembali ke Panggilan"
 
-#: qml/Components/Lockscreen.qml:214
+#: qml/Components/Lockscreen.qml:223
 msgid "Emergency Call"
 msgstr "Panggilan Darurat"
 
-#: qml/Components/Lockscreen.qml:247
+#: qml/Components/Lockscreen.qml:256
 msgid "OK"
-msgstr "OK"
+msgstr "Oke"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:33
 msgid "Apps may have unsaved data:"
-msgstr ""
+msgstr "Aplikasi mungkin mempunyai data yang belum tersimpan:"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:60
 msgctxt ""
 "Re-dock means connect the device again to an external screen/mouse/keyboard"
 msgid "Re-dock, save your work and close these apps to continue."
 msgstr ""
+"Kaitkan ulang, simpan pekerjaanmu dan tutup aplikasinya untuk melanjutkan."
 
 #: qml/Components/ModeSwitchWarningDialog.qml:67
 msgid "Or force close now (unsaved data will be lost)."
-msgstr ""
+msgstr "Atau paksa tutup sekarang (data yang belum tersimpan akan hilang)."
 
 #: qml/Components/ModeSwitchWarningDialog.qml:80
 msgid "OK, I will reconnect"
-msgstr ""
+msgstr "Oke, Saya akan menyambungkan lagi"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:81
 msgid "Reconnect now!"
-msgstr ""
+msgstr "Sambungkan lagi sekarang!"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:94
 msgid "Close all"
-msgstr ""
+msgstr "Tutup semua"
 
 #: qml/Components/SharingPicker.qml:54
 msgid "Preview Share Item"
-msgstr ""
+msgstr "Pratinjau Perihal yang Dibagikan"
 
-#: qml/Components/VirtualTouchPad.qml:312
+#: qml/Components/VirtualTouchPad.qml:343
 msgid ""
 "Your device is now connected to an external display. Use this screen as a "
 "touch pad to interact with the pointer."
 msgstr ""
+"Perangkan anda sekarang terhubung ke penampil luar. Gunakan layar ini "
+"sebagai papan sentuh untuk berinteraksi dengan penunjuknya."
 
-#: qml/Components/VirtualTouchPad.qml:322
-#, fuzzy
-#| msgid "Tap to return to call..."
+#: qml/Components/VirtualTouchPad.qml:353
 msgid "Tap left button to click."
-msgstr "Ketuk untuk kembali ke panggilan..."
+msgstr "Ketuk tombol kiri untuk klik."
 
-#: qml/Components/VirtualTouchPad.qml:334
+#: qml/Components/VirtualTouchPad.qml:365
 msgid "Tap right button to right click."
-msgstr ""
+msgstr "Ketuk tombol kanan untuk klik."
 
-#: qml/Components/VirtualTouchPad.qml:346
+#: qml/Components/VirtualTouchPad.qml:377
 msgid "Swipe with two fingers to scroll."
-msgstr ""
+msgstr "Usap dengan dua jari untuk gulir."
 
-#: qml/Components/VirtualTouchPad.qml:391
+#: qml/Components/VirtualTouchPad.qml:422
 msgid "Find more settings in the system settings."
-msgstr ""
+msgstr "Temukan pengaturan tambahan pada pengaturan sistem."
 
-#: qml/Greeter/CoverPage.qml:160
+#: qml/Greeter/CoverPage.qml:161
 msgid "Fully charged"
-msgstr ""
+msgstr "Sudah dicas penuh"
 
-#: qml/Greeter/CoverPage.qml:168
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1095
+#: qml/Greeter/CoverPage.qml:169
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1104
 #, qt-format
 msgid "%1 hour"
 msgid_plural "%1 hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 jam"
 
-#: qml/Greeter/CoverPage.qml:171
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1099
+#: qml/Greeter/CoverPage.qml:172
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1108
 #, qt-format
 msgid "%1 minute"
 msgid_plural "%1 minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 menit"
 
-#: qml/Greeter/CoverPage.qml:178
+#: qml/Greeter/CoverPage.qml:179
 #, qt-format
 msgid "%1, %2 until full"
-msgstr ""
+msgstr "%1, %2 sampai penuh"
 
-#: qml/Greeter/CoverPage.qml:181
+#: qml/Greeter/CoverPage.qml:182
 #, qt-format
 msgid "%1 until full"
-msgstr ""
+msgstr "%1 sampai penuh"
 
-#: qml/Greeter/CoverPage.qml:197
-#: tests/qmltests/Greeter/tst_GreeterView.qml:1239
+#: qml/Greeter/CoverPage.qml:198
+#: tests/qmltests/Greeter/tst_GreeterView.qml:1242
 msgid "Unlock"
 msgstr "Buka kunci"
 
@@ -487,65 +480,59 @@ msgstr ""
 #, qt-format
 msgid "Please wait %1 minute and then try again…"
 msgid_plural "Please wait %1 minutes and then try again…"
-msgstr[0] "Harap tunggu %1 menit lalu coba lagi..."
+msgstr[0] "Harap tunggu %1 menit dan lalu coba lagi…"
 
-#: qml/Greeter/Greeter.qml:627 tests/qmltests/Greeter/tst_Greeter.qml:578
+#: qml/Greeter/Greeter.qml:637 tests/qmltests/Greeter/tst_Greeter.qml:578
 #: tests/qmltests/Greeter/tst_Greeter.qml:597
 #: tests/qmltests/Greeter/tst_Greeter.qml:625
 #: tests/qmltests/Greeter/tst_Greeter.qml:637
 msgid "Try again"
-msgstr ""
+msgstr "Coba lagi"
 
-#: qml/Greeter/Greeter.qml:628 tests/qmltests/Greeter/tst_Greeter.qml:552
+#: qml/Greeter/Greeter.qml:638 tests/qmltests/Greeter/tst_Greeter.qml:552
 #: tests/qmltests/Greeter/tst_Greeter.qml:603
-#, fuzzy
-#| msgid "Enter passphrase"
 msgid "Enter passphrase to unlock"
-msgstr "Masukkan frasa sandi"
+msgstr "Masukkan frasa sandi untuk membuka kunci"
 
-#: qml/Greeter/Greeter.qml:629
-#, fuzzy
-#| msgid "Enter passcode"
+#: qml/Greeter/Greeter.qml:639
 msgid "Enter passcode to unlock"
-msgstr "Masukkan kode sandi"
+msgstr "Masukkan kode sandi untuk membuka kunci"
 
 #: qml/Greeter/GreeterView.qml:472
 msgid "Emergency"
-msgstr ""
+msgstr "Darurat"
 
 #: qml/Greeter/PromptList.qml:143
 msgid "Passphrase"
-msgstr ""
+msgstr "Frasa sandi"
 
 #: qml/Greeter/PromptList.qml:143
 msgid "Passcode"
-msgstr ""
+msgstr "Kode sandi"
 
 #: qml/Greeter/SessionsList.qml:124
 msgid "Select desktop environment"
-msgstr ""
+msgstr "Pilih lingkungan desktop"
 
 #: qml/Launcher/Drawer.qml:240
-#, fuzzy
-#| msgid "Search"
 msgid "Search…"
-msgstr "Cari"
+msgstr "Cari…"
 
 #: qml/Launcher/PullToRefreshScopeStyle.qml:56
 msgid "Pull to refresh…"
-msgstr "Tarik untuk menyegarkan..."
+msgstr "Tarik untuk menyegarkan…"
 
 #: qml/Launcher/PullToRefreshScopeStyle.qml:61
 msgid "Release to refresh…"
-msgstr "Lepas untuk menyegarkan..."
+msgstr "Lepas untuk menyegarkan…"
 
 #: qml/Notifications/NotificationMenuItemFactory.qml:124
 msgid "Show password"
 msgstr "Tampilkan sandi"
 
-#: qml/Notifications/Notification.qml:322
+#: qml/Notifications/Notification.qml:318
 msgid "New message"
-msgstr ""
+msgstr "Pesan baru"
 
 #: qml/Panel/ActiveCallHint.qml:79
 msgid "Tap to return to call..."
@@ -555,47 +542,46 @@ msgstr "Ketuk untuk kembali ke panggilan..."
 msgid "Conference"
 msgstr "Konferensi"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:967
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:975
 msgid "Nothing is playing"
 msgstr "Tak ada yang sedang diputar"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1104
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1113
 #, qt-format
 msgid "%1 second"
 msgid_plural "%1 seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 detik"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1107
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1116
 msgid "0 seconds"
-msgstr ""
+msgstr "0 detik"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1109
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1118
 #, qt-format
 msgid "%1 remaining"
-msgstr ""
+msgstr "%1 tersisa"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1115
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1129
 msgid "In queue…"
-msgstr "Dalam antrian..."
+msgstr "Dalam antrian…"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1119
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1133
 msgid "Downloading"
-msgstr "Sedang mengunduh"
+msgstr "Sedang Mengunduh"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1121
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1135
 msgid "Paused, tap to resume"
-msgstr "Jeda, ketuk untuk melanjutkan"
+msgstr "Dijeda, ketuk untuk melanjutkan"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1123
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1137
 msgid "Canceled"
 msgstr "Dibatalkan"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1125
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1139
 msgid "Finished"
 msgstr "Selesai"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1127
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1141
 msgid "Failed, tap to retry"
 msgstr "Gagal, ketuk untuk mencoba ulang"
 
@@ -603,60 +589,60 @@ msgstr "Gagal, ketuk untuk mencoba ulang"
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:210
 msgctxt "Button: Send a reply message"
 msgid "Send"
-msgstr ""
+msgstr "Kirim"
 
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:152
 msgctxt "Label: Hint in message indicator line edit"
 msgid "Reply"
-msgstr ""
+msgstr "Balas"
 
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:209
 msgctxt "Button: Call back on phone"
 msgid "Call back"
-msgstr ""
+msgstr "Panggil kembali"
 
-#: qml/Panel/PanelMenuPage.qml:92
+#: qml/Panel/PanelMenuPage.qml:93
 msgid "Back"
 msgstr "Kembali"
 
-#: qml/Stage/SideStage.qml:80
+#: qml/Stage/SideStage.qml:81
 msgid "Drag using 3 fingers any application from one window to the other"
 msgstr ""
+"Tarik menggunakan 3 jari aplikasi apapun dari satu jendela ke yang lainnya"
 
-#: qml/Stage/Stage.qml:834
+#: qml/Stage/Stage.qml:902
 msgid "No running apps"
-msgstr ""
+msgstr "Tidak ada aplikasi yang sedang berjalan"
 
 #: qml/Tutorial/TutorialLeftLong.qml:49
-#, fuzzy
-#| msgid "Try swiping from the top edge to access the indicators"
 msgid "Long swipe from the left edge to open the Application Drawer"
-msgstr "Coba usap dari tepi atas untuk mengakses indikator"
+msgstr "Usap panjang dari tepi kiri untuk membuka Laci Aplikasi"
 
 #: qml/Tutorial/TutorialLeft.qml:47
 msgid "Short swipe from the left edge to open the launcher"
-msgstr ""
+msgstr "Usap pendek dari tepi kiri untuk membuka peluncurnya"
 
 #: qml/Tutorial/TutorialRight.qml:54
 msgid "Push your mouse against the right edge to view your open apps"
 msgstr ""
+"Dorong tetikusmu ke arah tepi kanan untuk melihat aplikasimu yang terbuka"
 
 #: qml/Tutorial/TutorialRight.qml:55
 msgid "Swipe from the right edge to view your open apps"
-msgstr ""
+msgstr "Usap dari tepi kanan untuk melihat aplikasimu yang terbuka"
 
 #: qml/Tutorial/TutorialTop.qml:53
 msgid "Swipe from the top edge to access notifications and quick settings"
-msgstr ""
+msgstr "Usap dari tepi atas untuk mengakses notifikasi dan pengaturan cepat"
 
 #: qml/Wizard/Page.qml:59
 msgctxt "Button: Go back one page in the Wizard"
 msgid "Back"
-msgstr ""
+msgstr "Kembali"
 
 #: qml/Wizard/Pages/10-welcome.qml:29
 msgid "Language"
-msgstr ""
+msgstr "Bahasa"
 
 #: qml/Wizard/Pages/10-welcome.qml:176
 #: qml/Wizard/Pages/10-welcome-update.qml:128
@@ -666,259 +652,265 @@ msgstr ""
 #: qml/Wizard/Pages/passcode-desktop.qml:154
 #: qml/Wizard/Pages/password-set.qml:153
 msgid "Next"
-msgstr ""
+msgstr "Selanjutnya"
 
 #. TRANSLATORS: %1 contains the distro name, %2 the version
 #: qml/Wizard/Pages/10-welcome-update.qml:92
 #, qt-format
 msgid "Welcome to %1 %2"
-msgstr ""
+msgstr "Selamat datang di %1 %2"
 
 #. TRANSLATORS: %1 contains the distro name, %2 the version
 #: qml/Wizard/Pages/10-welcome-update.qml:108
 #, qt-format
 msgid "We will make sure your device is ready to use %1 %2"
-msgstr ""
+msgstr "Kami akan memastikan perangkat anda siap digunakan %1 %2"
 
 #: qml/Wizard/Pages/11-changelog.qml:28
 msgid "What's new"
-msgstr ""
+msgstr "Apa yang baru"
 
 #: qml/Wizard/Pages/11-changelog.qml:74
-#, fuzzy
 msgid "Loading..."
-msgstr "Berbicara..."
+msgstr "Memuat..."
 
 #: qml/Wizard/Pages/20-keyboard.qml:31
 msgid "Select Keyboard"
-msgstr ""
+msgstr "Pilih Papan Ketik"
 
 #: qml/Wizard/Pages/20-keyboard.qml:71
 msgid "Keyboard language"
-msgstr ""
+msgstr "Bahasa papan ketik"
 
 #: qml/Wizard/Pages/20-keyboard.qml:93
 msgid "Keyboard layout"
-msgstr ""
+msgstr "Tata letak papan ketik"
 
 #: qml/Wizard/Pages/20-keyboard.qml:152 qml/Wizard/Pages/30-wifi.qml:213
-#: qml/Wizard/Pages/60-account.qml:72 qml/Wizard/Pages/79-system-update.qml:144
+#: qml/Wizard/Pages/60-account.qml:72 qml/Wizard/Pages/79-system-update.qml:164
 #: qml/Wizard/Pages/sim.qml:101
 msgid "Skip"
-msgstr ""
+msgstr "Lewati"
 
 #: qml/Wizard/Pages/30-wifi.qml:31
 msgid "Connect to Wi‑Fi"
-msgstr ""
+msgstr "Hubungkan ke Wi-Fi"
 
 #: qml/Wizard/Pages/30-wifi.qml:139
 msgid "Connected"
-msgstr ""
+msgstr "Terhubung"
 
 #: qml/Wizard/Pages/30-wifi.qml:172
 msgid "Available Wi-Fi networks"
-msgstr ""
+msgstr "Jaringan Wi-Fi yang tersedia"
 
 #: qml/Wizard/Pages/30-wifi.qml:173
 msgid "No available Wi-Fi networks"
-msgstr ""
+msgstr "Jaringan Wi-Fi tidak tersedia"
 
 #: qml/Wizard/Pages/50-timezone.qml:30
 msgid "Time Zone"
-msgstr ""
+msgstr "Zona Waktu"
 
 #: qml/Wizard/Pages/50-timezone.qml:182
 msgid "Enter your city"
-msgstr ""
+msgstr "Masukkan kota anda"
 
 #: qml/Wizard/Pages/60-account.qml:24
 msgid "Personalize Your Device"
-msgstr ""
+msgstr "Personalisasikan Perangkat Anda"
 
 #: qml/Wizard/Pages/60-account.qml:54
 msgid "Preferred Name"
-msgstr ""
+msgstr "Nama yang disukai"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:40
 msgid "Lock Screen"
-msgstr ""
+msgstr "Kunci Layar"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:103
 msgctxt "Label: Type of security method"
 msgid "Create new password"
-msgstr ""
+msgstr "Buat kata sandi baru"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:105
 msgctxt "Label: Type of security method"
 msgid "Create passcode (numbers only)"
-msgstr ""
+msgstr "Buat kode sandi (hanya angka)"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:107
 msgctxt "Label: Type of security method"
 msgid "No lock code"
-msgstr ""
+msgstr "Tanpa kode kunci"
 
-#: qml/Wizard/Pages/79-system-update.qml:28
+#: qml/Wizard/Pages/79-system-update.qml:30
 msgid "Update Device"
-msgstr ""
+msgstr "Perbarui Perangkat"
 
-#: qml/Wizard/Pages/79-system-update.qml:55
+#: qml/Wizard/Pages/79-system-update.qml:57
 msgid ""
 "There is a system update available and ready to install. Afterwards, the "
 "device will automatically restart."
 msgstr ""
+"Tersedia pembaruan sistem dan siap untuk dipasang. Setelah itu, perangkat "
+"akan memulai ulang secara otomatis."
 
-#: qml/Wizard/Pages/79-system-update.qml:76
+#: qml/Wizard/Pages/79-system-update.qml:96
 msgctxt "string identifying name of the update"
 msgid "Ubuntu Touch system"
-msgstr ""
+msgstr "Sistem Ubuntu Touch"
 
-#: qml/Wizard/Pages/79-system-update.qml:83
+#: qml/Wizard/Pages/79-system-update.qml:103
 #, qt-format
 msgctxt "version of the system update"
 msgid "Version %1"
-msgstr ""
+msgstr "Versi %1"
 
-#: qml/Wizard/Pages/79-system-update.qml:95
+#: qml/Wizard/Pages/79-system-update.qml:115
 msgid "This could take a few minutes..."
-msgstr ""
+msgstr "Ini mungkin memakan waktu beberapa menit..."
 
-#: qml/Wizard/Pages/79-system-update.qml:109
+#: qml/Wizard/Pages/79-system-update.qml:129
 msgid "Install and restart now"
-msgstr ""
+msgstr "Pasang dan mulai ulang sekarang"
 
 #: qml/Wizard/Pages/80-finished.qml:93
 msgid "Welcome Back"
-msgstr ""
+msgstr "Selamat Datang Kembali"
 
 #. TRANSLATORS: %1 contains the distro name
 #: qml/Wizard/Pages/80-finished.qml:95
 #, qt-format
 msgid "Welcome to %1"
-msgstr ""
+msgstr "Selamat datang di %1"
 
 #: qml/Wizard/Pages/80-finished.qml:111
 msgid "You are ready to use your device now"
-msgstr ""
+msgstr "Anda siap untuk menggunakan perangkat anda sekarang"
 
 #: qml/Wizard/Pages/80-finished.qml:131
 msgid "Continue"
-msgstr ""
+msgstr "Melanjutkan"
 
 #: qml/Wizard/Pages/80-finished.qml:131
 msgid "Get Started"
-msgstr ""
+msgstr "Memulai"
 
 #: qml/Wizard/Pages/passcode-confirm.qml:43
 #: qml/Wizard/Pages/passcode-desktop.qml:104
 msgid "Confirm passcode"
-msgstr ""
+msgstr "Konfirmasi kode sandi"
 
 #: qml/Wizard/Pages/passcode-confirm.qml:45
 msgid "Incorrect passcode."
-msgstr ""
+msgstr "Kode sandi tidak tepat."
 
 #: qml/Wizard/Pages/passcode-confirm.qml:45
 msgctxt "Enter the passcode again"
 msgid "Please re-enter."
-msgstr ""
+msgstr "Harap masukkan ulang."
 
 #: qml/Wizard/Pages/passcode-desktop.qml:31
 msgid "Lock Screen Passcode"
-msgstr ""
+msgstr "Kode Sandi Pengunci Layar"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:68
 msgid "Enter at least 4 numbers to setup your passcode"
-msgstr ""
+msgstr "Masukkan setidaknya 4 angka untuk menyetel kode sandi anda"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:84
 #: qml/Wizard/Pages/passcode-set.qml:54
 msgid "Choose passcode"
-msgstr ""
+msgstr "Pilih kode sandi"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:139
 msgid "Passcode too short"
-msgstr ""
+msgstr "Kode sandi terlalu pendek"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:141
 msgid "Passcodes match"
-msgstr ""
+msgstr "Kode sandi cocok"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:143
 msgid "Passcodes do not match"
-msgstr ""
+msgstr "Kode sandi tidak cocok"
 
 #: qml/Wizard/Pages/passcode-set.qml:62
 msgid "Passcode must be at least 4 characters long"
-msgstr ""
+msgstr "Kode sandi harus setidaknya 4 karakter panjangnya"
 
 #: qml/Wizard/Pages/password-set.qml:31
 msgid "Lock Screen Password"
-msgstr ""
+msgstr "Kata Sandi Pengunci Layar"
 
 #: qml/Wizard/Pages/password-set.qml:68
 msgid "Enter at least 8 characters"
-msgstr ""
+msgstr "Masukkan setidaknya 8 karakter"
 
 #: qml/Wizard/Pages/password-set.qml:80
 msgid "Choose password"
-msgstr ""
+msgstr "Pilih kata sandi"
 
 #: qml/Wizard/Pages/password-set.qml:110
 msgid "Confirm password"
-msgstr ""
+msgstr "Konfirmasi kata sandi"
 
 #: qml/Wizard/Pages/sim.qml:27
 msgid "No SIM card installed"
-msgstr ""
+msgstr "Tidak ada kartu SIM yang terpasang"
 
 #: qml/Wizard/Pages/sim.qml:54
 msgid "SIM card added"
-msgstr ""
+msgstr "Kartu SIM ditambahkan"
 
 #: qml/Wizard/Pages/sim.qml:55
 msgid "You must restart the device to access the mobile network."
-msgstr ""
+msgstr "Anda harus memulai ulang perangkat untuk mengakses jaringan seluler."
 
 #: qml/Wizard/Pages/sim.qml:59
 msgid "Restart"
-msgstr "Nyalakan ulang"
+msgstr "Memulai ulang"
 
 #: qml/Wizard/Pages/sim.qml:78
 msgid "You won’t be able to make calls or use text messaging without a SIM."
 msgstr ""
+"Anda tidak akan bisa untuk membuat panggilan atau menggunakan pesan teks "
+"tanpa SIM."
 
 #: qml/Wizard/Pages/sim.qml:90
 msgid "To proceed with no SIM tap Skip."
-msgstr ""
+msgstr "Untuk memproses tanpa SIM ketuk Lewati."
 
 #: qml/Wizard/PasswordMeter.qml:87
 msgid "Password too short"
-msgstr ""
+msgstr "Kata sandi terlalu pendek"
 
 #: qml/Wizard/PasswordMeter.qml:89
 msgid "Passwords match"
-msgstr ""
+msgstr "Kata sandi cocok"
 
 #: qml/Wizard/PasswordMeter.qml:91
 msgid "Passwords do not match"
-msgstr ""
+msgstr "Kata sandi tidak cocok"
 
 #: qml/Wizard/PasswordMeter.qml:95
 msgid "Strong password"
-msgstr ""
+msgstr "Kata sandi kuat"
 
 #: qml/Wizard/PasswordMeter.qml:97
 msgid "Fair password"
-msgstr ""
+msgstr "Kata sandi sedang"
 
 #: qml/Wizard/PasswordMeter.qml:99
 msgid "Weak password"
-msgstr ""
+msgstr "Kata sandi lemah"
 
 #: qml/Wizard/PasswordMeter.qml:101
 msgid "Very weak password"
-msgstr ""
+msgstr "Kata sandi sangat lemah"
+
+#~ msgid "NoDisplay=false"
+#~ msgstr "NoDisplay=false"
 
 #~ msgid "Remove from Favorites"
 #~ msgstr "Hapus dari Favorit"

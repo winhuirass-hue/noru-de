@@ -408,7 +408,6 @@ FocusScope {
         objectName: "drawer"
         anchors {
             top: parent.top
-            topMargin: root.inverted ? root.topPanelHeight : 0
             bottom: parent.bottom
             right: parent.left
         }
@@ -451,7 +450,7 @@ FocusScope {
             bottom: parent.bottom
         }
         x: -width
-        visible: root.x > 0 || x > -width || dragArea.pressed
+        visible: root.x > 0 || x > -width || dragArea.pressed || panel.hasPeekingIcon
         lightMode: root.lightMode
         model: LauncherModel
 
@@ -609,6 +608,10 @@ FocusScope {
                 }
             }
             lastDragPoints = [];
+        }
+
+        GestureAreaSizeHint {
+            anchors.fill: parent
         }
     }
 

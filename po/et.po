@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unity8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-06 08:14+0000\n"
-"PO-Revision-Date: 2023-01-04 18:22+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"POT-Creation-Date: 2025-08-14 20:08+0000\n"
+"PO-Revision-Date: 2025-12-25 03:39+0000\n"
+"Last-Translator: Priit Jõerüüt <jrthwlate@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Estonian <https://hosted.weblate.org/projects/lomiri/lomiri/"
 "et/>\n"
 "Language: et\n"
@@ -17,73 +17,69 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15.1-dev\n"
+"X-Generator: Weblate 5.15.1\n"
 "X-Launchpad-Export-Date: 2017-04-07 06:30+0000\n"
 
 #: data/lomiri.desktop.in:4 qml/Components/KeyboardShortcutsOverlay.qml:55
 msgid "Lomiri"
-msgstr ""
+msgstr "Lomiri"
 
 #: data/lomiri.desktop.in:5
 msgid "The converged Lomiri shell"
-msgstr ""
+msgstr "Eri seadmetele kohanduv Lomiri kasutajaliides"
 
 #: data/lomiri-greeter.desktop.in:4
 msgid "Lomiri Greeter"
-msgstr ""
+msgstr "Lomiri tervitusvaade"
 
 #: data/lomiri-greeter.desktop.in:5
 msgid "The converged Lomiri shell's Greeter"
-msgstr ""
+msgstr "Eri seadmetele kohanduva Lomiri kasutajaliidese tervitusvaade"
 
 #: data/indicators-client.desktop.in:4
 msgid "Indicators Client"
-msgstr ""
+msgstr "Indikaatorite klient"
 
 #: data/indicators-client.desktop.in:5
 msgid "Application for testing the Indicators system"
-msgstr ""
-
-#: data/indicators-client.desktop.in:9
-msgid "NoDisplay=false"
-msgstr ""
+msgstr "Rakendus, mis on mõeldud indikaatorite süsteemi testimiseks"
 
 #: plugins/LightDM/Greeter.cpp:199
 msgid "Password: "
-msgstr "Parool: "
+msgstr "Salasõna: "
 
 #: plugins/LightDM/Greeter.cpp:214
 msgid "Username"
-msgstr ""
+msgstr "Kasutajanimi"
 
 #: plugins/LightDM/Greeter.cpp:258
 msgid "Failed to authenticate"
-msgstr ""
+msgstr "Autentimine ei õnnestunud"
 
 #: plugins/LightDM/Greeter.cpp:260
 msgid "Invalid password, please try again"
-msgstr ""
+msgstr "Vigane salasõna, palun proovi uuesti"
 
 #: plugins/LightDM/Greeter.cpp:270
 msgid "Log In"
-msgstr ""
+msgstr "Logi sisse"
 
 #: plugins/LightDM/Greeter.cpp:270
 msgid "Retry"
-msgstr ""
+msgstr "Proovi uuesti"
 
-#: plugins/LightDM/UsersModel.cpp:157
+#: plugins/LightDM/UsersModel.cpp:158
 msgid "Login"
-msgstr ""
+msgstr "Logi sisse"
 
-#: plugins/LightDM/UsersModel.cpp:165
+#: plugins/LightDM/UsersModel.cpp:166
 msgid "Guest Session"
-msgstr ""
+msgstr "Külalissessioon"
 
 #: plugins/Lomiri/Launcher/launcheritem.cpp:48
 #: plugins/Lomiri/Launcher/launcheritem.cpp:122
 msgid "Pin shortcut"
-msgstr ""
+msgstr "Kinnita otsetee"
 
 #: plugins/Lomiri/Launcher/launcheritem.cpp:54
 msgid "Quit"
@@ -91,51 +87,51 @@ msgstr "Välju"
 
 #: plugins/Lomiri/Launcher/launcheritem.cpp:122
 msgid "Unpin shortcut"
-msgstr ""
+msgstr "Eemalda otsetee kinnitus"
 
 #: plugins/WindowManager/Screen.cpp:160
 msgid "Unknown"
-msgstr ""
+msgstr "Pole teada"
 
 #: plugins/WindowManager/Screen.cpp:162
 msgid "VGA"
-msgstr ""
+msgstr "VGA"
 
 #: plugins/WindowManager/Screen.cpp:166
 msgid "DVI"
-msgstr ""
+msgstr "DVI"
 
 #: plugins/WindowManager/Screen.cpp:168
 msgid "Composite"
-msgstr ""
+msgstr "Komposiitvideo"
 
 #: plugins/WindowManager/Screen.cpp:170
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: plugins/WindowManager/Screen.cpp:176
 msgid "Internal"
-msgstr ""
+msgstr "Sisene"
 
 #: plugins/WindowManager/Screen.cpp:178
 msgid "Component"
-msgstr ""
+msgstr "Komponentvideo"
 
 #: plugins/WindowManager/Screen.cpp:180
 msgid "DisplayPort"
-msgstr ""
+msgstr "DisplayPort"
 
 #: plugins/WindowManager/Screen.cpp:183
 msgid "HDMI"
-msgstr ""
+msgstr "HDMI"
 
 #: plugins/WindowManager/Screen.cpp:185
 msgid "TV"
-msgstr ""
+msgstr "TV"
 
 #: plugins/WindowManager/Screen.cpp:187
 msgid "Virtual"
-msgstr ""
+msgstr "Virtuaalne"
 
 #: qml/Components/Dialogs.qml:176
 msgctxt "Title: Lock/Log out dialog"
@@ -144,12 +140,12 @@ msgstr "Logi välja"
 
 #: qml/Components/Dialogs.qml:177
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Kas sa oled kindel, et soovid logida välja?"
 
 #: qml/Components/Dialogs.qml:180
 msgctxt "Button: Lock the system"
 msgid "Lock"
-msgstr ""
+msgstr "Lukusta"
 
 #: qml/Components/Dialogs.qml:191
 msgctxt "Button: Log out from the system"
@@ -159,9 +155,8 @@ msgstr "Logi välja"
 #: qml/Components/Dialogs.qml:199 qml/Components/Dialogs.qml:284
 #: qml/Greeter/GreeterView.qml:452 qml/Wizard/Pages/passcode-confirm.qml:32
 #: qml/Wizard/Pages/passcode-set.qml:32
-#, fuzzy
 msgid "Cancel"
-msgstr "Cancel"
+msgstr "Katkesta"
 
 #: qml/Components/Dialogs.qml:211
 msgctxt "Title: Reboot dialog"
@@ -170,7 +165,7 @@ msgstr "Taaskäivita"
 
 #: qml/Components/Dialogs.qml:212
 msgid "Are you sure you want to reboot?"
-msgstr ""
+msgstr "Kas sa oled kindel, et soovid taaskäivitada?"
 
 #: qml/Components/Dialogs.qml:215
 msgid "No"
@@ -183,13 +178,15 @@ msgstr "Jah"
 #: qml/Components/Dialogs.qml:243
 msgctxt "Title: Power off/Restart dialog"
 msgid "Power"
-msgstr ""
+msgstr "Toitenupp"
 
 #: qml/Components/Dialogs.qml:244
 msgid ""
 "Are you sure you would like\n"
 "to power off?"
 msgstr ""
+"Kas oled kindel, et soovid\n"
+"nutiseadme välja lülitada?"
 
 #: qml/Components/Dialogs.qml:248
 msgctxt "Button: Power off the system"
@@ -203,446 +200,453 @@ msgstr "Taaskäivita"
 
 #: qml/Components/Dialogs.qml:276
 msgid "Screenshot"
-msgstr ""
+msgstr "Ekraanitõmmis"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:41
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Klaviatuuri kiirklahvid"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:62
 msgid "PrtScr"
-msgstr ""
+msgstr "PrtScr"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:67
 msgid "Takes a screenshot."
-msgstr ""
+msgstr "Teeb ekraanitõmmise."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:75
 msgid "Alt + PrtScr"
-msgstr ""
+msgstr "Alt + PrtScr"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:80
 msgid "Takes a screenshot of the current window."
-msgstr ""
+msgstr "Teeb ekraanitõmmise aktiivsest aknast."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:88
 msgid "Super + Space"
-msgstr ""
+msgstr "Super + tühikuklahv"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:93
 msgid "Switches to next keyboard layout."
-msgstr ""
+msgstr "Vahetab järgmisele klahvistikupaigutusele."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:101
 msgid "Super + Shift + Space"
-msgstr ""
+msgstr "Super + Shift + tühikuklahv"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:106
 msgid "Switches to previous keyboard layout."
-msgstr ""
+msgstr "Lülitab tagasi eelmisele klahvistikupaigutusele."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:114
 msgid "Ctrl + Alt + T"
-msgstr ""
+msgstr "Ctrl + Alt + T"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:119
 msgid "Starts the Terminal application."
-msgstr ""
+msgstr "Käivitab terminalirakenduse."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:131
 msgid "Launcher"
-msgstr ""
+msgstr "Käivitaja"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:138
 msgid "Super (Hold)"
-msgstr ""
+msgstr "Super (hoia sees)"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:143
 msgid "Opens the launcher, displays shortcuts."
-msgstr ""
+msgstr "Avab käivitaja, näitab kiirklahve."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:151
 msgid "Alt + F1"
-msgstr ""
+msgstr "Alt + F1"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:156
 msgid "Opens launcher keyboard navigation mode."
-msgstr ""
+msgstr "Avab käivitaja klahvistikult juhitavas vaates."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:164
 msgid "Super + Tab"
-msgstr ""
+msgstr "Super + Tab"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:169
 msgid "Switches applications via the launcher."
-msgstr ""
+msgstr "Vahetab rakenduse käivitaja kaudu."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:177
 msgid "Super + 1 to 0"
-msgstr ""
+msgstr "Super + 1 kuni 0"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:182
 msgid "Same as clicking on a launcher icon."
-msgstr ""
+msgstr "Sama, kui käivitaja ikooni klõpsimine."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:190
 msgid "Super + A"
-msgstr ""
+msgstr "Super + A"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:195
 msgid "Opens the Application Drawer."
-msgstr ""
+msgstr "Avan rakenduste laeka."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:211
 msgid "Switching"
-msgstr ""
+msgstr "Vaadete vahetamine"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:218
 msgid "Alt + Tab"
-msgstr ""
+msgstr "Alt + Tab"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:223
 msgid "Switches between applications."
-msgstr ""
+msgstr "Liigub avatud rakenduste vahel."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:231
 msgid "Super + W"
-msgstr ""
+msgstr "Super + W"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:236
 msgid "Opens the desktop spread."
-msgstr ""
+msgstr "Avan töölaua laienduse."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:244
 msgid "Cursor Left or Right"
-msgstr ""
+msgstr "Kursor vasakule või paremale"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:249
 msgid "Moves the focus."
-msgstr ""
+msgstr "Nihutab fookust."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:261
 msgid "Windows"
-msgstr ""
+msgstr "Aknad"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:268
 msgid "Ctrl + Super + D"
-msgstr ""
+msgstr "Ctrl + Super + D"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:273
 msgid "Minimizes all windows."
-msgstr ""
+msgstr "Minimeerib kõik aknad."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:281
 msgid "Ctrl + Super + Up"
-msgstr ""
+msgstr "Ctrl + Super + Nool üles"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:286
 msgid "Maximizes the current window."
-msgstr ""
+msgstr "Maksimeerib praeguse akna."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:294
 msgid "Ctrl + Super + Down"
-msgstr ""
+msgstr "Ctrl + Super + Nool alla"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:299
 msgid "Minimizes or restores the current window."
-msgstr ""
+msgstr "Minimeerib või taastab praeguse akna."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:307
 msgid "Ctrl + Super + Left or Right"
-msgstr ""
+msgstr "Ctrl + Super + Nool vasakule või paremale"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:312
 msgid "Semi-maximizes the current window."
-msgstr ""
+msgstr "Maksimeerib praeguse akna osaliselt."
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:320
 msgid "Alt + F4"
-msgstr ""
+msgstr "Alt + F4"
 
 #: qml/Components/KeyboardShortcutsOverlay.qml:325
 msgid "Closes the current window."
-msgstr ""
+msgstr "Sulgeb praeguse akna."
 
-#: qml/Components/Lockscreen.qml:214 qml/Greeter/GreeterView.qml:472
+#: qml/Components/Lockscreen.qml:223 qml/Greeter/GreeterView.qml:472
 msgid "Return to Call"
-msgstr ""
+msgstr "Tagasi kõne juurde"
 
-#: qml/Components/Lockscreen.qml:214
+#: qml/Components/Lockscreen.qml:223
 msgid "Emergency Call"
-msgstr ""
+msgstr "Hädaabikõne"
 
-#: qml/Components/Lockscreen.qml:247
+#: qml/Components/Lockscreen.qml:256
 msgid "OK"
-msgstr ""
+msgstr "Sobib"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:33
 msgid "Apps may have unsaved data:"
-msgstr ""
+msgstr "Rakendustel võib olla salvestamata andmeid:"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:60
 msgctxt ""
 "Re-dock means connect the device again to an external screen/mouse/keyboard"
 msgid "Re-dock, save your work and close these apps to continue."
 msgstr ""
+"Jätkamiseks lisa uuesti dokki, salvesta oma tööd ja sulge need rakendused."
 
 #: qml/Components/ModeSwitchWarningDialog.qml:67
 msgid "Or force close now (unsaved data will be lost)."
-msgstr ""
+msgstr "Võis ulge sundkorras kohe (kõik salvestamata andmed lähevad kaotsi)."
 
 #: qml/Components/ModeSwitchWarningDialog.qml:80
 msgid "OK, I will reconnect"
-msgstr ""
+msgstr "Sobib, ühendan uuesti"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:81
 msgid "Reconnect now!"
-msgstr ""
+msgstr "Ühenda uuesti kohe!"
 
 #: qml/Components/ModeSwitchWarningDialog.qml:94
 msgid "Close all"
-msgstr ""
+msgstr "Sulge kõik"
 
 #: qml/Components/SharingPicker.qml:54
 msgid "Preview Share Item"
-msgstr ""
+msgstr "Jagatava objekti eelvaade"
 
-#: qml/Components/VirtualTouchPad.qml:312
+#: qml/Components/VirtualTouchPad.qml:343
 msgid ""
 "Your device is now connected to an external display. Use this screen as a "
 "touch pad to interact with the pointer."
 msgstr ""
+"Sinu seade on nüüd ühendatud välise ekraaniga. Seda ekraani saad kursori "
+"juhtimiseks kasutada puuteplaadina."
 
-#: qml/Components/VirtualTouchPad.qml:322
+#: qml/Components/VirtualTouchPad.qml:353
 msgid "Tap left button to click."
-msgstr ""
+msgstr "Klõpsimiseks puuduta vasakut nuppu."
 
-#: qml/Components/VirtualTouchPad.qml:334
+#: qml/Components/VirtualTouchPad.qml:365
 msgid "Tap right button to right click."
-msgstr ""
+msgstr "Parema hiireklõpsu kontekstis puuduta paremat nuppu."
 
-#: qml/Components/VirtualTouchPad.qml:346
+#: qml/Components/VirtualTouchPad.qml:377
 msgid "Swipe with two fingers to scroll."
-msgstr ""
+msgstr "Kerimiseks viipa kahe sõrmega."
 
-#: qml/Components/VirtualTouchPad.qml:391
+#: qml/Components/VirtualTouchPad.qml:422
 msgid "Find more settings in the system settings."
-msgstr ""
+msgstr "Täiendavaid seadistusi leiad süsteemi seadistustest."
 
-#: qml/Greeter/CoverPage.qml:160
+#: qml/Greeter/CoverPage.qml:161
 msgid "Fully charged"
-msgstr ""
+msgstr "Täislaetud"
 
-#: qml/Greeter/CoverPage.qml:168
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1095
+#: qml/Greeter/CoverPage.qml:169
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1104
 #, qt-format
 msgid "%1 hour"
 msgid_plural "%1 hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 tund"
+msgstr[1] "%1 tundi"
 
-#: qml/Greeter/CoverPage.qml:171
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1099
+#: qml/Greeter/CoverPage.qml:172
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1108
 #, qt-format
 msgid "%1 minute"
 msgid_plural "%1 minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 minut"
+msgstr[1] "%1 minutit"
 
-#: qml/Greeter/CoverPage.qml:178
+#: qml/Greeter/CoverPage.qml:179
 #, qt-format
 msgid "%1, %2 until full"
-msgstr ""
+msgstr "%1, %2 täitumiseni"
 
-#: qml/Greeter/CoverPage.qml:181
+#: qml/Greeter/CoverPage.qml:182
 #, qt-format
 msgid "%1 until full"
-msgstr ""
+msgstr "%1 täitumiseni"
 
-#: qml/Greeter/CoverPage.qml:197
-#: tests/qmltests/Greeter/tst_GreeterView.qml:1239
+#: qml/Greeter/CoverPage.qml:198
+#: tests/qmltests/Greeter/tst_GreeterView.qml:1242
 msgid "Unlock"
-msgstr ""
+msgstr "Ava lukustus"
 
 #: qml/Greeter/DelayedLockscreen.qml:43
 msgid "Device Locked"
-msgstr ""
+msgstr "Nutiseade on lukustatud"
 
 #: qml/Greeter/DelayedLockscreen.qml:58
 msgid "You have been locked out due to too many failed passphrase attempts."
 msgstr ""
+"Sa oled liiga palju kordi üritanud salafraasi sisestada ja nüüd enam ei saa "
+"mõnda aega ligi."
 
 #: qml/Greeter/DelayedLockscreen.qml:59
 msgid "You have been locked out due to too many failed passcode attempts."
 msgstr ""
+"Sa oled liiga palju kordi üritanud salakoodi sisestada ja nüüd enam ei saa "
+"mõnda aega ligi."
 
 #: qml/Greeter/DelayedLockscreen.qml:68
 #, qt-format
 msgid "Please wait %1 minute and then try again…"
 msgid_plural "Please wait %1 minutes and then try again…"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Palun oota %1 minut ja proovi siis uuesti…"
+msgstr[1] "Palun oota %1 minutit ja proovi siis uuesti…"
 
-#: qml/Greeter/Greeter.qml:627 tests/qmltests/Greeter/tst_Greeter.qml:578
+#: qml/Greeter/Greeter.qml:637 tests/qmltests/Greeter/tst_Greeter.qml:578
 #: tests/qmltests/Greeter/tst_Greeter.qml:597
 #: tests/qmltests/Greeter/tst_Greeter.qml:625
 #: tests/qmltests/Greeter/tst_Greeter.qml:637
 msgid "Try again"
-msgstr ""
+msgstr "Proovi uuesti"
 
-#: qml/Greeter/Greeter.qml:628 tests/qmltests/Greeter/tst_Greeter.qml:552
+#: qml/Greeter/Greeter.qml:638 tests/qmltests/Greeter/tst_Greeter.qml:552
 #: tests/qmltests/Greeter/tst_Greeter.qml:603
 msgid "Enter passphrase to unlock"
-msgstr ""
+msgstr "Lukustuse eemaldamiseks sisesta salafraas"
 
-#: qml/Greeter/Greeter.qml:629
+#: qml/Greeter/Greeter.qml:639
 msgid "Enter passcode to unlock"
-msgstr ""
+msgstr "Lukustuse eemaldamiseks sisesta salakood"
 
 #: qml/Greeter/GreeterView.qml:472
 msgid "Emergency"
-msgstr ""
+msgstr "Hädaabi"
 
 #: qml/Greeter/PromptList.qml:143
 msgid "Passphrase"
-msgstr ""
+msgstr "Salafraas"
 
 #: qml/Greeter/PromptList.qml:143
 msgid "Passcode"
-msgstr ""
+msgstr "Salakood"
 
 #: qml/Greeter/SessionsList.qml:124
 msgid "Select desktop environment"
-msgstr ""
+msgstr "Vali töölauakeskkond"
 
 #: qml/Launcher/Drawer.qml:240
 msgid "Search…"
-msgstr ""
+msgstr "Otsi…"
 
 #: qml/Launcher/PullToRefreshScopeStyle.qml:56
 msgid "Pull to refresh…"
-msgstr ""
+msgstr "Värskendamiseks tõmba ülevalt alla…"
 
 #: qml/Launcher/PullToRefreshScopeStyle.qml:61
 msgid "Release to refresh…"
-msgstr ""
+msgstr "Värskendamiseks lase lahti…"
 
 #: qml/Notifications/NotificationMenuItemFactory.qml:124
 msgid "Show password"
-msgstr ""
+msgstr "Näita salasõna"
 
-#: qml/Notifications/Notification.qml:322
+#: qml/Notifications/Notification.qml:318
 msgid "New message"
-msgstr ""
+msgstr "Uus sõnum"
 
 #: qml/Panel/ActiveCallHint.qml:79
 msgid "Tap to return to call..."
-msgstr ""
+msgstr "Klõpsa tagasihelistamiseks..."
 
 #: qml/Panel/ActiveCallHint.qml:93
 msgid "Conference"
-msgstr ""
+msgstr "Rühmakõne"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:967
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:975
 msgid "Nothing is playing"
-msgstr ""
+msgstr "Mitte midagi pole esitamisel"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1104
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1113
 #, qt-format
 msgid "%1 second"
 msgid_plural "%1 seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1 sekund"
+msgstr[1] "%1 sekundit"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1107
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1116
 msgid "0 seconds"
-msgstr ""
+msgstr "0 sekundit"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1109
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1118
 #, qt-format
 msgid "%1 remaining"
-msgstr ""
+msgstr "jäänud: %1"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1115
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1129
 msgid "In queue…"
-msgstr ""
+msgstr "Tööde järjekorras…"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1119
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1133
 msgid "Downloading"
-msgstr ""
+msgstr "Laadin alla"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1121
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1135
 msgid "Paused, tap to resume"
-msgstr ""
+msgstr "Peatatud, jätkamiseks klõpsa"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1123
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1137
 msgid "Canceled"
-msgstr ""
+msgstr "Katkestatud"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1125
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1139
 msgid "Finished"
-msgstr ""
+msgstr "Valmis"
 
-#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1127
+#: qml/Panel/Indicators/IndicatorMenuItemFactory.qml:1141
 msgid "Failed, tap to retry"
-msgstr ""
+msgstr "Ebaõnnestunud, jätkamiseks klõpsa"
 
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:151
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:210
 msgctxt "Button: Send a reply message"
 msgid "Send"
-msgstr ""
+msgstr "Saada"
 
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:152
 msgctxt "Label: Hint in message indicator line edit"
 msgid "Reply"
-msgstr ""
+msgstr "Vasta"
 
 #: qml/Panel/Indicators/MessageMenuItemFactory.qml:209
 msgctxt "Button: Call back on phone"
 msgid "Call back"
-msgstr ""
+msgstr "Helista tagasi"
 
-#: qml/Panel/PanelMenuPage.qml:92
+#: qml/Panel/PanelMenuPage.qml:93
 msgid "Back"
-msgstr ""
+msgstr "Tagasi"
 
-#: qml/Stage/SideStage.qml:80
+#: qml/Stage/SideStage.qml:81
 msgid "Drag using 3 fingers any application from one window to the other"
-msgstr ""
+msgstr "Kolme sõrmega lohistades saad iga rakendust tõsta ühest ekraanist teise"
 
-#: qml/Stage/Stage.qml:834
+#: qml/Stage/Stage.qml:902
 msgid "No running apps"
-msgstr ""
+msgstr "Töötavaid rakendusi pole"
 
 #: qml/Tutorial/TutorialLeftLong.qml:49
 msgid "Long swipe from the left edge to open the Application Drawer"
-msgstr ""
+msgstr "Rakenduste laeka saad avada pika viipega vasakust äärest"
 
 #: qml/Tutorial/TutorialLeft.qml:47
 msgid "Short swipe from the left edge to open the launcher"
-msgstr ""
+msgstr "Käivitaja saad avada lühikese viipega vasakust äärest"
 
 #: qml/Tutorial/TutorialRight.qml:54
 msgid "Push your mouse against the right edge to view your open apps"
-msgstr ""
+msgstr "Avatud rakendusi näed, kui liigutad hiire parema ääre vastu"
 
 #: qml/Tutorial/TutorialRight.qml:55
 msgid "Swipe from the right edge to view your open apps"
-msgstr ""
+msgstr "Avatud rakendusi näed, kui viipad paremast äärest"
 
 #: qml/Tutorial/TutorialTop.qml:53
 msgid "Swipe from the top edge to access notifications and quick settings"
-msgstr ""
+msgstr "Teavitusi ja kiirseadistusi näed, kui viipad ülevalt äärest allapoole"
 
 #: qml/Wizard/Page.qml:59
 msgctxt "Button: Go back one page in the Wizard"
 msgid "Back"
-msgstr ""
+msgstr "Tagasi"
 
 #: qml/Wizard/Pages/10-welcome.qml:29
 msgid "Language"
-msgstr ""
+msgstr "Keel"
 
 #: qml/Wizard/Pages/10-welcome.qml:176
 #: qml/Wizard/Pages/10-welcome-update.qml:128
@@ -652,255 +656,258 @@ msgstr ""
 #: qml/Wizard/Pages/passcode-desktop.qml:154
 #: qml/Wizard/Pages/password-set.qml:153
 msgid "Next"
-msgstr ""
+msgstr "Edasi"
 
 #. TRANSLATORS: %1 contains the distro name, %2 the version
 #: qml/Wizard/Pages/10-welcome-update.qml:92
 #, qt-format
 msgid "Welcome to %1 %2"
-msgstr ""
+msgstr "Tere tulemast, see on %1 %2"
 
 #. TRANSLATORS: %1 contains the distro name, %2 the version
 #: qml/Wizard/Pages/10-welcome-update.qml:108
 #, qt-format
 msgid "We will make sure your device is ready to use %1 %2"
 msgstr ""
+"Me hoolitseme selle eest, et sinu nutiseade oleks valmis kasutama: %1 %2"
 
 #: qml/Wizard/Pages/11-changelog.qml:28
 msgid "What's new"
-msgstr ""
+msgstr "Mida on meil uut"
 
 #: qml/Wizard/Pages/11-changelog.qml:74
 msgid "Loading..."
-msgstr ""
+msgstr "Laadin..."
 
 #: qml/Wizard/Pages/20-keyboard.qml:31
 msgid "Select Keyboard"
-msgstr ""
+msgstr "Vali klahvistik"
 
 #: qml/Wizard/Pages/20-keyboard.qml:71
 msgid "Keyboard language"
-msgstr ""
+msgstr "Klahvistiku keel"
 
 #: qml/Wizard/Pages/20-keyboard.qml:93
 msgid "Keyboard layout"
-msgstr ""
+msgstr "Klahvistiku paigutus"
 
 #: qml/Wizard/Pages/20-keyboard.qml:152 qml/Wizard/Pages/30-wifi.qml:213
-#: qml/Wizard/Pages/60-account.qml:72 qml/Wizard/Pages/79-system-update.qml:144
+#: qml/Wizard/Pages/60-account.qml:72 qml/Wizard/Pages/79-system-update.qml:164
 #: qml/Wizard/Pages/sim.qml:101
 msgid "Skip"
-msgstr ""
+msgstr "Jäta vahele"
 
 #: qml/Wizard/Pages/30-wifi.qml:31
 msgid "Connect to Wi‑Fi"
-msgstr ""
+msgstr "Ühenda WiFi-võrkku"
 
 #: qml/Wizard/Pages/30-wifi.qml:139
 msgid "Connected"
-msgstr ""
+msgstr "Ühendatud"
 
 #: qml/Wizard/Pages/30-wifi.qml:172
 msgid "Available Wi-Fi networks"
-msgstr ""
+msgstr "Saadaval WiFi-võrgud"
 
 #: qml/Wizard/Pages/30-wifi.qml:173
 msgid "No available Wi-Fi networks"
-msgstr ""
+msgstr "WiFi-võrke pole saadaval"
 
 #: qml/Wizard/Pages/50-timezone.qml:30
 msgid "Time Zone"
-msgstr ""
+msgstr "Ajavöönd"
 
 #: qml/Wizard/Pages/50-timezone.qml:182
 msgid "Enter your city"
-msgstr ""
+msgstr "Sisesta oma linn"
 
 #: qml/Wizard/Pages/60-account.qml:24
 msgid "Personalize Your Device"
-msgstr ""
+msgstr "Muuda nutiseade isikupäraseks"
 
 #: qml/Wizard/Pages/60-account.qml:54
 msgid "Preferred Name"
-msgstr ""
+msgstr "Eelistatud nimi"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:40
 msgid "Lock Screen"
-msgstr ""
+msgstr "Lukustusvaade"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:103
 msgctxt "Label: Type of security method"
 msgid "Create new password"
-msgstr ""
+msgstr "Loo uus salasõna"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:105
 msgctxt "Label: Type of security method"
 msgid "Create passcode (numbers only)"
-msgstr ""
+msgstr "Loo salakood (vaid numbrid)"
 
 #: qml/Wizard/Pages/70-passwd-type.qml:107
 msgctxt "Label: Type of security method"
 msgid "No lock code"
-msgstr ""
+msgstr "Lukustuskoodi pole"
 
-#: qml/Wizard/Pages/79-system-update.qml:28
+#: qml/Wizard/Pages/79-system-update.qml:30
 msgid "Update Device"
-msgstr ""
+msgstr "Uuenda nutiseadet"
 
-#: qml/Wizard/Pages/79-system-update.qml:55
+#: qml/Wizard/Pages/79-system-update.qml:57
 msgid ""
 "There is a system update available and ready to install. Afterwards, the "
 "device will automatically restart."
 msgstr ""
+"Saadavalt on süsteemitarkvara uuendus, mille paigaldamise järel nutiseade "
+"käivitub automaatselt uuesti."
 
-#: qml/Wizard/Pages/79-system-update.qml:76
+#: qml/Wizard/Pages/79-system-update.qml:96
 msgctxt "string identifying name of the update"
 msgid "Ubuntu Touch system"
-msgstr ""
+msgstr "Operatsioonisüsteem Ubuntu Touch"
 
-#: qml/Wizard/Pages/79-system-update.qml:83
+#: qml/Wizard/Pages/79-system-update.qml:103
 #, qt-format
 msgctxt "version of the system update"
 msgid "Version %1"
-msgstr ""
+msgstr "Versioon %1"
 
-#: qml/Wizard/Pages/79-system-update.qml:95
+#: qml/Wizard/Pages/79-system-update.qml:115
 msgid "This could take a few minutes..."
-msgstr ""
+msgstr "Selleks võib kuluda mõni minut..."
 
-#: qml/Wizard/Pages/79-system-update.qml:109
+#: qml/Wizard/Pages/79-system-update.qml:129
 msgid "Install and restart now"
-msgstr ""
+msgstr "Paigalda kohe ja käivita siis uuesti"
 
 #: qml/Wizard/Pages/80-finished.qml:93
 msgid "Welcome Back"
-msgstr ""
+msgstr "Tere tulemast tagasi"
 
 #. TRANSLATORS: %1 contains the distro name
 #: qml/Wizard/Pages/80-finished.qml:95
 #, qt-format
 msgid "Welcome to %1"
-msgstr ""
+msgstr "Tere tulemast, see on %1"
 
 #: qml/Wizard/Pages/80-finished.qml:111
 msgid "You are ready to use your device now"
-msgstr ""
+msgstr "Võid alustada nüüd selle nutiseadme kasutamist"
 
 #: qml/Wizard/Pages/80-finished.qml:131
 msgid "Continue"
-msgstr ""
+msgstr "Jätka"
 
 #: qml/Wizard/Pages/80-finished.qml:131
 msgid "Get Started"
-msgstr ""
+msgstr "Alustame siis"
 
 #: qml/Wizard/Pages/passcode-confirm.qml:43
 #: qml/Wizard/Pages/passcode-desktop.qml:104
 msgid "Confirm passcode"
-msgstr ""
+msgstr "Korda salakoodi"
 
 #: qml/Wizard/Pages/passcode-confirm.qml:45
 msgid "Incorrect passcode."
-msgstr ""
+msgstr "Vigane salakood."
 
 #: qml/Wizard/Pages/passcode-confirm.qml:45
 msgctxt "Enter the passcode again"
 msgid "Please re-enter."
-msgstr ""
+msgstr "Palun sisesta uuesti."
 
 #: qml/Wizard/Pages/passcode-desktop.qml:31
 msgid "Lock Screen Passcode"
-msgstr ""
+msgstr "Lukustusvaate salakood"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:68
 msgid "Enter at least 4 numbers to setup your passcode"
-msgstr ""
+msgstr "Salakoodi lisamiseks pead sisestama vähemalt 4 numbrit"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:84
 #: qml/Wizard/Pages/passcode-set.qml:54
 msgid "Choose passcode"
-msgstr ""
+msgstr "Sisesta salakood"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:139
 msgid "Passcode too short"
-msgstr ""
+msgstr "Salakood on liiga lühikene"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:141
 msgid "Passcodes match"
-msgstr ""
+msgstr "Salakoodid klapivad"
 
 #: qml/Wizard/Pages/passcode-desktop.qml:143
 msgid "Passcodes do not match"
-msgstr ""
+msgstr "Salakoodid ei klapi"
 
 #: qml/Wizard/Pages/passcode-set.qml:62
 msgid "Passcode must be at least 4 characters long"
-msgstr ""
+msgstr "Salakood peab olema vähemalt 4 numbri pikkune"
 
 #: qml/Wizard/Pages/password-set.qml:31
 msgid "Lock Screen Password"
-msgstr ""
+msgstr "Lukustusvaate salasõna"
 
 #: qml/Wizard/Pages/password-set.qml:68
 msgid "Enter at least 8 characters"
-msgstr ""
+msgstr "Sisesta vähemalt 8 tähemärki"
 
 #: qml/Wizard/Pages/password-set.qml:80
 msgid "Choose password"
-msgstr ""
+msgstr "Sisesta salasõna"
 
 #: qml/Wizard/Pages/password-set.qml:110
 msgid "Confirm password"
-msgstr ""
+msgstr "Korda salasõna"
 
 #: qml/Wizard/Pages/sim.qml:27
 msgid "No SIM card installed"
-msgstr ""
+msgstr "SIM-kaart on sisestamata"
 
 #: qml/Wizard/Pages/sim.qml:54
 msgid "SIM card added"
-msgstr ""
+msgstr "SIM-kaart on sisestatud"
 
 #: qml/Wizard/Pages/sim.qml:55
 msgid "You must restart the device to access the mobile network."
-msgstr ""
+msgstr "Mobiilsidevõrgu kasutamiseks pead nutiseadme uuesti käivitama."
 
 #: qml/Wizard/Pages/sim.qml:59
 msgid "Restart"
-msgstr ""
+msgstr "Käivita uuesti"
 
 #: qml/Wizard/Pages/sim.qml:78
 msgid "You won’t be able to make calls or use text messaging without a SIM."
-msgstr ""
+msgstr "Ilma SIM-kaardita sa ei saa helistada ega saata tekstisõnumeid."
 
 #: qml/Wizard/Pages/sim.qml:90
 msgid "To proceed with no SIM tap Skip."
-msgstr ""
+msgstr "Jätkamaks ilma SIM-kaardita klõpsi „Jäta vahele“."
 
 #: qml/Wizard/PasswordMeter.qml:87
 msgid "Password too short"
-msgstr ""
+msgstr "Salasõna on liiga lühike"
 
 #: qml/Wizard/PasswordMeter.qml:89
 msgid "Passwords match"
-msgstr ""
+msgstr "Salasõnad klapivad omavahel"
 
 #: qml/Wizard/PasswordMeter.qml:91
 msgid "Passwords do not match"
-msgstr ""
+msgstr "Salasõnad ei klapi omavahel"
 
 #: qml/Wizard/PasswordMeter.qml:95
 msgid "Strong password"
-msgstr ""
+msgstr "Väga hea salasõna"
 
 #: qml/Wizard/PasswordMeter.qml:97
 msgid "Fair password"
-msgstr ""
+msgstr "Üsna hea salasõna"
 
 #: qml/Wizard/PasswordMeter.qml:99
 msgid "Weak password"
-msgstr ""
+msgstr "Kehv salasõna"
 
 #: qml/Wizard/PasswordMeter.qml:101
 msgid "Very weak password"
-msgstr ""
+msgstr "Väga kehv salasõna"

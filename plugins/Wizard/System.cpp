@@ -30,7 +30,7 @@
 #include <QSettings>
 #include <QStringBuilder>
 
-#include <initializer_list>
+#include <glib.h>
 
 System::System()
     : QObject()
@@ -187,10 +187,10 @@ void System::updateSessionLocale(const QString &locale)
 
     // Restart bits of the session to pick up new language.
     const QStringList units {
-        "ayatana-indicators.target",
+        "lomiri-indicators.target",
         "lomiri-location-service-trust-stored.service",
         "pulseaudio-trust-stored.service",
-        "sync-monitor.service",
+        "lomiri-sync-monitor.service",
         "maliit-server.service",
         "ciborium.service",
     };
@@ -211,27 +211,9 @@ QString System::distroName() const
 #ifdef LOMIRI_DISPLAYED_DISTRO_NAME
     return QStringLiteral(LOMIRI_DISPLAYED_DISTRO_NAME);
 #else
-    for (const QString &fileName : {
-        QStringLiteral("/etc/os-release"),
-        QStringLiteral("/usr/lib/os-release"),
-    }) {
-        QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly))
-            continue;
-
-        QTextStream fileIO(&file);
-        QString line;
-
-        while (!(line = fileIO.readLine()).isEmpty()) {
-            if (line.startsWith(QStringLiteral("NAME="))) {
-                line = line.right(line.length() - 5);
-                // Remove quote, quick n' dirty way.
-                line = line.replace("\"", "");
-
-                return line;
-            }
-        }
-    }
+    g_autofree gchar * name = g_get_os_info(G_OS_INFO_KEY_NAME);
+    if (name)
+        return QString::fromLocal8Bit(name);
 
     return QStringLiteral("Lomiri");
 #endif

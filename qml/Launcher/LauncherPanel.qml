@@ -19,6 +19,7 @@ import QtQml.StateMachine 1.0 as DSM
 import Lomiri.Components 1.3
 import Lomiri.Launcher 0.1
 import Lomiri.Components.Popups 1.3
+import GSettings 1.0
 import Utils 0.1
 import "../Components"
 
@@ -38,6 +39,7 @@ Rectangle {
                                  || dndArea.containsMouse || dashItem.hovered
     property int highlightIndex: -2
     property bool shortcutHintsShown: false
+    readonly property bool hasPeekingIcon: launcherListView.peekingIndex !== -1
     readonly property bool quickListOpen: quickList.state === "open"
     readonly property bool dragging: launcherListView.dragging || dndArea.dragging
 
@@ -89,17 +91,52 @@ Rectangle {
             objectName: "buttonShowDashHome"
             width: parent.width
             height: width * .9
-            color: LomiriColors.orange
+            color: {
+                // To exchange the default Lomiri home logo bgcolor by your distro's bgcolor, add a gsettings override:
+                //
+                // [com.lomiri.Shell.Launcher]
+                // home-button-background-color='<some-RGB-value-such-as-#123456>'
+                //
+                if (Functions.isValidColor(launcherSettings.homeButtonBackgroundColor)) {
+                    return launcherSettings.homeButtonBackgroundColor;
+                } else {
+                    if (launcherSettings.homeButtonBackgroundColor != '')
+                        console.warn(`Invalid color name '${launcherSettings.homeButtonBackgroundColor}'`);
+
+                    return LomiriColors.orange;
+                }
+            }
             readonly property bool highlighted: root.highlightIndex == -1;
+
+            GSettings {
+                id: launcherSettings
+                schema.id: "com.lomiri.Shell.Launcher"
+            }
 
             Icon {
                 objectName: "dashItem"
-                width: parent.width * .6
+                width: parent.width * .75
                 height: width
                 anchors.centerIn: parent
-                source: "graphics/home.svg"
-                color: "white"
+                source: homeLogoResolver.resolvedImage
                 rotation: root.rotation
+            }
+
+            ImageResolver {
+                id: homeLogoResolver
+                objectName: "homeLogoResolver"
+
+                readonly property url defaultLogo: "file://" + Constants.defaultLogo
+
+                candidates: [
+                    // To exchange the default Lomiri home logo by your distro's logo, add a gsettings override:
+                    //
+                    // [com.lomiri.Shell.Launcher]
+                    // logo-picture-uri='image://theme/start-here'
+                    //
+                    launcherSettings.logoPictureUri,
+                    defaultLogo
+                ]
             }
 
             AbstractButton {
@@ -265,7 +302,6 @@ Rectangle {
                             objectName: "peekingAnimation" + index
 
                             // revealing
-                            PropertyAction { target: root; property: "visible"; value: (launcher.visibleWidth === 0) ? 1 : 0 }
                             PropertyAction { target: launcherListViewItem; property: "clip"; value: 0 }
 
                             LomiriNumberAnimation {
@@ -288,7 +324,6 @@ Rectangle {
                             }
 
                             PropertyAction { target: launcherListViewItem; property: "clip"; value: 1 }
-                            PropertyAction { target: root; property: "visible"; value: (launcher.visibleWidth === 0) ? 1 : 0 }
                             PropertyAction { target: launcherListView; property: "peekingIndex"; value: -1 }
                         }
 

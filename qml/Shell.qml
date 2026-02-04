@@ -150,7 +150,7 @@ StyledItem {
                 wizard.hide();
             }
 
-            if (appId === "dialer-app" && callManager.hasCalls && greeter.locked) {
+            if (appId === "lomiri-dialer-app" && callManager.hasCalls && greeter.locked) {
                 // If we are in the middle of a call, make dialer lockedApp. The
                 // Greeter will show it when it's notified of the focus.
                 // This can happen if user backs out of dialer back to greeter, then
@@ -184,21 +184,30 @@ StyledItem {
 
     property real edgeSize: units.gu(settings.edgeDragWidth)
 
-    WallpaperResolver {
+    ImageResolver {
         id: wallpaperResolver
         objectName: "wallpaperResolver"
 
         readonly property url defaultBackground: "file://" + Constants.defaultWallpaper
-        readonly property bool hasCustomBackground: background != defaultBackground
+        readonly property bool hasCustomBackground: resolvedImage != defaultBackground
+        readonly property string gsettingsBackgroundPictureUri: ((shell.showingGreeter == true)
+                                                             ||  (shell.mode === "full-greeter")
+                                                             ||  (shell.mode === "greeter"))
+                                                              ? backgroundGreeterSettings.backgroundPictureUri
+                                                              : backgroundShellSettings.backgroundPictureUri
 
         GSettings {
-            id: backgroundSettings
-            schema.id: "org.gnome.desktop.background"
+            id: backgroundShellSettings
+            schema.id: "com.lomiri.Shell"
+        }
+        GSettings {
+            id: backgroundGreeterSettings
+            schema.id: "com.lomiri.Shell.Greeter"
         }
 
         candidates: [
             AccountsService.backgroundFile,
-            backgroundSettings.pictureUri,
+            gsettingsBackgroundPictureUri,
             defaultBackground
         ]
     }
@@ -326,7 +335,7 @@ StyledItem {
             lightMode: shell.lightMode
 
             dragAreaWidth: shell.edgeSize
-            background: wallpaperResolver.background
+            background: wallpaperResolver.resolvedImage
             backgroundSourceSize: shell.largestScreenDimension
 
             applicationManager: ApplicationManager
@@ -335,8 +344,6 @@ StyledItem {
             rightEdgePushProgress: rightEdgeBarrier.progress
             availableDesktopArea: availableDesktopAreaItem
             launcherLeftMargin: launcher.visibleWidth
-            launcherLockedVisible: launcher.lockedVisible
-            topPanelHeight: panel.panelHeight
 
             property string usageScenario: shell.usageScenario === "phone" || greeter.hasLockedApp
                                                        ? "phone"
@@ -452,7 +459,7 @@ StyledItem {
             usageMode: shell.usageScenario
             orientation: shell.orientation
             forcedUnlock: wizard.active || shell.mode === "full-shell"
-            background: wallpaperResolver.background
+            background: wallpaperResolver.resolvedImage
             backgroundSourceSize: shell.largestScreenDimension
             hasCustomBackground: wallpaperResolver.hasCustomBackground
             inputMethodRect: inputMethod.visibleRect
@@ -474,7 +481,13 @@ StyledItem {
                 }
             }
 
-            onEmergencyCall: startLockedApp("dialer-app")
+            onEmergencyCall: startLockedApp("lomiri-dialer-app")
+
+            // Quit the greeter as soon as a session has been started
+            onSessionStarted: {
+                if (shell.mode == "greeter")
+                    Qt.quit();
+            }
         }
     }
 
@@ -501,16 +514,16 @@ StyledItem {
         target: callManager
 
         function onHasCallsChanged() {
-            if (greeter.locked && callManager.hasCalls && greeter.lockedApp !== "dialer-app") {
+            if (greeter.locked && callManager.hasCalls && greeter.lockedApp !== "lomiri-dialer-app") {
                 // We just received an incoming call while locked.  The
-                // indicator will have already launched dialer-app for us, but
-                // there is a race between "hasCalls" changing and the dialer
-                // starting up.  So in case we lose that race, we'll start/
-                // focus the dialer ourselves here too.  Even if the indicator
-                // didn't launch the dialer for some reason (or maybe a call
-                // started via some other means), if an active call is
+                // indicator will have already launched lomiri-dialer-app for
+                // us, but there is a race between "hasCalls" changing and the
+                // dialer starting up.  So in case we lose that race, we'll
+                // start/focus the dialer ourselves here too.  Even if the
+                // indicator didn't launch the dialer for some reason (or maybe
+                // a call started via some other means), if an active call is
                 // happening, we want to be in the dialer.
-                startLockedApp("dialer-app")
+                startLockedApp("lomiri-dialer-app")
             }
         }
     }
@@ -602,7 +615,13 @@ StyledItem {
                     // greeter or tell the session to load the app.  This will
                     // involve taking the url-dispatcher dbus name and using
                     // SessionBroadcast to tell the session.
-                    profile: shell.mode === "greeter" ? "desktop_greeter" : "phone"
+                    // For now indicators will just hide their buttons that
+                    // usually spawn lomiri-system-settings, based on the
+                    // active username being 'lightdm'.
+                    profile: shell.mode === "greeter"
+                                 ? ((shell.usageScenario === "phone" || shell.usageScenario === "tablet")
+                                     ? "phone_greeter" : "desktop_greeter")
+                                 : "phone"
                     Component.onCompleted: {
                         load();
                     }
@@ -632,7 +651,7 @@ StyledItem {
             objectName: "launcher"
 
             anchors.top: parent.top
-            anchors.topMargin: inverted ? 0 : panel.panelHeight
+            anchors.topMargin: panel.panelHeight
             anchors.bottom: parent.bottom
             width: parent.width
             dragAreaWidth: shell.edgeSize
@@ -640,6 +659,8 @@ StyledItem {
                     && (!greeter.locked || AccountsService.enableLauncherWhileLocked)
                     && !greeter.hasLockedApp
                     && !shell.waitingOnGreeter
+                    && shell.mode !== "greeter"
+            visible: shell.mode !== "greeter"
             inverted: shell.usageScenario !== "desktop"
             superPressed: physicalKeysMapper.superPressed
             superTabPressed: physicalKeysMapper.superTabPressed
@@ -650,7 +671,7 @@ StyledItem {
             lightMode: shell.lightMode
             drawerEnabled: !greeter.active && tutorial.launcherLongSwipeEnabled
             privateMode: greeter.active
-            background: wallpaperResolver.background
+            background: wallpaperResolver.resolvedImage
 
             // It can be assumed that the Launcher and Panel would overlap if
             // the Panel is open and taking up the full width of the shell
@@ -759,7 +780,7 @@ StyledItem {
             deferred: shell.mode === "greeter"
 
             function unlockWhenDoneWithWizard() {
-                if (!active) {
+                if (!active && shell.mode !== "greeter") {
                     ModemConnectivity.unlockAllModems();
                 }
             }
@@ -780,7 +801,7 @@ StyledItem {
             model: NotificationBackend.Model
             margin: units.gu(1)
             hasMouse: shell.hasMouse
-            background: wallpaperResolver.background
+            background: wallpaperResolver.resolvedImage
             privacyMode: greeter.locked && AccountsService.hideNotificationContentWhileLocked
 
             y: topmostIsFullscreen ? 0 : panel.panelHeight

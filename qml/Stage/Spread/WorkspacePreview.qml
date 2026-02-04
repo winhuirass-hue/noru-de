@@ -47,6 +47,7 @@ Item {
         sourceSize.height: height
         fillMode: Image.PreserveAspectCrop
         autoTransform: true
+        asynchronous: true
 
         Repeater {
             id: topLevelSurfaceRepeater
@@ -184,6 +185,7 @@ Item {
             }
             Label {
                 text: qsTr("Drop here")
+                color: "white"
             }
         }
     }
@@ -205,6 +207,7 @@ Item {
             }
             Label {
                 text: qsTr("Drop and go")
+                color: "white"
             }
         }
     }
