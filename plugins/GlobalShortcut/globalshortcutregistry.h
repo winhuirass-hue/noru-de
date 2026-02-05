@@ -24,7 +24,7 @@
 
 #include "globalshortcut.h"
 
-typedef QMap<QVariant, QVector<QPointer<GlobalShortcut>>> GlobalShortcutList;
+typedef QMap<int, QVector<QPointer<GlobalShortcut>>> GlobalShortcutList;
 
 /**
  * @brief The GlobalShortcutRegistry class
@@ -45,11 +45,11 @@ public:
     /**
      * @return whether shortcut @p seq is currently registered
      */
-    bool hasShortcut(const QVariant &seq) const;
+    bool hasShortcut(int &seq) const;
     /**
      * Adds a shortcut @p seq to the registry
      */
-    void addShortcut(const QVariant &seq, GlobalShortcut * sc);
+    void addShortcut(int seq, GlobalShortcut * sc);
 
     /**
      * Sets up key events filtering on window @p window

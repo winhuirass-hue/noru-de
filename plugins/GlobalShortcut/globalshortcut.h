@@ -33,6 +33,7 @@
 class GlobalShortcut: public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
     /**
      * The shortcut itself
      */

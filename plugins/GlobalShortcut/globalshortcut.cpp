@@ -38,7 +38,7 @@ void GlobalShortcut::setShortcut(const QVariant &shortcut)
         return;
 
     m_shortcut = shortcut;
-    registry->addShortcut(shortcut, this);
+    registry->addShortcut(shortcut.toInt(), this);
     Q_EMIT shortcutChanged(shortcut);
 }
 
