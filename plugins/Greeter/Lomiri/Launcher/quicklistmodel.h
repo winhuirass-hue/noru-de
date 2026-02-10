@@ -20,12 +20,15 @@
 #include "quicklistentry.h"
 
 #include <lomiri/shell/launcher/QuickListModelInterface.h>
+#include <qqmlintegration.h>
 
 using namespace lomiri::shell::launcher;
 
 class QuickListModel: public QuickListModelInterface
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Can't create a QuickListModel in QML. Get them from the LauncherItems.")
 
 public:
     explicit QuickListModel(QObject *parent = 0);

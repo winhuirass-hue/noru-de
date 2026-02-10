@@ -20,6 +20,7 @@
 #include "quicklistmodel.h"
 
 #include <lomiri/shell/launcher/LauncherItemInterface.h>
+#include <qqmlintegration.h>
 
 class QuickListModel;
 
@@ -28,6 +29,8 @@ using namespace lomiri::shell::launcher;
 class LauncherItem: public LauncherItemInterface
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Can't create new Launcher Items in QML. Get them from the LauncherModel.")
 public:
     LauncherItem(const QString &appId, const QString &name, const QString &icon, QObject *parent = 0);
 

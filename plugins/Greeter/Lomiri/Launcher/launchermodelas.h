@@ -17,21 +17,33 @@
 #ifndef LAUNCHERMODEL_H
 #define LAUNCHERMODEL_H
 
+#include <QAbstractListModel>
+#include <qqmlintegration.h>
+
 #include <lomiri/shell/launcher/LauncherModelInterface.h>
 #include <lomiri/shell/application/ApplicationManagerInterface.h>
-
-#include <QAbstractListModel>
 
 class LauncherItem;
 class GSettings;
 class AccountsServiceDBusAdaptor;
-
 using namespace lomiri::shell::launcher;
 using namespace lomiri::shell::application;
+
+namespace lomiri {
+namespace shell {
+namespace application {
+class MirSurfaceListInterface;
+}
+}
+}
+
+Q_DECLARE_OPAQUE_POINTER(lomiri::shell::application::MirSurfaceListInterface*)
 
 class LauncherModel: public LauncherModelInterface
 {
    Q_OBJECT
+   QML_ELEMENT
+   QML_SINGLETON
 
 public:
     LauncherModel(QObject *parent = 0);
