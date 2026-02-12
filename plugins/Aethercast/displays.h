@@ -25,10 +25,12 @@
 #include <QtDBus>
 #include <org_aethercast.h>
 #include <freedesktop_properties.h>
+#include <qqmlintegration.h>
 
 class Displays : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
     Q_PROPERTY (bool scanning
                 READ scanning

@@ -1,3 +1,12 @@
+cmake_minimum_required(VERSION 3.24)
+project(Aethercast-qml LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt6 COMPONENTS Qml DBus REQUIRED)
+
+file(GLOB AETHERCAST_FILES "*.h" "*.cpp")
+
 qt_add_dbus_interface(
     DBUS_INTERFACE
     org.aethercast.xml
@@ -10,9 +19,11 @@ qt_add_dbus_interface(
     freedesktop_properties
 )
 
-add_library(Aethercast-qml MODULE
-    plugin.cpp
-    displays.cpp
+qt_add_qml_module(Aethercast-qml
+    URI Aethercast
+    VERSION 0.1
+    SOURCES
+    ${AETHERCAST_FILES}
     ${DBUS_INTERFACE}
     ${FREEDESKTOP_PROPERTIES}
 )
@@ -23,5 +34,5 @@ target_include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_link_libraries(Aethercast-qml Qt5::Qml Qt5::DBus)
-add_lomiri_plugin(Aethercast 0.1 Aethercast TARGETS Aethercast-qml)
+target_link_libraries(Aethercast-qml PRIVATE Qt6::Qml Qt6::DBus)
+
