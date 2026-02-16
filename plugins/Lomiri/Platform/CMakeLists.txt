@@ -1,11 +1,21 @@
-find_package(Qt5DBus REQUIRED)
+cmake_minimum_required(VERSION 3.24)
+project(Platform-qml LANGUAGES CXX)
 
-set(platformplugin_SRCS
-    platform.cpp
-    plugin.cpp)
+set(CMAKE_AUTOMOC ON)
 
-add_library(Platform-qml SHARED ${platformplugin_SRCS})
+find_package(Qt6 COMPONENTS DBus Qml REQUIRED)
 
-target_link_libraries(Platform-qml Qt5::DBus Qt5::Qml)
+file(GLOB PLATFORM_FILES "*.h" "*.cpp")
 
-add_lomiri_plugin(Lomiri.Platform 1.0 Lomiri/Platform TARGETS Platform-qml)
+qt_add_qml_module(Platform-qml
+    URI Lomiri.Platform
+    VERSION 1.0
+    SOURCES
+    ${PLATFORM_FILES}
+)
+
+target_link_libraries(Platform-qml
+    PRIVATE
+    Qt6::DBus
+    Qt6::Qml)
+
