@@ -117,11 +117,7 @@ StyledItem {
     }
 
     readonly property var mainApp: stage.mainApp
-
-    readonly property var topLevelSurfaceList: {
-        if (!WMScreen.currentWorkspace) return null;
-        return stage.temporarySelectedWorkspace ? stage.temporarySelectedWorkspace.windowModel : WMScreen.currentWorkspace.windowModel
-    }
+    readonly property alias topLevelSurfaceList: stage.topLevelSurfaceList
 
     onMainAppChanged: {
         _onMainAppChanged((mainApp ? mainApp.appId : ""));
@@ -339,7 +335,6 @@ StyledItem {
             backgroundSourceSize: shell.largestScreenDimension
 
             applicationManager: ApplicationManager
-            topLevelSurfaceList: shell.topLevelSurfaceList
             inputMethodRect: inputMethod.visibleRect
             rightEdgePushProgress: rightEdgeBarrier.progress
             availableDesktopArea: availableDesktopAreaItem

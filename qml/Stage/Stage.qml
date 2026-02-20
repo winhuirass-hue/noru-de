@@ -35,8 +35,11 @@ FocusScope {
     id: root
     anchors.fill: parent
 
+    readonly property Item currentWorkspaceContainer: workspacesView.currentItem
+    readonly property Repeater appRepeater: currentWorkspaceContainer.appRepeater
+    readonly property QtObject topLevelSurfaceList: currentWorkspaceContainer.workspace.windowModel
+
     property QtObject applicationManager
-    property QtObject topLevelSurfaceList
     property bool altTabPressed
     property url background
     property alias backgroundSourceSize: wallpaper.sourceSize
@@ -63,7 +66,6 @@ FocusScope {
     // Configuration
     property string mode: "staged"
 
-    readonly property var temporarySelectedWorkspace: state == "spread" ? screensAndWorkspaces.activeWorkspace : null
     property bool workspaceEnabled: (mode == "windowed" && settings.enableWorkspace) || settings.forceEnableWorkspace
 
     // Used by the tutorial code
@@ -109,13 +111,6 @@ FocusScope {
     }
 
     property int launcherLeftMargin : 0
-
-    Binding {
-        target: topLevelSurfaceList
-        restoreMode: Binding.RestoreBinding
-        property: "rootFocus"
-        value: interactive
-    }
 
     onInteractiveChanged: {
         // Stage must have focus before activating windows, including null
@@ -389,6 +384,7 @@ FocusScope {
         active: !workspaceSwitcher.active && root.workspaceEnabled && priv.focusedAppDelegate !== null
         onTriggered: {
             root.focus = true;
+            priv.focusedAppDelegate.saveWindowState()
             workspaceSwitcher.showLeftMoveApp(priv.focusedAppDelegate.surface)
         }
     }
@@ -398,6 +394,7 @@ FocusScope {
         active: !workspaceSwitcher.active && root.workspaceEnabled && priv.focusedAppDelegate !== null
         onTriggered: {
             root.focus = true;
+            priv.focusedAppDelegate.saveWindowState()
             workspaceSwitcher.showRightMoveApp(priv.focusedAppDelegate.surface)
         }
     }
@@ -407,6 +404,7 @@ FocusScope {
         active: !workspaceSwitcher.active && root.workspaceEnabled && priv.focusedAppDelegate !== null
         onTriggered: {
             root.focus = true;
+            priv.focusedAppDelegate.saveWindowState()
             workspaceSwitcher.showUpMoveApp(priv.focusedAppDelegate.surface)
         }
     }
@@ -416,6 +414,7 @@ FocusScope {
         active: !workspaceSwitcher.active && root.workspaceEnabled && priv.focusedAppDelegate !== null
         onTriggered: {
             root.focus = true;
+            priv.focusedAppDelegate.saveWindowState()
             workspaceSwitcher.showDownMoveApp(priv.focusedAppDelegate.surface)
         }
     }
@@ -432,52 +431,31 @@ FocusScope {
             }
         }
 
-        property var focusedAppDelegate: null
-        property var foregroundMaximizedAppDelegate: null // for stuff like drop shadow and focusing maximized app by clicking panel
+        readonly property var focusedAppDelegate: workspacesView.currentItem.focusedAppDelegate
+        readonly property var foregroundMaximizedAppDelegate: workspacesView.currentItem.foregroundMaximizedAppDelegate // for stuff like drop shadow and focusing maximized app by clicking panel
 
         property bool goneToSpread: false
         property int closingIndex: -1
         property int animationDuration: LomiriAnimation.FastDuration
 
         function updateForegroundMaximizedApp() {
-            var found = false;
-            for (var i = 0; i < appRepeater.count && !found; i++) {
-                var item = appRepeater.itemAt(i);
-                if (item && item.visuallyMaximized) {
-                    foregroundMaximizedAppDelegate = item;
-                    found = true;
-                }
-            }
-            if (!found) {
-                foregroundMaximizedAppDelegate = null;
-            }
+            root.currentWorkspaceContainer.updateForegroundMaximizedApp();
         }
 
         function minimizeAllWindows() {
-            for (var i = appRepeater.count - 1; i >= 0; i--) {
-                var appDelegate = appRepeater.itemAt(i);
-                if (appDelegate && !appDelegate.minimized) {
-                    appDelegate.requestMinimize();
-                }
-            }
+            root.currentWorkspaceContainer.minimizeAllWindows();
         }
 
         readonly property bool sideStageEnabled: root.mode === "stagedWithSideStage" &&
                                                  (root.shellOrientation == Qt.LandscapeOrientation ||
                                                  root.shellOrientation == Qt.InvertedLandscapeOrientation)
-        onSideStageEnabledChanged: {
-            for (var i = 0; i < appRepeater.count; i++) {
-                appRepeater.itemAt(i).refreshStage();
-            }
-            priv.updateMainAndSideStageIndexes();
-        }
 
-        property var mainStageDelegate: null
-        property var sideStageDelegate: null
-        property int mainStageItemId: 0
-        property int sideStageItemId: 0
-        property string mainStageAppId: ""
-        property string sideStageAppId: ""
+        readonly property var mainStageDelegate: workspacesView.currentItem.mainStageDelegate
+        readonly property var sideStageDelegate: workspacesView.currentItem.sideStageDelegate
+        readonly property int mainStageItemId: workspacesView.currentItem.mainStageItemId
+        readonly property int sideStageItemId: workspacesView.currentItem.sideStageItemId
+        readonly property string mainStageAppId: workspacesView.currentItem.mainStageAppId
+        readonly property string sideStageAppId: workspacesView.currentItem.sideStageAppId
 
         onSideStageDelegateChanged: {
             if (!sideStageDelegate) {
@@ -495,69 +473,10 @@ FocusScope {
         }
 
         function updateMainAndSideStageIndexes() {
-            if (root.mode != "stagedWithSideStage") {
-                priv.sideStageDelegate = null;
-                priv.sideStageItemId = 0;
-                priv.sideStageAppId = "";
-                priv.mainStageDelegate = appRepeater.itemAt(0);
-                priv.mainStageItemId = topLevelSurfaceList.idAt(0);
-                priv.mainStageAppId = topLevelSurfaceList.applicationAt(0) ? topLevelSurfaceList.applicationAt(0).appId : ""
-                return;
-            }
-
-            var choseMainStage = false;
-            var choseSideStage = false;
-
-            if (!root.topLevelSurfaceList)
-                return;
-
-            for (var i = 0; i < appRepeater.count && (!choseMainStage || !choseSideStage); ++i) {
-                var appDelegate = appRepeater.itemAt(i);
-                if (!appDelegate) {
-                    // This might happen during startup phase... If the delegate appears and claims focus
-                    // things are updated and appRepeater.itemAt(x) still returns null while appRepeater.count >= x
-                    // Lets just skip it, on startup it will be generated at a later point too...
-                    continue;
-                }
-                if (sideStage.shown && appDelegate.stage == ApplicationInfoInterface.SideStage
-                        && !choseSideStage) {
-                    priv.sideStageDelegate = appDelegate
-                    priv.sideStageItemId = root.topLevelSurfaceList.idAt(i);
-                    priv.sideStageAppId = root.topLevelSurfaceList.applicationAt(i).appId;
-                    choseSideStage = true;
-                } else if (!choseMainStage && appDelegate.stage == ApplicationInfoInterface.MainStage) {
-                    priv.mainStageDelegate = appDelegate;
-                    priv.mainStageItemId = root.topLevelSurfaceList.idAt(i);
-                    priv.mainStageAppId = root.topLevelSurfaceList.applicationAt(i).appId;
-                    choseMainStage = true;
-                }
-            }
-            if (!choseMainStage && priv.mainStageDelegate) {
-                priv.mainStageDelegate = null;
-                priv.mainStageItemId = 0;
-                priv.mainStageAppId = "";
-            }
-            if (!choseSideStage && priv.sideStageDelegate) {
-                priv.sideStageDelegate = null;
-                priv.sideStageItemId = 0;
-                priv.sideStageAppId = "";
-            }
+            root.currentWorkspaceContainer.updateMainAndSideStageIndexes();
         }
 
-        property int nextInStack: {
-            var mainStageIndex = priv.mainStageDelegate ? priv.mainStageDelegate.itemIndex : -1;
-            var sideStageIndex = priv.sideStageDelegate ? priv.sideStageDelegate.itemIndex : -1;
-            if (sideStageIndex == -1) {
-                return topLevelSurfaceList.count > 1 ? 1 : -1;
-            }
-            if (mainStageIndex == 0 || sideStageIndex == 0) {
-                if (mainStageIndex == 1 || sideStageIndex == 1) {
-                    return topLevelSurfaceList.count > 2 ? 2 : -1;
-                }
-                return 1;
-            }
-            return -1;
-        }
+        property int nextInStack: root.currentWorkspaceContainer.nextInStack
 
         readonly property real virtualKeyboardHeight: root.inputMethodRect.height
 
@@ -695,6 +614,7 @@ FocusScope {
             name: "spread"; when: priv.goneToSpread
             PropertyChanges { target: floatingFlickable; enabled: true }
             PropertyChanges { target: root; focus: true }
+            PropertyChanges { target: workspacesView; focus: false }
             PropertyChanges { target: spreadItem; focus: true }
             PropertyChanges { target: hoverMouseArea; enabled: true }
             PropertyChanges { target: rightEdgeDragArea; enabled: false }
@@ -738,6 +658,7 @@ FocusScope {
             name: "staged"; when: root.mode === "staged"
             PropertyChanges { target: root; focus: true }
             PropertyChanges { target: appContainer; focus: true }
+            PropertyChanges { target: workspacesView; focus: true }
         },
         State {
             name: "stagedWithSideStage"; when: root.mode === "stagedWithSideStage"
@@ -745,11 +666,13 @@ FocusScope {
             PropertyChanges { target: sideStage; visible: true }
             PropertyChanges { target: root; focus: true }
             PropertyChanges { target: appContainer; focus: true }
+            PropertyChanges { target: workspacesView; focus: true }
         },
         State {
             name: "windowed"; when: root.mode === "windowed"
             PropertyChanges { target: root; focus: true }
             PropertyChanges { target: appContainer; focus: true }
+            PropertyChanges { target: workspacesView; focus: true }
         }
     ]
     transitions: [
@@ -979,12 +902,6 @@ FocusScope {
             color: "#FFFFFF"
         }
 
-        Connections {
-            target: root.topLevelSurfaceList
-            function onListChanged() { priv.updateMainAndSideStageIndexes() }
-        }
-
-
         DropArea {
             objectName: "MainStageDropArea"
             anchors {
@@ -1011,8 +928,9 @@ FocusScope {
             visible: false
             showHint: !priv.sideStageDelegate
             Behavior on opacity { LomiriNumberAnimation {} }
+            parent: root.currentWorkspaceContainer
             z: {
-                if (!priv.mainStageItemId) return 0;
+                if (!priv.mainStageItemId) return -1;
 
                 if (priv.sideStageItemId && priv.nextInStack > 0) {
 
@@ -1029,12 +947,12 @@ FocusScope {
 
                     if (nextDelegateInStack.stage ===  ApplicationInfoInterface.MainStage) {
                         // if the next app in stack is a main stage app, put the sidestage on top of it.
-                        return 2;
+                        return 1;
                     }
-                    return 1;
+                    return 0;
                 }
 
-                return 1;
+                return 0;
             }
 
             onShownChanged: {
@@ -1092,1267 +1010,1487 @@ FocusScope {
             z: 1000
         }
 
-        Repeater {
-            id: appRepeater
-            model: topLevelSurfaceList
-            objectName: "appRepeater"
+        ListView {
+            id: workspacesView
+            objectName: "workspacesView"
+            anchors.fill: parent
+            focus: true
+            model: WMScreen.workspaces
+            cacheBuffer: count * width * 2 // Do not unload any item
+            orientation: ListView.Horizontal
+            snapMode: ListView.SnapOneItem
+            interactive: false
+            highlightMoveDuration: LomiriAnimation.FastDuration
+            highlightMoveVelocity: -1
+            highlightResizeDuration: 0
+            highlightResizeVelocity: -1
 
-            function indexOf(delegateItem) {
-                for (var i = 0; i < count; i++) {
-                    if (itemAt(i) === delegateItem) {
-                        return i;
-                    }
-                }
-                return -1;
+            // Check if highlight animation is running since 'moving' doesn't apply to non-user movements
+            property bool highlightAnimationIsRunning: highlightAnimationTimer.running
+
+            Timer {
+                id: highlightAnimationTimer
+                interval: workspacesView.highlightMoveDuration
             }
+            onCurrentIndexChanged: highlightAnimationTimer.restart()
 
             delegate: FocusScope {
-                id: appDelegate
-                objectName: "appDelegate_" + model.window.id
-                property int itemIndex: index // We need this from outside the repeater
-                // z might be overriden in some cases by effects, but we need z ordering
-                // to calculate occlusion detection
-                property int normalZ: topLevelSurfaceList.count - index
-                onNormalZChanged: {
-                    if (visuallyMaximized) {
-                        priv.updateForegroundMaximizedApp();
+                id: workspaceContainer
+                objectName: "workspaceContainer"
+                focus: true
+
+                // Do not hide non-active workspaces while the switching animation is still running
+                visible: isActive || ListView.view.moving || workspacesView.highlightAnimationIsRunning
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                }
+                width: ListView.view.width
+
+                property var workspace: modelData
+                property int workspaceIndex: index
+                property var windowModel: workspace.windowModel
+                property bool isActive: workspace.active
+                property alias appRepeater: appRepeater
+
+                property var focusedAppDelegate: null
+                property var foregroundMaximizedAppDelegate: null
+
+                function updateForegroundMaximizedApp() {
+                    var found = false;
+                    for (var i = 0; i < appRepeater.count && !found; i++) {
+                        var item = appRepeater.itemAt(i);
+                        if (item && item.visuallyMaximized) {
+                            foregroundMaximizedAppDelegate = item;
+                            found = true;
+                        }
                     }
-                }
-                z: normalZ
-
-                opacity: fakeDragItem.surface == model.window.surface && fakeDragItem.Drag.active ? 0 : 1
-                Behavior on opacity { LomiriNumberAnimation {} }
-
-                // Set these as propertyes as they wont update otherwise
-                property real screenOffsetX: Screen.virtualX
-                property real screenOffsetY: Screen.virtualY
-
-                // Normally we want x/y where the surface thinks it is. Width/height of our delegate will
-                // match what the actual surface size is.
-                // Don't write to those, they will be set by states
-                // --
-                // Here we will also need to remove the screen offset from miral's results
-                // as lomiri x,y will be relative to the current screen only
-                // FIXME: when proper multiscreen lands
-                x: model.window.position.x - clientAreaItem.x - screenOffsetX
-                y: model.window.position.y - clientAreaItem.y - screenOffsetY
-                width: decoratedWindow.implicitWidth
-                height: decoratedWindow.implicitHeight
-
-                // requestedX/Y/width/height is what we ask the actual surface to be.
-                // Do not write to those, they will be set by states
-                property real requestedX: windowedX
-                property real requestedY: windowedY
-                property real requestedWidth: windowedWidth
-                property real requestedHeight: windowedHeight
-
-                // For both windowed and staged need to tell miral what screen we are on,
-                // so we need to add the screen offset to the position we tell miral
-                // FIXME: when proper multiscreen lands
-                Binding {
-                    target: model.window; property: "requestedPosition"
-                    // miral doesn't know about our window decorations. So we have to deduct them
-                    value: Qt.point(appDelegate.requestedX + appDelegate.clientAreaItem.x + screenOffsetX,
-                                    appDelegate.requestedY + appDelegate.clientAreaItem.y + screenOffsetY)
-                    when: root.mode == "windowed"
-                    restoreMode: Binding.RestoreBinding
-                }
-                Binding {
-                    target: model.window; property: "requestedPosition"
-                    value: Qt.point(screenOffsetX, screenOffsetY)
-                    when: root.mode != "windowed"
-                    restoreMode: Binding.RestoreBinding
-                }
-
-                // In those are for windowed mode. Those values basically store the window's properties
-                // when having a floating window. If you want to move/resize a window in normal mode, this is what you want to write to.
-                property real windowedX
-                property real windowedY
-                property real windowedWidth
-                property real windowedHeight
-
-                // unlike windowedX/Y, this is the last known grab position before being pushed against edges/corners
-                // when restoring, the window should return to these, not to the place where it was dropped near the edge
-                property real restoredX
-                property real restoredY
-
-                // Keeps track of the window geometry while in normal or restored state
-                // Useful when returning from some maxmized state or when saving the geometry while maximized
-                // FIXME: find a better solution
-                property real normalX: 0
-                property real normalY: 0
-                property real normalWidth: 0
-                property real normalHeight: 0
-                function updateNormalGeometry() {
-                    if (appDelegate.state == "normal" || appDelegate.state == "restored") {
-                        normalX = appDelegate.requestedX;
-                        normalY = appDelegate.requestedY;
-                        normalWidth = appDelegate.width;
-                        normalHeight = appDelegate.height;
-                    }
-                }
-                function updateRestoredGeometry() {
-                    if (appDelegate.state == "normal" || appDelegate.state == "restored") {
-                        // save the x/y to restore to
-                        restoredX = appDelegate.x;
-                        restoredY = appDelegate.y;
+                    if (!found) {
+                        foregroundMaximizedAppDelegate = null;
                     }
                 }
 
-                Connections {
-                    target: appDelegate
-                    function onXChanged() { appDelegate.updateNormalGeometry(); }
-                    function onYChanged() {  appDelegate.updateNormalGeometry(); }
-                    function onWidthChanged() {  appDelegate.updateNormalGeometry(); }
-                    function onHeightChanged() {  appDelegate.updateNormalGeometry(); }
-                }
-
-                // True when the Stage is focusing this app and playing its own animation.
-                // Stays true until the app is unfocused.
-                // If it is, we don't want to play the slide in/out transition from StageMaths.
-                // Setting it imperatively is not great, but any declarative solution hits
-                // race conditions, causing two animations to play for one focus event.
-                property bool inhibitSlideAnimation: false
-
-                Binding {
-                    target: appDelegate
-                    property: "y"
-                    value: appDelegate.requestedY -
-                           Math.min(appDelegate.requestedY - root.availableDesktopArea.y,
-                                    Math.max(0, priv.virtualKeyboardHeight - (appContainer.height - (appDelegate.requestedY + appDelegate.height))))
-                    when: root.oskEnabled && appDelegate.focus && (appDelegate.state == "normal" || appDelegate.state == "restored")
-                          && root.inputMethodRect.height > 0
-                    restoreMode: Binding.RestoreBinding
-                }
-
-                Behavior on x { id: xBehavior; enabled: priv.closingIndex >= 0; LomiriNumberAnimation { onRunningChanged: if (!running) priv.closingIndex = -1} }
-
-                Connections {
-                    target: root
-                    function onShellOrientationAngleChanged() {
-                        // at this point decoratedWindow.surfaceOrientationAngle is the old shellOrientationAngle
-                        if (appDelegate.application && appDelegate.application.rotatesWindowContents) {
-                            if (root.state == "windowed") {
-                                var angleDiff = decoratedWindow.surfaceOrientationAngle - shellOrientationAngle;
-                                angleDiff = (360 + angleDiff) % 360;
-                                if (angleDiff === 90 || angleDiff === 270) {
-                                    var aux = decoratedWindow.requestedHeight;
-                                    decoratedWindow.requestedHeight = decoratedWindow.requestedWidth + decoratedWindow.actualDecorationHeight;
-                                    decoratedWindow.requestedWidth = aux - decoratedWindow.actualDecorationHeight;
-                                }
-                            }
-                            decoratedWindow.surfaceOrientationAngle = shellOrientationAngle;
-                        } else {
-                            decoratedWindow.surfaceOrientationAngle = 0;
+                function minimizeAllWindows() {
+                    for (var i = appRepeater.count - 1; i >= 0; i--) {
+                        var appDelegate = appRepeater.itemAt(i);
+                        if (appDelegate && !appDelegate.minimized) {
+                            appDelegate.requestMinimize();
                         }
                     }
                 }
 
-                readonly property alias application: decoratedWindow.application
-                readonly property alias minimumWidth: decoratedWindow.minimumWidth
-                readonly property alias minimumHeight: decoratedWindow.minimumHeight
-                readonly property alias maximumWidth: decoratedWindow.maximumWidth
-                readonly property alias maximumHeight: decoratedWindow.maximumHeight
-                readonly property alias widthIncrement: decoratedWindow.widthIncrement
-                readonly property alias heightIncrement: decoratedWindow.heightIncrement
+                property var mainStageDelegate: null
+                property var sideStageDelegate: null
+                property int mainStageItemId: 0
+                property int sideStageItemId: 0
+                property string mainStageAppId: ""
+                property string sideStageAppId: ""
 
-                readonly property bool maximized: windowState === WindowStateStorage.WindowStateMaximized
-                readonly property bool maximizedLeft: windowState === WindowStateStorage.WindowStateMaximizedLeft
-                readonly property bool maximizedRight: windowState === WindowStateStorage.WindowStateMaximizedRight
-                readonly property bool maximizedHorizontally: windowState === WindowStateStorage.WindowStateMaximizedHorizontally
-                readonly property bool maximizedVertically: windowState === WindowStateStorage.WindowStateMaximizedVertically
-                readonly property bool maximizedTopLeft: windowState === WindowStateStorage.WindowStateMaximizedTopLeft
-                readonly property bool maximizedTopRight: windowState === WindowStateStorage.WindowStateMaximizedTopRight
-                readonly property bool maximizedBottomLeft: windowState === WindowStateStorage.WindowStateMaximizedBottomLeft
-                readonly property bool maximizedBottomRight: windowState === WindowStateStorage.WindowStateMaximizedBottomRight
-                readonly property bool anyMaximized: maximized || maximizedLeft || maximizedRight || maximizedHorizontally || maximizedVertically ||
-                                                     maximizedTopLeft || maximizedTopRight || maximizedBottomLeft || maximizedBottomRight
-
-                readonly property bool minimized: windowState & WindowStateStorage.WindowStateMinimized
-                readonly property bool fullscreen: windowState === WindowStateStorage.WindowStateFullscreen
-
-                readonly property bool canBeMaximized: canBeMaximizedHorizontally && canBeMaximizedVertically
-                readonly property bool canBeMaximizedLeftRight: (maximumWidth == 0 || maximumWidth >= appContainer.width/2) &&
-                                                                (maximumHeight == 0 || maximumHeight >= appContainer.height)
-                readonly property bool canBeCornerMaximized: (maximumWidth == 0 || maximumWidth >= appContainer.width/2) &&
-                                                             (maximumHeight == 0 || maximumHeight >= appContainer.height/2)
-                readonly property bool canBeMaximizedHorizontally: maximumWidth == 0 || maximumWidth >= appContainer.width
-                readonly property bool canBeMaximizedVertically: maximumHeight == 0 || maximumHeight >= appContainer.height
-                readonly property alias orientationChangesEnabled: decoratedWindow.orientationChangesEnabled
-
-                // TODO drop our own windowType once Mir/Miral/Qtmir gets in sync with ours
-                property int windowState: WindowStateStorage.WindowStateNormal
-                property int prevWindowState: WindowStateStorage.WindowStateRestored
-
-                property bool animationsEnabled: true
-                property alias title: decoratedWindow.title
-                readonly property string appName: model.application ? model.application.name : ""
-                property bool visuallyMaximized: false
-                property bool visuallyMinimized: false
-                readonly property alias windowedTransitionRunning: windowedTransition.running
-
-                property int stage: ApplicationInfoInterface.MainStage
-                function saveStage(newStage) {
-                    appDelegate.stage = newStage;
-                    WindowStateStorage.saveStage(appId, newStage);
-                    priv.updateMainAndSideStageIndexes()
-                }
-
-                readonly property var surface: model.window.surface
-                readonly property var window: model.window
-
-                readonly property alias focusedSurface: decoratedWindow.focusedSurface
-                readonly property bool dragging: touchControls.overlayShown ? touchControls.dragging : decoratedWindow.dragging
-
-                readonly property string appId: model.application.appId
-                readonly property alias clientAreaItem: decoratedWindow.clientAreaItem
-
-                // It is Lomiri policy to close any window but the last one during OOM teardown
-/*
-                Connections {
-                    target: model.window.surface
-                    onLiveChanged: {
-                        if ((!surface.live && application && application.surfaceCount > 1) || !application)
-                            topLevelSurfaceList.removeAt(appRepeater.indexOf(appDelegate));
-                    }
-                }
-*/
-
-
-                function activate() {
-                    if (model.window.focused) {
-                        updateQmlFocusFromMirSurfaceFocus();
-                    } else {
-                        if (surface.live) {
-                            // Activate the window since it has a surface (with a running app) backing it
-                            model.window.activate();
-                        } else {
-                            // Otherwise, cause a respawn of the app, and trigger it's refocusing as the last window
-                            topLevelSurfaceList.raiseId(model.window.id);
-                        }
-                    }
-                }
-                function requestMaximize() { model.window.requestState(Mir.MaximizedState); }
-                function requestMaximizeVertically() { model.window.requestState(Mir.VertMaximizedState); }
-                function requestMaximizeHorizontally() { model.window.requestState(Mir.HorizMaximizedState); }
-                function requestMaximizeLeft() { model.window.requestState(Mir.MaximizedLeftState); }
-                function requestMaximizeRight() { model.window.requestState(Mir.MaximizedRightState); }
-                function requestMaximizeTopLeft() { model.window.requestState(Mir.MaximizedTopLeftState); }
-                function requestMaximizeTopRight() { model.window.requestState(Mir.MaximizedTopRightState); }
-                function requestMaximizeBottomLeft() { model.window.requestState(Mir.MaximizedBottomLeftState); }
-                function requestMaximizeBottomRight() { model.window.requestState(Mir.MaximizedBottomRightState); }
-                function requestMinimize() { model.window.requestState(Mir.MinimizedState); }
-                function requestRestore() { model.window.requestState(Mir.RestoredState); }
-
-                function claimFocus() {
-                    if (root.state == "spread") {
-                        spreadItem.highlightedIndex = index
-                        // force pendingActivation so that when switching to staged mode, topLevelSurfaceList focus won't got to previous app ( case when apps are launched from outside )
-                        topLevelSurfaceList.pendingActivation();
-                        priv.goneToSpread = false;
-                    }
-                    if (root.mode == "stagedWithSideStage") {
-                        if (appDelegate.stage == ApplicationInfoInterface.SideStage && !sideStage.shown) {
-                            sideStage.show();
-                        }
-                        priv.updateMainAndSideStageIndexes();
-                    }
-                    appDelegate.focus = true;
-
-                    // Don't set focusedAppDelegate (and signal mainAppChanged) unnecessarily
-                    // which can happen after getting interactive again.
-                    if (priv.focusedAppDelegate !== appDelegate)
-                        priv.focusedAppDelegate = appDelegate;
-                }
-
-                function updateQmlFocusFromMirSurfaceFocus() {
-                    if (model.window.focused) {
-                        claimFocus();
-                        decoratedWindow.focus = true;
+                onSideStageDelegateChanged: {
+                    if (!sideStageDelegate) {
+                        sideStage.hide();
                     }
                 }
 
-                WindowStateSaver {
-                    id: windowStateSaver
-                    target: appDelegate
-                    screenWidth: appContainer.width
-                    screenHeight: appContainer.height
-                    leftMargin: root.availableDesktopArea.x
-                    minimumY: root.availableDesktopArea.y
-                }
-
-                Connections {
-                    target: model.window
-                    function onFocusedChanged() {
-                        updateQmlFocusFromMirSurfaceFocus();
-                        if (!model.window.focused) {
-                            inhibitSlideAnimation = false;
-                        }
-                    }
-                    function onFocusRequested() {
-                        appDelegate.activate();
-                    }
-                    function onStateChanged(value) {
-                        if (value == Mir.MinimizedState) {
-                            appDelegate.minimize();
-                        } else if (value == Mir.MaximizedState) {
-                            appDelegate.maximize();
-                        } else if (value == Mir.VertMaximizedState) {
-                            appDelegate.maximizeVertically();
-                        } else if (value == Mir.HorizMaximizedState) {
-                            appDelegate.maximizeHorizontally();
-                        } else if (value == Mir.MaximizedLeftState) {
-                            appDelegate.maximizeLeft();
-                        } else if (value == Mir.MaximizedRightState) {
-                            appDelegate.maximizeRight();
-                        } else if (value == Mir.MaximizedTopLeftState) {
-                            appDelegate.maximizeTopLeft();
-                        } else if (value == Mir.MaximizedTopRightState) {
-                            appDelegate.maximizeTopRight();
-                        } else if (value == Mir.MaximizedBottomLeftState) {
-                            appDelegate.maximizeBottomLeft();
-                        } else if (value == Mir.MaximizedBottomRightState) {
-                            appDelegate.maximizeBottomRight();
-                        } else if (value == Mir.RestoredState) {
-                            if (appDelegate.fullscreen && appDelegate.prevWindowState != WindowStateStorage.WindowStateRestored
-                                    && appDelegate.prevWindowState != WindowStateStorage.WindowStateNormal) {
-                                model.window.requestState(WindowStateStorage.toMirState(appDelegate.prevWindowState));
-                            } else {
-                                appDelegate.restore();
-                            }
-                        } else if (value == Mir.FullscreenState) {
-                            appDelegate.prevWindowState = appDelegate.windowState;
-                            appDelegate.windowState = WindowStateStorage.WindowStateFullscreen;
-                        }
-                    }
-                }
-
-                readonly property bool windowReady: clientAreaItem.surfaceInitialized
-                onWindowReadyChanged: {
-                    if (windowReady) {
-                        var loadedMirState = WindowStateStorage.toMirState(windowStateSaver.loadedState);
-                        var state = loadedMirState;
-
-                        if (window.state == Mir.FullscreenState) {
-                            // If the app is fullscreen at startup, we should not use saved state
-                            // Example of why: if you open game that only requests fullscreen at
-                            // Statup, this will automaticly be set to "restored state" since
-                            // thats the default value of stateStorage, this will result in the app
-                            // having the "restored state" as it will not make a fullscreen
-                            // call after the app has started.
-                            console.log("Initial window state is fullscreen, not using saved state.");
-                            state = window.state;
-                        } else if (loadedMirState == Mir.FullscreenState) {
-                            // If saved state is fullscreen, we should use app initial state
-                            // Example of why: if you open browser with youtube video at fullscreen
-                            // and close this app, it will be fullscreen next time you open the app.
-                            console.log("Saved window state is fullscreen, using initial window state");
-                            state = window.state;
-                        }
-
-                        // need to apply the shell chrome policy on top the saved window state
-                        var policy;
-                        if (root.mode == "windowed") {
-                            policy = windowedFullscreenPolicy;
-                        } else {
-                            policy = stagedFullscreenPolicy
-                        }
-                        window.requestState(policy.applyPolicy(state, surface.shellChrome));
-                    }
-                }
-
-                Component.onCompleted: {
-                    if (application && application.rotatesWindowContents) {
-                        decoratedWindow.surfaceOrientationAngle = shellOrientationAngle;
-                    } else {
-                        decoratedWindow.surfaceOrientationAngle = 0;
-                    }
-
-                    // First, cascade the newly created window, relative to the currently/old focused window.
-                    windowedX = priv.focusedAppDelegate ? priv.focusedAppDelegate.windowedX + units.gu(3) : (normalZ - 1) * units.gu(3)
-                    windowedY = priv.focusedAppDelegate ? priv.focusedAppDelegate.windowedY + units.gu(3) : normalZ * units.gu(3)
-                    // Now load any saved state. This needs to happen *after* the cascading!
-                    windowStateSaver.load();
-
-                    if (!root.spreadShown) {
-                        updateQmlFocusFromMirSurfaceFocus();
-                    }
-
-                    refreshStage();
-                    _constructing = false;
-                }
-                Component.onDestruction: {
-                    windowStateSaver.save();
-
-                    if (!root.parent) {
-                        // This stage is about to be destroyed. Don't mess up with the model at this point
+                function updateMainAndSideStageIndexes() {
+                    if (root.mode != "stagedWithSideStage") {
+                        workspaceContainer.sideStageDelegate = null;
+                        workspaceContainer.sideStageItemId = 0;
+                        workspaceContainer.sideStageAppId = "";
+                        workspaceContainer.mainStageDelegate = appRepeater.itemAt(0);
+                        workspaceContainer.mainStageItemId = workspaceContainer.windowModel.idAt(0);
+                        workspaceContainer.mainStageAppId = workspaceContainer.windowModel.applicationAt(0) ? workspaceContainer.windowModel.applicationAt(0).appId : ""
                         return;
                     }
 
-                    if (visuallyMaximized) {
-                        priv.updateForegroundMaximizedApp();
+                    var choseMainStage = false;
+                    var choseSideStage = false;
+
+                    if (!workspaceContainer.windowModel)
+                        return;
+
+                    for (var i = 0; i < appRepeater.count && (!choseMainStage || !choseSideStage); ++i) {
+                        var appDelegate = appRepeater.itemAt(i);
+                        if (!appDelegate) {
+                            // This might happen during startup phase... If the delegate appears and claims focus
+                            // things are updated and appRepeater.itemAt(x) still returns null while appRepeater.count >= x
+                            // Lets just skip it, on startup it will be generated at a later point too...
+                            continue;
+                        }
+                        if (sideStage.shown && appDelegate.stage == ApplicationInfoInterface.SideStage
+                                && !choseSideStage) {
+                            workspaceContainer.sideStageDelegate = appDelegate
+                            workspaceContainer.sideStageItemId = workspaceContainer.windowModel.idAt(i);
+                            workspaceContainer.sideStageAppId = workspaceContainer.windowModel.applicationAt(i).appId;
+                            choseSideStage = true;
+                        } else if (!choseMainStage && appDelegate.stage == ApplicationInfoInterface.MainStage) {
+                            workspaceContainer.mainStageDelegate = appDelegate;
+                            workspaceContainer.mainStageItemId = workspaceContainer.windowModel.idAt(i);
+                            workspaceContainer.mainStageAppId = workspaceContainer.windowModel.applicationAt(i).appId;
+                            choseMainStage = true;
+                        }
+                    }
+                    if (!choseMainStage && workspaceContainer.mainStageDelegate) {
+                        workspaceContainer.mainStageDelegate = null;
+                        workspaceContainer.mainStageItemId = 0;
+                        workspaceContainer.mainStageAppId = "";
+                    }
+                    if (!choseSideStage && workspaceContainer.sideStageDelegate) {
+                        workspaceContainer.sideStageDelegate = null;
+                        workspaceContainer.sideStageItemId = 0;
+                        workspaceContainer.sideStageAppId = "";
                     }
                 }
 
-                onVisuallyMaximizedChanged: priv.updateForegroundMaximizedApp()
-
-                property bool _constructing: true;
-                onStageChanged: {
-                    if (!_constructing) {
-                        priv.updateMainAndSideStageIndexes();
+                property int nextInStack: {
+                    var mainStageIndex = workspaceContainer.mainStageDelegate ? workspaceContainer.mainStageDelegate.itemIndex : -1;
+                    var sideStageIndex = workspaceContainer.sideStageDelegate ? workspaceContainer.sideStageDelegate.itemIndex : -1;
+                    if (sideStageIndex == -1) {
+                        return workspaceContainer.windowModel.count > 1 ? 1 : -1;
                     }
-                }
-
-                visible: (
-                          !visuallyMinimized
-                          && !greeter.fullyShown
-                          && (priv.foregroundMaximizedAppDelegate === null || priv.foregroundMaximizedAppDelegate.normalZ <= z)
-                         )
-                         || appDelegate.fullscreen
-                         || focusAnimation.running || rightEdgeFocusAnimation.running || hidingAnimation.running
-
-                function close() {
-                    model.window.close();
-                }
-
-                function maximize(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximized;
-                }
-                function maximizeLeft(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedLeft;
-                }
-                function maximizeRight(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedRight;
-                }
-                function maximizeHorizontally(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedHorizontally;
-                }
-                function maximizeVertically(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedVertically;
-                }
-                function maximizeTopLeft(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedTopLeft;
-                }
-                function maximizeTopRight(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedTopRight;
-                }
-                function maximizeBottomLeft(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedBottomLeft;
-                }
-                function maximizeBottomRight(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = WindowStateStorage.WindowStateMaximizedBottomRight;
-                }
-                function minimize(animated) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState |= WindowStateStorage.WindowStateMinimized; // add the minimized bit
-                }
-                function restore(animated,state) {
-                    animationsEnabled = (animated === undefined) || animated;
-                    windowState = state || WindowStateStorage.WindowStateRestored;
-                    windowState &= ~WindowStateStorage.WindowStateMinimized; // clear the minimized bit
-                    prevWindowState = windowState;
-                }
-
-                function playFocusAnimation() {
-                    if (state == "stagedRightEdge") {
-                        // TODO: Can we drop this if and find something that always works?
-                        if (root.mode == "staged") {
-                            rightEdgeFocusAnimation.targetX = 0
-                            rightEdgeFocusAnimation.start()
-                        } else if (root.mode == "stagedWithSideStage") {
-                            rightEdgeFocusAnimation.targetX = appDelegate.stage == ApplicationInfoInterface.SideStage ? sideStage.x : 0
-                            rightEdgeFocusAnimation.start()
+                    if (mainStageIndex == 0 || sideStageIndex == 0) {
+                        if (mainStageIndex == 1 || sideStageIndex == 1) {
+                            return workspaceContainer.windowModel.count > 2 ? 2 : -1;
                         }
-                    } else {
-                        focusAnimation.start()
+                        return 1;
                     }
+                    return -1;
                 }
-                function playHidingAnimation() {
-                    if (state != "windowedRightEdge") {
-                        hidingAnimation.start()
-                    }
-                }
-
-                function refreshStage() {
-                    var newStage = ApplicationInfoInterface.MainStage;
-                    if (priv.sideStageEnabled) { // we're in lanscape rotation.
-                        if (application && application.supportedOrientations & (Qt.PortraitOrientation|Qt.InvertedPortraitOrientation)) {
-                            var defaultStage = ApplicationInfoInterface.SideStage; // if application supports portrait, it defaults to sidestage.
-                            if (application.supportedOrientations & (Qt.LandscapeOrientation|Qt.InvertedLandscapeOrientation)) {
-                                // if it supports lanscape, it defaults to mainstage.
-                                defaultStage = ApplicationInfoInterface.MainStage;
-                            }
-                            newStage = WindowStateStorage.getStage(application.appId, defaultStage);
-                        }
-                    }
-
-                    stage = newStage;
-                    if (focus && stage == ApplicationInfoInterface.SideStage && !sideStage.shown) {
-                        sideStage.show();
-                    }
-                }
-
-                LomiriNumberAnimation {
-                    id: focusAnimation
-                    target: appDelegate
-                    property: "scale"
-                    from: 0.98
-                    to: 1
-                    duration: LomiriAnimation.SnapDuration
-                    onStarted: {
-                        topLevelSurfaceList.pendingActivation();
-                        topLevelSurfaceList.raiseId(model.window.id);
-                    }
-                    onStopped: {
-                        appDelegate.activate();
-                    }
-                }
-                ParallelAnimation {
-                    id: rightEdgeFocusAnimation
-                    property int targetX: 0
-                    LomiriNumberAnimation { target: appDelegate; properties: "x"; to: rightEdgeFocusAnimation.targetX; duration: priv.animationDuration }
-                    LomiriNumberAnimation { target: decoratedWindow; properties: "angle"; to: 0; duration: priv.animationDuration }
-                    LomiriNumberAnimation { target: decoratedWindow; properties: "itemScale"; to: 1; duration: priv.animationDuration }
-                    onStarted: {
-                        topLevelSurfaceList.pendingActivation();
-                        inhibitSlideAnimation = true;
-                    }
-                    onStopped: {
-                        appDelegate.activate();
-                    }
-                }
-                ParallelAnimation {
-                    id: hidingAnimation
-                    LomiriNumberAnimation { target: appDelegate; property: "opacity"; to: 0; duration: priv.animationDuration }
-                    onStopped: appDelegate.opacity = 1
-                }
-
-                SpreadMaths {
-                    id: spreadMaths
-                    spread: spreadItem
-                    itemIndex: index
-                    flickable: floatingFlickable
-                }
-                StageMaths {
-                    id: stageMaths
-                    sceneWidth: root.width
-                    stage: appDelegate.stage
-                    thisDelegate: appDelegate
-                    mainStageDelegate: priv.mainStageDelegate
-                    sideStageDelegate: priv.sideStageDelegate
-                    sideStageWidth: sideStage.panelWidth
-                    sideStageHandleWidth: sideStage.handleWidth
-                    sideStageX: sideStage.x
-                    itemIndex: appDelegate.itemIndex
-                    nextInStack: priv.nextInStack
-                    animationDuration: priv.animationDuration
-                }
-
-                StagedRightEdgeMaths {
-                    id: stagedRightEdgeMaths
-                    sceneWidth: root.availableDesktopArea.width
-                    sceneHeight: appContainer.height
-                    isMainStageApp: priv.mainStageDelegate == appDelegate
-                    isSideStageApp: priv.sideStageDelegate == appDelegate
-                    sideStageWidth: sideStage.width
-                    sideStageOpen: sideStage.shown
-                    itemIndex: index
-                    nextInStack: priv.nextInStack
-                    progress: 0
-                    targetHeight: spreadItem.stackHeight
-                    targetX: spreadMaths.targetX
-                    startY: appDelegate.fullscreen ? 0 : root.availableDesktopArea.y
-                    targetY: spreadMaths.targetY
-                    targetAngle: spreadMaths.targetAngle
-                    targetScale: spreadMaths.targetScale
-                    shuffledZ: stageMaths.itemZ
-                    breakPoint: spreadItem.rightEdgeBreakPoint
-                }
-
-                WindowedRightEdgeMaths {
-                    id: windowedRightEdgeMaths
-                    itemIndex: index
-                    startWidth: appDelegate.requestedWidth
-                    startHeight: appDelegate.requestedHeight
-                    targetHeight: spreadItem.stackHeight
-                    targetX: spreadMaths.targetX
-                    targetY: spreadMaths.targetY
-                    normalZ: appDelegate.normalZ
-                    targetAngle: spreadMaths.targetAngle
-                    targetScale: spreadMaths.targetScale
-                    breakPoint: spreadItem.rightEdgeBreakPoint
-                }
-
-                states: [
-                    State {
-                        name: "spread"; when: root.state == "spread"
-                        StateChangeScript { script: { decoratedWindow.cancelDrag(); } }
-                        PropertyChanges {
-                            target: decoratedWindow;
-                            showDecoration: false;
-                            angle: spreadMaths.targetAngle
-                            itemScale: spreadMaths.targetScale
-                            scaleToPreviewSize: spreadItem.stackHeight
-                            scaleToPreviewProgress: 1
-                            hasDecoration: root.mode === "windowed"
-                            shadowOpacity: spreadMaths.shadowOpacity
-                            showHighlight: spreadItem.highlightedIndex === index
-                            darkening: spreadItem.highlightedIndex >= 0
-                            anchors.topMargin: dragArea.distance
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            x: spreadMaths.targetX
-                            y: spreadMaths.targetY
-                            z: index
-                            height: spreadItem.spreadItemHeight
-                            visible: spreadMaths.itemVisible
-                        }
-                        PropertyChanges { target: dragArea; enabled: true }
-                        PropertyChanges { target: windowInfoItem; opacity: spreadMaths.tileInfoOpacity; visible: spreadMaths.itemVisible }
-                        PropertyChanges { target: touchControls; enabled: false }
-                    },
-                    State {
-                        name: "stagedRightEdge"
-                        when: (root.mode == "staged" || root.mode == "stagedWithSideStage") && (root.state == "sideStagedRightEdge" || root.state == "stagedRightEdge" || rightEdgeFocusAnimation.running || hidingAnimation.running)
-                        PropertyChanges {
-                            target: stagedRightEdgeMaths
-                            progress: Math.max(rightEdgePushProgress, rightEdgeDragArea.draggedProgress)
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            x: stagedRightEdgeMaths.animatedX
-                            y: stagedRightEdgeMaths.animatedY
-                            z: stagedRightEdgeMaths.animatedZ
-                            height: stagedRightEdgeMaths.animatedHeight
-                            visible: appDelegate.x < root.width
-                        }
-                        PropertyChanges {
-                            target: decoratedWindow
-                            hasDecoration: false
-                            angle: stagedRightEdgeMaths.animatedAngle
-                            itemScale: stagedRightEdgeMaths.animatedScale
-                            scaleToPreviewSize: spreadItem.stackHeight
-                            scaleToPreviewProgress: stagedRightEdgeMaths.scaleToPreviewProgress
-                            shadowOpacity: .3
-                        }
-                        // make sure it's visible but transparent so it fades in when we transition to spread
-                        PropertyChanges { target: windowInfoItem; opacity: 0; visible: true }
-                    },
-                    State {
-                        name: "windowedRightEdge"
-                        when: root.mode == "windowed" && (root.state == "windowedRightEdge" || rightEdgeFocusAnimation.running || hidingAnimation.running || rightEdgePushProgress > 0)
-                        PropertyChanges {
-                            target: windowedRightEdgeMaths
-                            swipeProgress: rightEdgeDragArea.dragging ? rightEdgeDragArea.progress : 0
-                            pushProgress: rightEdgePushProgress
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            x: windowedRightEdgeMaths.animatedX
-                            y: windowedRightEdgeMaths.animatedY
-                            z: windowedRightEdgeMaths.animatedZ
-                            height: stagedRightEdgeMaths.animatedHeight
-                        }
-                        PropertyChanges {
-                            target: decoratedWindow
-                            showDecoration: windowedRightEdgeMaths.decorationHeight
-                            angle: windowedRightEdgeMaths.animatedAngle
-                            itemScale: windowedRightEdgeMaths.animatedScale
-                            scaleToPreviewSize: spreadItem.stackHeight
-                            scaleToPreviewProgress: windowedRightEdgeMaths.scaleToPreviewProgress
-                            shadowOpacity: .3
-                        }
-                        PropertyChanges {
-                            target: opacityEffect;
-                            opacityValue: windowedRightEdgeMaths.opacityMask
-                            sourceItem: windowedRightEdgeMaths.opacityMask < 1 ? decoratedWindow : null
-                        }
-                    },
-                    State {
-                        name: "staged"; when: root.state == "staged"
-                        PropertyChanges {
-                            target: appDelegate
-                            x: stageMaths.itemX
-                            y: root.availableDesktopArea.y
-                            visuallyMaximized: true
-                            visible: appDelegate.x < root.width
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            requestedWidth: appContainer.width
-                            requestedHeight: root.availableDesktopArea.height
-                            restoreEntryValues: false
-                        }
-                        PropertyChanges {
-                            target: decoratedWindow
-                            hasDecoration: false
-                        }
-                        PropertyChanges {
-                            target: resizeArea
-                            enabled: false
-                        }
-                        PropertyChanges {
-                            target: stageMaths
-                            animateX: !focusAnimation.running && !rightEdgeFocusAnimation.running && itemIndex !== spreadItem.highlightedIndex && !inhibitSlideAnimation
-                        }
-                        PropertyChanges {
-                            target: appDelegate.window
-                            allowClientResize: false
-                        }
-                    },
-                    State {
-                        name: "stagedWithSideStage"; when: root.state == "stagedWithSideStage"
-                        PropertyChanges {
-                            target: stageMaths
-                            itemIndex: index
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            x: stageMaths.itemX
-                            y: root.availableDesktopArea.y
-                            z: stageMaths.itemZ
-                            visuallyMaximized: true
-                            visible: appDelegate.x < root.width
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            requestedWidth: stageMaths.itemWidth
-                            requestedHeight: root.availableDesktopArea.height
-                            restoreEntryValues: false
-                        }
-                        PropertyChanges {
-                            target: decoratedWindow
-                            hasDecoration: false
-                        }
-                        PropertyChanges {
-                            target: resizeArea
-                            enabled: false
-                        }
-                        PropertyChanges {
-                            target: appDelegate.window
-                            allowClientResize: false
-                        }
-                    },
-                    State {
-                        name: "maximized"; when: appDelegate.maximized && !appDelegate.minimized
-                        PropertyChanges {
-                            target: appDelegate;
-                            requestedX: root.availableDesktopArea.x;
-                            requestedY: 0;
-                            visuallyMinimized: false;
-                            visuallyMaximized: true
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            requestedWidth: root.availableDesktopArea.width;
-                            requestedHeight: appContainer.height;
-                            restoreEntryValues: false
-                        }
-                        PropertyChanges { target: touchControls; enabled: true }
-                        PropertyChanges { target: decoratedWindow; windowControlButtonsVisible: false }
-                    },
-                    State {
-                        name: "fullscreen"; when: appDelegate.fullscreen && !appDelegate.minimized
-                        PropertyChanges {
-                            target: appDelegate;
-                            requestedX: 0
-                            requestedY: 0
-                        }
-                        PropertyChanges {
-                            target: appDelegate
-                            requestedWidth: appContainer.width
-                            requestedHeight: appContainer.height
-                            restoreEntryValues: false
-                        }
-                        PropertyChanges { target: decoratedWindow; hasDecoration: false }
-                    },
-                    State {
-                        name: "normal";
-                        when: appDelegate.windowState == WindowStateStorage.WindowStateNormal
-                        PropertyChanges {
-                            target: appDelegate
-                            visuallyMinimized: false
-                        }
-                        PropertyChanges { target: touchControls; enabled: true }
-                        PropertyChanges { target: resizeArea; enabled: true }
-                        PropertyChanges { target: decoratedWindow; shadowOpacity: .3; windowControlButtonsVisible: true}
-                        PropertyChanges {
-                            target: appDelegate
-                            requestedWidth: windowedWidth
-                            requestedHeight: windowedHeight
-                            restoreEntryValues: false
-                        }
-                    },
-                    State {
-                        name: "restored";
-                        when: appDelegate.windowState == WindowStateStorage.WindowStateRestored
-                        extend: "normal"
-                        PropertyChanges {
-                            restoreEntryValues: false
-                            target: appDelegate;
-                            windowedX: restoredX;
-                            windowedY: restoredY;
-                        }
-                    },
-                    State {
-                        name: "maximizedLeft"; when: appDelegate.maximizedLeft && !appDelegate.minimized
-                        extend: "normal"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x
-                            windowedY: root.availableDesktopArea.y
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height
-                        }
-                    },
-                    State {
-                        name: "maximizedRight"; when: appDelegate.maximizedRight && !appDelegate.minimized
-                        extend: "maximizedLeft"
-                        PropertyChanges {
-                            target: appDelegate;
-                            windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
-                        }
-                    },
-                    State {
-                        name: "maximizedTopLeft"; when: appDelegate.maximizedTopLeft && !appDelegate.minimized
-                        extend: "normal"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x
-                            windowedY: root.availableDesktopArea.y
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height / 2
-                        }
-                    },
-                    State {
-                        name: "maximizedTopRight"; when: appDelegate.maximizedTopRight && !appDelegate.minimized
-                        extend: "maximizedTopLeft"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
-                        }
-                    },
-                    State {
-                        name: "maximizedBottomLeft"; when: appDelegate.maximizedBottomLeft && !appDelegate.minimized
-                        extend: "normal"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x
-                            windowedY: root.availableDesktopArea.y + (root.availableDesktopArea.height / 2)
-                            windowedWidth: root.availableDesktopArea.width / 2
-                            windowedHeight: root.availableDesktopArea.height / 2
-                        }
-                    },
-                    State {
-                        name: "maximizedBottomRight"; when: appDelegate.maximizedBottomRight && !appDelegate.minimized
-                        extend: "maximizedBottomLeft"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
-                        }
-                    },
-                    State {
-                        name: "maximizedHorizontally"; when: appDelegate.maximizedHorizontally && !appDelegate.minimized
-                        extend: "normal"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: root.availableDesktopArea.x; windowedY: windowedY
-                            windowedWidth: root.availableDesktopArea.width; windowedHeight: windowedHeight
-                        }
-                    },
-                    State {
-                        name: "maximizedVertically"; when: appDelegate.maximizedVertically && !appDelegate.minimized
-                        extend: "normal"
-                        PropertyChanges {
-                            target: appDelegate
-                            windowedX: windowedX; windowedY: root.availableDesktopArea.y
-                            windowedWidth: windowedWidth; windowedHeight: root.availableDesktopArea.height
-                        }
-                    },
-                    State {
-                        name: "minimized"; when: appDelegate.minimized
-                        PropertyChanges {
-                            target: appDelegate
-                            scale: units.gu(5) / appDelegate.width
-                            opacity: 0;
-                            visuallyMinimized: true
-                            visuallyMaximized: false
-                            x: -appDelegate.width / 2
-                            y: root.height / 2
-                        }
-                    }
-                ]
-
-                transitions: [
-
-                    // These two animate applications into position from Staged to Desktop and back
-                    Transition {
-                        from: "staged,stagedWithSideStage"
-                        to: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight"
-                        enabled: appDelegate.animationsEnabled
-                        PropertyAction { target: appDelegate; properties: "visuallyMinimized,visuallyMaximized" }
-                        LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedX,requestedY,opacity,requestedWidth,requestedHeight,scale"; duration: priv.animationDuration }
-                    },
-                    Transition {
-                        from: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight"
-                        to: "staged,stagedWithSideStage"
-                        LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedX,requestedY,requestedWidth,requestedHeight"; duration: priv.animationDuration}
-                    },
-
-                    Transition {
-                        from: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight,staged,stagedWithSideStage,windowedRightEdge,stagedRightEdge";
-                        to: "spread"
-                        // DecoratedWindow wants the scaleToPreviewSize set before enabling scaleToPreview
-                        PropertyAction { target: appDelegate; properties: "z,visible" }
-                        PropertyAction { target: decoratedWindow; property: "scaleToPreviewSize" }
-                        LomiriNumberAnimation { target: appDelegate; properties: "x,y,height"; duration: priv.animationDuration }
-                        LomiriNumberAnimation { target: decoratedWindow; properties: "width,height,itemScale,angle,scaleToPreviewProgress"; duration: priv.animationDuration }
-                        LomiriNumberAnimation { target: windowInfoItem; properties: "opacity"; duration: priv.animationDuration }
-                    },
-                    Transition {
-                        from: "normal,staged"; to: "stagedWithSideStage"
-                        LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedWidth,requestedHeight"; duration: priv.animationDuration }
-                    },
-                    Transition {
-                        to: "windowedRightEdge"
-                        ScriptAction {
-                            script: {
-                                windowedRightEdgeMaths.startX = appDelegate.requestedX
-                                windowedRightEdgeMaths.startY = appDelegate.requestedY
-
-                                if (index == 1) {
-                                    var thisRect = { x: appDelegate.windowedX, y: appDelegate.windowedY, width: appDelegate.requestedWidth, height: appDelegate.requestedHeight }
-                                    var otherDelegate = appRepeater.itemAt(0);
-                                    var otherRect = { x: otherDelegate.windowedX, y: otherDelegate.windowedY, width: otherDelegate.requestedWidth, height: otherDelegate.requestedHeight }
-                                    var intersectionRect = MathUtils.intersectionRect(thisRect, otherRect)
-                                    var mappedInterSectionRect = appDelegate.mapFromItem(root, intersectionRect.x, intersectionRect.y)
-                                    opacityEffect.maskX = mappedInterSectionRect.x
-                                    opacityEffect.maskY = mappedInterSectionRect.y
-                                    opacityEffect.maskWidth = intersectionRect.width
-                                    opacityEffect.maskHeight = intersectionRect.height
-                                }
-                            }
-                        }
-                    },
-                    Transition {
-                        from: "stagedRightEdge"; to: "staged"
-                        enabled: rightEdgeDragArea.cancelled // only transition back to state if the gesture was cancelled, in the other cases we play the focusAnimations.
-                        SequentialAnimation {
-                            ParallelAnimation {
-                                LomiriNumberAnimation { target: appDelegate; properties: "x,y,height,width,scale"; duration: priv.animationDuration }
-                                LomiriNumberAnimation { target: decoratedWindow; properties: "width,height,itemScale,angle,scaleToPreviewProgress"; duration: priv.animationDuration }
-                            }
-                            // We need to release scaleToPreviewSize at last
-                            PropertyAction { target: decoratedWindow; property: "scaleToPreviewSize" }
-                            PropertyAction { target: appDelegate; property: "visible" }
-                        }
-                    },
-                    Transition {
-                        from: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
-                        to: "minimized"
-                        SequentialAnimation {
-                            ScriptAction { script: { fakeRectangle.stop(); } }
-                            PropertyAction { target: appDelegate; property: "visuallyMaximized" }
-                            PropertyAction { target: appDelegate; property: "visuallyMinimized" }
-                            LomiriNumberAnimation { target: appDelegate; properties: "x,y,scale,opacity"; duration: priv.animationDuration }
-                            PropertyAction { target: appDelegate; property: "visuallyMinimized" }
-                        }
-                    },
-                    Transition {
-                        from: "minimized"
-                        to: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
-                        SequentialAnimation {
-                            PropertyAction { target: appDelegate; property: "visuallyMinimized,z" }
-                            ParallelAnimation {
-                                LomiriNumberAnimation { target: appDelegate; properties: "x"; from: -appDelegate.width / 2; duration: priv.animationDuration }
-                                LomiriNumberAnimation { target: appDelegate; properties: "y,opacity"; duration: priv.animationDuration }
-                                LomiriNumberAnimation { target: appDelegate; properties: "scale"; from: 0; duration: priv.animationDuration }
-                            }
-                            PropertyAction { target: appDelegate; property: "visuallyMaximized" }
-                        }
-                    },
-                    Transition {
-                        id: windowedTransition
-                        from: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen,minimized"
-                        to: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
-                        enabled: appDelegate.animationsEnabled
-                        SequentialAnimation {
-                            ScriptAction { script: {
-                                    if (appDelegate.visuallyMaximized) visuallyMaximized = false; // maximized before -> going to restored
-                                }
-                            }
-                            PropertyAction { target: appDelegate; property: "visuallyMinimized" }
-                            LomiriNumberAnimation { target: appDelegate; properties: "requestedX,requestedY,windowedX,windowedY,opacity,scale,requestedWidth,requestedHeight,windowedWidth,windowedHeight";
-                                duration: priv.animationDuration }
-                            ScriptAction { script: {
-                                    fakeRectangle.stop();
-                                    appDelegate.visuallyMaximized = appDelegate.maximized; // reflect the target state
-                                }
-                            }
-                        }
-                    }
-                ]
 
                 Binding {
-                    target: panelState
-                    property: "decorationsAlwaysVisible"
-                    value: appDelegate && appDelegate.maximized && touchControls.overlayShown
+                    target: workspaceContainer.windowModel
                     restoreMode: Binding.RestoreBinding
+                    property: "rootFocus"
+                    value: root.interactive && workspaceContainer.isActive
                 }
 
-                WindowResizeArea {
-                    id: resizeArea
-                    objectName: "windowResizeArea"
-
-                    anchors.fill: appDelegate
-
-                    // workaround so that it chooses the correct resize borders when you drag from a corner ResizeGrip
-                    anchors.margins: touchControls.overlayShown ? borderThickness/2 : -borderThickness
-
-                    target: appDelegate
-                    boundsItem: root.availableDesktopArea
-                    minWidth: units.gu(10)
-                    minHeight: units.gu(10)
-                    borderThickness: units.gu(2)
-                    enabled: false
-                    visible: enabled
-                    readyToAssesBounds: !appDelegate._constructing
-
-                    onPressed: {
-                        appDelegate.activate();
+                onIsActiveChanged: {
+                    if (isActive) {
+                        workspacesView.currentIndex = index;
+                        workspaceContainer.updateMainAndSideStageIndexes();
                     }
                 }
 
-                DecoratedWindow {
-                    id: decoratedWindow
-                    objectName: "decoratedWindow"
-                    anchors.left: appDelegate.left
-                    anchors.top: appDelegate.top
-                    application: model.application
-                    surface: model.window.surface
-                    active: model.window.focused
-                    focus: true
-                    interactive: root.interactive
-                    showDecoration: 1
-                    decorationHeight: priv.windowDecorationHeight
-                    maximizeButtonShown: appDelegate.canBeMaximized
-                    overlayShown: touchControls.overlayShown
-                    width: implicitWidth
-                    height: implicitHeight
-                    highlightSize: windowInfoItem.iconMargin
-                    boundsItem: root.availableDesktopArea
-                    panelState: root.panelState
-                    altDragEnabled: root.mode == "windowed"
-                    lightMode: root.lightMode
+                Connections {
+                    target: workspaceContainer.windowModel
+                    function onListChanged() { workspaceContainer.updateMainAndSideStageIndexes() }
+                }
 
-                    requestedWidth: appDelegate.requestedWidth
-                    requestedHeight: appDelegate.requestedHeight
-
-                    onCloseClicked: { appDelegate.close(); }
-                    onMaximizeClicked: {
-                        if (appDelegate.canBeMaximized) {
-                            appDelegate.anyMaximized ? appDelegate.requestRestore() : appDelegate.requestMaximize();
+                Connections {
+                    property bool sideStageTempHidden: false
+                    target: workspaceContainer.focusedAppDelegate
+                    function onFullscreenChanged() {
+                        if (target.stage == ApplicationInfoInterface.MainStage) {
+                            if (target.fullscreen && sideStage.shown) {
+                                sideStage.hide()
+                                sideStageTempHidden = true
+                            } else {
+                                if (sideStageTempHidden && !sideStage.shown
+                                        && priv.sideStageEnabled) {
+                                    sideStage.show()
+                                    workspaceContainer.updateMainAndSideStageIndexes()
+                                }
+                                sideStageTempHidden = false
+                            }
                         }
                     }
-                    onMaximizeHorizontallyClicked: {
-                        if (appDelegate.canBeMaximizedHorizontally) {
-                            appDelegate.maximizedHorizontally ? appDelegate.requestRestore() : appDelegate.requestMaximizeHorizontally()
+                }
+
+                Connections {
+                    target: priv
+                    function onSideStageEnabledChanged() {
+                        for (var i = 0; i < appRepeater.count; i++) {
+                            appRepeater.itemAt(i).refreshStage();
                         }
+                        workspaceContainer.updateMainAndSideStageIndexes();
                     }
-                    onMaximizeVerticallyClicked: {
-                        if (appDelegate.canBeMaximizedVertically) {
-                            appDelegate.maximizedVertically ? appDelegate.requestRestore() : appDelegate.requestMaximizeVertically()
+                }
+
+                Repeater {
+                    id: appRepeater
+                    model: workspaceContainer.windowModel
+                    objectName: "appRepeater"
+
+                    function indexOf(delegateItem) {
+                        for (var i = 0; i < count; i++) {
+                            if (itemAt(i) === delegateItem) {
+                                return i;
+                            }
                         }
+                        return -1;
                     }
-                    onMinimizeClicked: { appDelegate.requestMinimize(); }
-                    onDecorationPressed: { appDelegate.activate(); }
-                    onDecorationReleased: fakeRectangle.visible ? fakeRectangle.commit() : appDelegate.updateRestoredGeometry()
 
-                    onDragResizePressed: {
-                        appDelegate.activate();
-                        resizeArea.pressedChangedEx(true, mouse);
-                    }
-                    onDragResizeReleased: resizeArea.pressedChangedEx(false, mouse);
-                    onDragResizePositionChanged: resizeArea.positionChangedEx(mouse);
-
-                    property real angle: 0
-                    Behavior on angle { enabled: priv.closingIndex >= 0; LomiriNumberAnimation {} }
-                    property real itemScale: 1
-                    Behavior on itemScale { enabled: priv.closingIndex >= 0; LomiriNumberAnimation {} }
-
-                    transform: [
-                        Scale {
-                            origin.x: 0
-                            origin.y: decoratedWindow.implicitHeight / 2
-                            xScale: decoratedWindow.itemScale
-                            yScale: decoratedWindow.itemScale
-                        },
-                        Rotation {
-                            origin { x: 0; y: (decoratedWindow.height / 2) }
-                            axis { x: 0; y: 1; z: 0 }
-                            angle: decoratedWindow.angle
+                    delegate: FocusScope {
+                        id: appDelegate
+                        objectName: "appDelegate_" + model.window.id
+                        property int itemIndex: index // We need this from outside the repeater
+                        // z might be overriden in some cases by effects, but we need z ordering
+                        // to calculate occlusion detection
+                        property int normalZ: workspaceContainer.windowModel.count - index
+                        onNormalZChanged: {
+                            if (visuallyMaximized) {
+                                workspaceContainer.updateForegroundMaximizedApp();
+                            }
                         }
-                    ]
-                }
+                        z: normalZ
 
-                OpacityMask {
-                    id: opacityEffect
-                    anchors.fill: decoratedWindow
-                }
-
-                WindowControlsOverlay {
-                    id: touchControls
-                    anchors.fill: appDelegate
-                    target: appDelegate
-                    resizeArea: resizeArea
-                    enabled: false
-                    visible: enabled
-                    boundsItem: root.availableDesktopArea
-
-                    onFakeMaximizeAnimationRequested: if (!appDelegate.maximized) fakeRectangle.maximize(amount, true)
-                    onFakeMaximizeLeftAnimationRequested: if (!appDelegate.maximizedLeft) fakeRectangle.maximizeLeft(amount, true)
-                    onFakeMaximizeRightAnimationRequested: if (!appDelegate.maximizedRight) fakeRectangle.maximizeRight(amount, true)
-                    onFakeMaximizeTopLeftAnimationRequested: if (!appDelegate.maximizedTopLeft) fakeRectangle.maximizeTopLeft(amount, true);
-                    onFakeMaximizeTopRightAnimationRequested: if (!appDelegate.maximizedTopRight) fakeRectangle.maximizeTopRight(amount, true);
-                    onFakeMaximizeBottomLeftAnimationRequested: if (!appDelegate.maximizedBottomLeft) fakeRectangle.maximizeBottomLeft(amount, true);
-                    onFakeMaximizeBottomRightAnimationRequested: if (!appDelegate.maximizedBottomRight) fakeRectangle.maximizeBottomRight(amount, true);
-                    onStopFakeAnimation: fakeRectangle.stop();
-                    onDragReleased: fakeRectangle.visible ? fakeRectangle.commit() : appDelegate.updateRestoredGeometry()
-                }
-
-                WindowedFullscreenPolicy {
-                    id: windowedFullscreenPolicy
-                }
-                StagedFullscreenPolicy {
-                    id: stagedFullscreenPolicy
-                    active: root.mode == "staged" || root.mode == "stagedWithSideStage"
-                    surface: model.window.surface
-                }
-
-                SpreadDelegateInputArea {
-                    id: dragArea
-                    objectName: "dragArea"
-                    anchors.fill: decoratedWindow
-                    enabled: false
-                    closeable: true
-                    stage: root
-                    dragDelegate: fakeDragItem
-
-                    onClicked: {
-                        spreadItem.highlightedIndex = index;
-                        if (distance == 0) {
-                            priv.goneToSpread = false;
+                        readonly property bool dragActiveInSpread: fakeDragItem.Drag.active && fakeDragItem.surface === model.window.surface
+                        onDragActiveInSpreadChanged: {
+                            // Save window state when it is about to be moved to another workspace
+                            // Otherwise, we sometimes hit timing issue when it is being destroyed in current workspace
+                            // and being created in the new one
+                            if (dragActiveInSpread) {
+                                appDelegate.saveWindowState();
+                            }
                         }
-                    }
-                    onClose: {
-                        priv.closingIndex = index
-                        appDelegate.close();
-                    }
-                }
 
-                WindowInfoItem {
-                    id: windowInfoItem
-                    objectName: "windowInfoItem"
-                    anchors { left: parent.left; top: decoratedWindow.bottom; topMargin: units.gu(1) }
-                    title: model.application.name
-                    iconSource: model.application.icon
-                    height: spreadItem.appInfoHeight
-                    opacity: 0
-                    z: 1
-                    visible: opacity > 0
-                    maxWidth: {
-                        var nextApp = appRepeater.itemAt(index + 1);
-                        if (nextApp) {
-                            return Math.max(iconHeight, nextApp.x - appDelegate.x - units.gu(1))
+                        opacity: dragActiveInSpread ? 0 : 1
+                        Behavior on opacity { LomiriNumberAnimation {} }
+
+                        // Set these as propertyes as they wont update otherwise
+                        property real screenOffsetX: Screen.virtualX
+                        property real screenOffsetY: Screen.virtualY
+
+                        // Normally we want x/y where the surface thinks it is. Width/height of our delegate will
+                        // match what the actual surface size is.
+                        // Don't write to those, they will be set by states
+                        // --
+                        // Here we will also need to remove the screen offset from miral's results
+                        // as lomiri x,y will be relative to the current screen only
+                        // FIXME: when proper multiscreen lands
+                        x: model.window.position.x - clientAreaItem.x - screenOffsetX
+                        y: model.window.position.y - clientAreaItem.y - screenOffsetY
+                        width: decoratedWindow.implicitWidth
+                        height: decoratedWindow.implicitHeight
+
+                        // requestedX/Y/width/height is what we ask the actual surface to be.
+                        // Do not write to those, they will be set by states
+                        property real requestedX: windowedX
+                        property real requestedY: windowedY
+                        property real requestedWidth: windowedWidth
+                        property real requestedHeight: windowedHeight
+
+                        // For both windowed and staged need to tell miral what screen we are on,
+                        // so we need to add the screen offset to the position we tell miral
+                        // FIXME: when proper multiscreen lands
+                        Binding {
+                            target: model.window; property: "requestedPosition"
+                            // miral doesn't know about our window decorations. So we have to deduct them
+                            value: Qt.point(appDelegate.requestedX + appDelegate.clientAreaItem.x + screenOffsetX,
+                                            appDelegate.requestedY + appDelegate.clientAreaItem.y + screenOffsetY)
+                            when: root.mode == "windowed"
+                            restoreMode: Binding.RestoreBinding
                         }
-                        return appDelegate.width;
-                    }
+                        Binding {
+                            target: model.window; property: "requestedPosition"
+                            value: Qt.point(screenOffsetX, screenOffsetY)
+                            when: root.mode != "windowed"
+                            restoreMode: Binding.RestoreBinding
+                        }
 
-                    onClicked: {
-                        spreadItem.highlightedIndex = index;
-                        priv.goneToSpread = false;
-                    }
-                }
+                        // In those are for windowed mode. Those values basically store the window's properties
+                        // when having a floating window. If you want to move/resize a window in normal mode, this is what you want to write to.
+                        property real windowedX
+                        property real windowedY
+                        property real windowedWidth
+                        property real windowedHeight
 
-                MouseArea {
-                    id: closeMouseArea
-                    objectName: "closeMouseArea"
-                    anchors { left: parent.left; top: parent.top; leftMargin: -height / 2; topMargin: -height / 2 + spreadMaths.closeIconOffset }
-                    readonly property var mousePos: hoverMouseArea.mapToItem(appDelegate, hoverMouseArea.mouseX, hoverMouseArea.mouseY)
-                    readonly property bool shown: dragArea.distance == 0
-                             && index == spreadItem.highlightedIndex
-                             && mousePos.y < (decoratedWindow.height / 3)
-                             && mousePos.y > -units.gu(4)
-                             && mousePos.x > -units.gu(4)
-                             && mousePos.x < (decoratedWindow.width * 2 / 3)
-                    opacity: shown ? 1 : 0
-                    visible: opacity > 0
-                    Behavior on opacity { LomiriNumberAnimation { duration: LomiriAnimation.SnapDuration } }
-                    height: units.gu(6)
-                    width: height
+                        // unlike windowedX/Y, this is the last known grab position before being pushed against edges/corners
+                        // when restoring, the window should return to these, not to the place where it was dropped near the edge
+                        property real restoredX
+                        property real restoredY
 
-                    onClicked: {
-                        priv.closingIndex = index;
-                        appDelegate.close();
-                    }
-                    Image {
-                        id: closeImage
-                        source: "graphics/window-close.svg"
-                        anchors.fill: closeMouseArea
-                        anchors.margins: units.gu(2)
-                        sourceSize.width: width
-                        sourceSize.height: height
-                    }
-                }
+                        // Keeps track of the window geometry while in normal or restored state
+                        // Useful when returning from some maxmized state or when saving the geometry while maximized
+                        // FIXME: find a better solution
+                        property real normalX: 0
+                        property real normalY: 0
+                        property real normalWidth: 0
+                        property real normalHeight: 0
+                        function updateNormalGeometry() {
+                            if (appDelegate.state == "normal" || appDelegate.state == "restored") {
+                                normalX = appDelegate.requestedX;
+                                normalY = appDelegate.requestedY;
+                                normalWidth = appDelegate.width;
+                                normalHeight = appDelegate.height;
+                            }
+                        }
+                        function updateRestoredGeometry() {
+                            if (appDelegate.state == "normal" || appDelegate.state == "restored") {
+                                // save the x/y to restore to
+                                restoredX = appDelegate.x;
+                                restoredY = appDelegate.y;
+                            }
+                        }
 
-                Item {
-                    // Group all child windows in this item so that we can fade them out together when going to the spread
-                    // (and fade them in back again when returning from it)
-                    readonly property bool stageOnProperState: root.state === "windowed"
-                                                            || root.state === "staged"
-                                                            || root.state === "stagedWithSideStage"
+                        Connections {
+                            target: appDelegate
+                            function onXChanged() { appDelegate.updateNormalGeometry(); }
+                            function onYChanged() {  appDelegate.updateNormalGeometry(); }
+                            function onWidthChanged() {  appDelegate.updateNormalGeometry(); }
+                            function onHeightChanged() {  appDelegate.updateNormalGeometry(); }
+                        }
 
-                    // TODO: Is it worth the extra cost of layering to avoid the opacity artifacts of intersecting children?
-                    //       Btw, will involve more than uncommenting the line below as children won't necessarily fit this item's
-                    //       geometry. This is just a reference.
-                    //layer.enabled: opacity !== 0.0 && opacity !== 1.0
+                        // True when the Stage is focusing this app and playing its own animation.
+                        // Stays true until the app is unfocused.
+                        // If it is, we don't want to play the slide in/out transition from StageMaths.
+                        // Setting it imperatively is not great, but any declarative solution hits
+                        // race conditions, causing two animations to play for one focus event.
+                        property bool inhibitSlideAnimation: false
 
-                    opacity: stageOnProperState ? 1.0 : 0.0
-                    visible: opacity !== 0.0 // make it transparent to input as well
-                    Behavior on opacity { LomiriNumberAnimation {} }
+                        Binding {
+                            target: appDelegate
+                            property: "y"
+                            value: appDelegate.requestedY -
+                                   Math.min(appDelegate.requestedY - root.availableDesktopArea.y,
+                                            Math.max(0, priv.virtualKeyboardHeight - (appContainer.height - (appDelegate.requestedY + appDelegate.height))))
+                            when: root.oskEnabled && appDelegate.focus && (appDelegate.state == "normal" || appDelegate.state == "restored")
+                                  && root.inputMethodRect.height > 0
+                            restoreMode: Binding.RestoreBinding
+                        }
 
-                    Repeater {
-                        id: childWindowRepeater
-                        model: appDelegate.surface ? appDelegate.surface.childSurfaceList : null
+                        Behavior on x { id: xBehavior; enabled: priv.closingIndex >= 0; LomiriNumberAnimation { onRunningChanged: if (!running) priv.closingIndex = -1} }
 
-                        delegate: ChildWindowTree {
-                            surface: model.surface
+                        Connections {
+                            target: root
+                            function onShellOrientationAngleChanged() {
+                                // at this point decoratedWindow.surfaceOrientationAngle is the old shellOrientationAngle
+                                if (appDelegate.application && appDelegate.application.rotatesWindowContents) {
+                                    if (root.state == "windowed") {
+                                        var angleDiff = decoratedWindow.surfaceOrientationAngle - shellOrientationAngle;
+                                        angleDiff = (360 + angleDiff) % 360;
+                                        if (angleDiff === 90 || angleDiff === 270) {
+                                            var aux = decoratedWindow.requestedHeight;
+                                            decoratedWindow.requestedHeight = decoratedWindow.requestedWidth + decoratedWindow.actualDecorationHeight;
+                                            decoratedWindow.requestedWidth = aux - decoratedWindow.actualDecorationHeight;
+                                        }
+                                    }
+                                    decoratedWindow.surfaceOrientationAngle = shellOrientationAngle;
+                                } else {
+                                    decoratedWindow.surfaceOrientationAngle = 0;
+                                }
+                            }
+                        }
 
-                            // Account for the displacement caused by window decoration in the top-level surface
-                            // Ie, the top-level surface is not positioned at (0,0) of this ChildWindow's parent (appDelegate)
-                            displacementX: appDelegate.clientAreaItem.x
-                            displacementY: appDelegate.clientAreaItem.y
+                        readonly property alias application: decoratedWindow.application
+                        readonly property alias minimumWidth: decoratedWindow.minimumWidth
+                        readonly property alias minimumHeight: decoratedWindow.minimumHeight
+                        readonly property alias maximumWidth: decoratedWindow.maximumWidth
+                        readonly property alias maximumHeight: decoratedWindow.maximumHeight
+                        readonly property alias widthIncrement: decoratedWindow.widthIncrement
+                        readonly property alias heightIncrement: decoratedWindow.heightIncrement
 
+                        readonly property bool maximized: windowState === WindowStateStorage.WindowStateMaximized
+                        readonly property bool maximizedLeft: windowState === WindowStateStorage.WindowStateMaximizedLeft
+                        readonly property bool maximizedRight: windowState === WindowStateStorage.WindowStateMaximizedRight
+                        readonly property bool maximizedHorizontally: windowState === WindowStateStorage.WindowStateMaximizedHorizontally
+                        readonly property bool maximizedVertically: windowState === WindowStateStorage.WindowStateMaximizedVertically
+                        readonly property bool maximizedTopLeft: windowState === WindowStateStorage.WindowStateMaximizedTopLeft
+                        readonly property bool maximizedTopRight: windowState === WindowStateStorage.WindowStateMaximizedTopRight
+                        readonly property bool maximizedBottomLeft: windowState === WindowStateStorage.WindowStateMaximizedBottomLeft
+                        readonly property bool maximizedBottomRight: windowState === WindowStateStorage.WindowStateMaximizedBottomRight
+                        readonly property bool anyMaximized: maximized || maximizedLeft || maximizedRight || maximizedHorizontally || maximizedVertically ||
+                                                             maximizedTopLeft || maximizedTopRight || maximizedBottomLeft || maximizedBottomRight
+
+                        readonly property bool minimized: windowState & WindowStateStorage.WindowStateMinimized
+                        readonly property bool fullscreen: windowState === WindowStateStorage.WindowStateFullscreen
+
+                        readonly property bool canBeMaximized: canBeMaximizedHorizontally && canBeMaximizedVertically
+                        readonly property bool canBeMaximizedLeftRight: (maximumWidth == 0 || maximumWidth >= appContainer.width/2) &&
+                                                                        (maximumHeight == 0 || maximumHeight >= appContainer.height)
+                        readonly property bool canBeCornerMaximized: (maximumWidth == 0 || maximumWidth >= appContainer.width/2) &&
+                                                                     (maximumHeight == 0 || maximumHeight >= appContainer.height/2)
+                        readonly property bool canBeMaximizedHorizontally: maximumWidth == 0 || maximumWidth >= appContainer.width
+                        readonly property bool canBeMaximizedVertically: maximumHeight == 0 || maximumHeight >= appContainer.height
+                        readonly property alias orientationChangesEnabled: decoratedWindow.orientationChangesEnabled
+
+                        // TODO drop our own windowType once Mir/Miral/Qtmir gets in sync with ours
+                        property int windowState: WindowStateStorage.WindowStateNormal
+                        property int prevWindowState: WindowStateStorage.WindowStateRestored
+
+                        property bool animationsEnabled: true
+                        property alias title: decoratedWindow.title
+                        readonly property string appName: model.application ? model.application.name : ""
+                        property bool visuallyMaximized: false
+                        property bool visuallyMinimized: false
+                        readonly property alias windowedTransitionRunning: windowedTransition.running
+
+                        property int stage: ApplicationInfoInterface.MainStage
+                        function saveStage(newStage) {
+                            appDelegate.stage = newStage;
+                            WindowStateStorage.saveStage(appId, newStage);
+                            workspaceContainer.updateMainAndSideStageIndexes();
+                        }
+
+                        readonly property var surface: model.window.surface
+                        readonly property var window: model.window
+
+                        readonly property alias focusedSurface: decoratedWindow.focusedSurface
+                        readonly property bool dragging: touchControls.overlayShown ? touchControls.dragging : decoratedWindow.dragging
+
+                        readonly property string appId: model.application.appId
+                        readonly property alias clientAreaItem: decoratedWindow.clientAreaItem
+
+                        // It is Lomiri policy to close any window but the last one during OOM teardown
+        /*
+                        Connections {
+                            target: model.window.surface
+                            onLiveChanged: {
+                                if ((!surface.live && application && application.surfaceCount > 1) || !application)
+                                    topLevelSurfaceList.removeAt(appRepeater.indexOf(appDelegate));
+                            }
+                        }
+        */
+
+
+                        function activate() {
+                            if (model.window.focused) {
+                                updateQmlFocusFromMirSurfaceFocus();
+                            } else {
+                                if (surface.live) {
+                                    // Activate the window since it has a surface (with a running app) backing it
+                                    model.window.activate();
+                                } else {
+                                    // Otherwise, cause a respawn of the app, and trigger it's refocusing as the last window
+                                    workspaceContainer.windowModel.raiseId(model.window.id);
+                                }
+                            }
+                        }
+                        function requestMaximize() { model.window.requestState(Mir.MaximizedState); }
+                        function requestMaximizeVertically() { model.window.requestState(Mir.VertMaximizedState); }
+                        function requestMaximizeHorizontally() { model.window.requestState(Mir.HorizMaximizedState); }
+                        function requestMaximizeLeft() { model.window.requestState(Mir.MaximizedLeftState); }
+                        function requestMaximizeRight() { model.window.requestState(Mir.MaximizedRightState); }
+                        function requestMaximizeTopLeft() { model.window.requestState(Mir.MaximizedTopLeftState); }
+                        function requestMaximizeTopRight() { model.window.requestState(Mir.MaximizedTopRightState); }
+                        function requestMaximizeBottomLeft() { model.window.requestState(Mir.MaximizedBottomLeftState); }
+                        function requestMaximizeBottomRight() { model.window.requestState(Mir.MaximizedBottomRightState); }
+                        function requestMinimize() { model.window.requestState(Mir.MinimizedState); }
+                        function requestRestore() { model.window.requestState(Mir.RestoredState); }
+
+                        function claimFocus() {
+                            if (root.state == "spread") {
+                                spreadItem.highlightedIndex = index
+                                // force pendingActivation so that when switching to staged mode, topLevelSurfaceList focus won't got to previous app ( case when apps are launched from outside )
+                                workspaceContainer.windowModel.pendingActivation();
+
+                                // Do not close spread if the window doesn't belong to the current workspace
+                                if (workspaceContainer.isActive) {
+                                    priv.goneToSpread = false;
+                                }
+                            }
+                            if (root.mode == "stagedWithSideStage") {
+                                if (appDelegate.stage == ApplicationInfoInterface.SideStage && !sideStage.shown) {
+                                    sideStage.show();
+                                }
+                                workspaceContainer.updateMainAndSideStageIndexes();
+                            }
+                            appDelegate.focus = true;
+
+                            // Don't set focusedAppDelegate (and signal mainAppChanged) unnecessarily
+                            // which can happen after getting interactive again.
+                            if (workspaceContainer.focusedAppDelegate !== appDelegate)
+                                workspaceContainer.focusedAppDelegate = appDelegate;
+                        }
+
+                        function updateQmlFocusFromMirSurfaceFocus() {
+                            if (model.window.focused) {
+                                claimFocus();
+                                decoratedWindow.focus = true;
+                            }
+                        }
+
+                        function saveWindowState() {
+                            windowStateSaver.save();
+                        }
+
+                        WindowStateSaver {
+                            id: windowStateSaver
+                            target: appDelegate
+                            screenWidth: appContainer.width
+                            screenHeight: appContainer.height
+                            leftMargin: root.availableDesktopArea.x
+                            minimumY: root.availableDesktopArea.y
+                        }
+
+                        Connections {
+                            target: model.window
+                            function onFocusedChanged() {
+                                updateQmlFocusFromMirSurfaceFocus();
+                                if (!model.window.focused) {
+                                    inhibitSlideAnimation = false;
+                                }
+                            }
+                            function onFocusRequested() {
+                                // Switch to the workspace if the requesting window isn't the current one
+                                if (!workspaceContainer.isActive) {
+                                    workspaceContainer.workspace.activate();
+                                }
+                                appDelegate.activate();
+                            }
+                            function onStateChanged(value) {
+                                if (value == Mir.MinimizedState) {
+                                    appDelegate.minimize();
+                                } else if (value == Mir.MaximizedState) {
+                                    appDelegate.maximize();
+                                } else if (value == Mir.VertMaximizedState) {
+                                    appDelegate.maximizeVertically();
+                                } else if (value == Mir.HorizMaximizedState) {
+                                    appDelegate.maximizeHorizontally();
+                                } else if (value == Mir.MaximizedLeftState) {
+                                    appDelegate.maximizeLeft();
+                                } else if (value == Mir.MaximizedRightState) {
+                                    appDelegate.maximizeRight();
+                                } else if (value == Mir.MaximizedTopLeftState) {
+                                    appDelegate.maximizeTopLeft();
+                                } else if (value == Mir.MaximizedTopRightState) {
+                                    appDelegate.maximizeTopRight();
+                                } else if (value == Mir.MaximizedBottomLeftState) {
+                                    appDelegate.maximizeBottomLeft();
+                                } else if (value == Mir.MaximizedBottomRightState) {
+                                    appDelegate.maximizeBottomRight();
+                                } else if (value == Mir.RestoredState) {
+                                    if (appDelegate.fullscreen && appDelegate.prevWindowState != WindowStateStorage.WindowStateRestored
+                                            && appDelegate.prevWindowState != WindowStateStorage.WindowStateNormal) {
+                                        model.window.requestState(WindowStateStorage.toMirState(appDelegate.prevWindowState));
+                                    } else {
+                                        appDelegate.restore();
+                                    }
+                                } else if (value == Mir.FullscreenState) {
+                                    appDelegate.prevWindowState = appDelegate.windowState;
+                                    appDelegate.windowState = WindowStateStorage.WindowStateFullscreen;
+                                }
+                            }
+                        }
+
+                        readonly property bool windowReady: clientAreaItem.surfaceInitialized
+                        onWindowReadyChanged: {
+                            if (windowReady) {
+                                var loadedMirState = WindowStateStorage.toMirState(windowStateSaver.loadedState);
+                                var state = loadedMirState;
+
+                                if (window.state == Mir.FullscreenState) {
+                                    // If the app is fullscreen at startup, we should not use saved state
+                                    // Example of why: if you open game that only requests fullscreen at
+                                    // Statup, this will automaticly be set to "restored state" since
+                                    // thats the default value of stateStorage, this will result in the app
+                                    // having the "restored state" as it will not make a fullscreen
+                                    // call after the app has started.
+                                    console.log("Initial window state is fullscreen, not using saved state.");
+                                    state = window.state;
+                                } else if (loadedMirState == Mir.FullscreenState) {
+                                    // If saved state is fullscreen, we should use app initial state
+                                    // Example of why: if you open browser with youtube video at fullscreen
+                                    // and close this app, it will be fullscreen next time you open the app.
+                                    console.log("Saved window state is fullscreen, using initial window state");
+                                    state = window.state;
+                                }
+
+                                // need to apply the shell chrome policy on top the saved window state
+                                var policy;
+                                if (root.mode == "windowed") {
+                                    policy = windowedFullscreenPolicy;
+                                } else {
+                                    policy = stagedFullscreenPolicy
+                                }
+                                window.requestState(policy.applyPolicy(state, surface.shellChrome));
+                            }
+                        }
+
+                        Component.onCompleted: {
+                            if (application && application.rotatesWindowContents) {
+                                decoratedWindow.surfaceOrientationAngle = shellOrientationAngle;
+                            } else {
+                                decoratedWindow.surfaceOrientationAngle = 0;
+                            }
+
+                            // First, cascade the newly created window, relative to the currently/old focused window.
+                            windowedX = workspaceContainer.focusedAppDelegate ? workspaceContainer.focusedAppDelegate.windowedX + units.gu(3) : (normalZ - 1) * units.gu(3);
+                            windowedY = workspaceContainer.focusedAppDelegate ? workspaceContainer.focusedAppDelegate.windowedY + units.gu(3) : normalZ * units.gu(3);
+                            // Now load any saved state. This needs to happen *after* the cascading!
+                            windowStateSaver.load();
+
+                            if (!root.spreadShown) {
+                                updateQmlFocusFromMirSurfaceFocus();
+                            }
+
+                            refreshStage();
+                            _constructing = false;
+                        }
+                        Component.onDestruction: {
+                            windowStateSaver.save();
+
+                            if (!root.parent) {
+                                // This stage is about to be destroyed. Don't mess up with the model at this point
+                                return;
+                            }
+
+                            if (visuallyMaximized) {
+                                workspaceContainer.updateForegroundMaximizedApp();
+                            }
+                        }
+
+                        onVisuallyMaximizedChanged: workspaceContainer.updateForegroundMaximizedApp();
+
+                        property bool _constructing: true;
+                        onStageChanged: {
+                            if (!_constructing) {
+                                workspaceContainer.updateMainAndSideStageIndexes();
+                            }
+                        }
+
+                        visible: (
+                                  !visuallyMinimized
+                                  && !greeter.fullyShown
+                                  && (workspaceContainer.foregroundMaximizedAppDelegate === null || workspaceContainer.foregroundMaximizedAppDelegate.normalZ <= z)
+                                 )
+                                 || appDelegate.fullscreen
+                                 || focusAnimation.running || rightEdgeFocusAnimation.running || hidingAnimation.running
+
+                        function close() {
+                            model.window.close();
+                        }
+
+                        function maximize(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximized;
+                        }
+                        function maximizeLeft(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedLeft;
+                        }
+                        function maximizeRight(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedRight;
+                        }
+                        function maximizeHorizontally(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedHorizontally;
+                        }
+                        function maximizeVertically(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedVertically;
+                        }
+                        function maximizeTopLeft(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedTopLeft;
+                        }
+                        function maximizeTopRight(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedTopRight;
+                        }
+                        function maximizeBottomLeft(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedBottomLeft;
+                        }
+                        function maximizeBottomRight(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = WindowStateStorage.WindowStateMaximizedBottomRight;
+                        }
+                        function minimize(animated) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState |= WindowStateStorage.WindowStateMinimized; // add the minimized bit
+                        }
+                        function restore(animated,state) {
+                            animationsEnabled = (animated === undefined) || animated;
+                            windowState = state || WindowStateStorage.WindowStateRestored;
+                            windowState &= ~WindowStateStorage.WindowStateMinimized; // clear the minimized bit
+                            prevWindowState = windowState;
+                        }
+
+                        function playFocusAnimation() {
+                            if (state == "stagedRightEdge") {
+                                // TODO: Can we drop this if and find something that always works?
+                                if (root.mode == "staged") {
+                                    rightEdgeFocusAnimation.targetX = 0
+                                    rightEdgeFocusAnimation.start()
+                                } else if (root.mode == "stagedWithSideStage") {
+                                    rightEdgeFocusAnimation.targetX = appDelegate.stage == ApplicationInfoInterface.SideStage ? sideStage.x : 0
+                                    rightEdgeFocusAnimation.start()
+                                }
+                            } else {
+                                focusAnimation.start()
+                            }
+                        }
+                        function playHidingAnimation() {
+                            if (state != "windowedRightEdge") {
+                                hidingAnimation.start()
+                            }
+                        }
+
+                        function refreshStage() {
+                            var newStage = ApplicationInfoInterface.MainStage;
+                            if (priv.sideStageEnabled) { // we're in lanscape rotation.
+                                if (application && application.supportedOrientations & (Qt.PortraitOrientation|Qt.InvertedPortraitOrientation)) {
+                                    var defaultStage = ApplicationInfoInterface.SideStage; // if application supports portrait, it defaults to sidestage.
+                                    if (application.supportedOrientations & (Qt.LandscapeOrientation|Qt.InvertedLandscapeOrientation)) {
+                                        // if it supports lanscape, it defaults to mainstage.
+                                        defaultStage = ApplicationInfoInterface.MainStage;
+                                    }
+                                    newStage = WindowStateStorage.getStage(application.appId, defaultStage);
+                                }
+                            }
+
+                            stage = newStage;
+                            if (focus && stage == ApplicationInfoInterface.SideStage && !sideStage.shown) {
+                                sideStage.show();
+                            }
+                        }
+
+                        LomiriNumberAnimation {
+                            id: focusAnimation
+                            target: appDelegate
+                            property: "scale"
+                            from: 0.98
+                            to: 1
+                            duration: LomiriAnimation.SnapDuration
+                            onStarted: {
+                                workspaceContainer.windowModel.pendingActivation();
+                                workspaceContainer.windowModel.raiseId(model.window.id);
+                            }
+                            onStopped: {
+                                appDelegate.activate();
+                            }
+                        }
+                        ParallelAnimation {
+                            id: rightEdgeFocusAnimation
+                            property int targetX: 0
+                            LomiriNumberAnimation { target: appDelegate; properties: "x"; to: rightEdgeFocusAnimation.targetX; duration: priv.animationDuration }
+                            LomiriNumberAnimation { target: decoratedWindow; properties: "angle"; to: 0; duration: priv.animationDuration }
+                            LomiriNumberAnimation { target: decoratedWindow; properties: "itemScale"; to: 1; duration: priv.animationDuration }
+                            onStarted: {
+                                workspaceContainer.windowModel.pendingActivation();
+                                inhibitSlideAnimation = true;
+                            }
+                            onStopped: {
+                                appDelegate.activate();
+                            }
+                        }
+                        ParallelAnimation {
+                            id: hidingAnimation
+                            LomiriNumberAnimation { target: appDelegate; property: "opacity"; to: 0; duration: priv.animationDuration }
+                            onStopped: appDelegate.opacity = Qt.binding( function() { return appDelegate.dragActiveInSpread ? 0 : 1 } )
+                        }
+
+                        SpreadMaths {
+                            id: spreadMaths
+                            spread: spreadItem
+                            itemIndex: index
+                            flickable: floatingFlickable
+                        }
+                        StageMaths {
+                            id: stageMaths
+                            sceneWidth: root.width
+                            stage: appDelegate.stage
+                            thisDelegate: appDelegate
+                            mainStageDelegate: workspaceContainer.mainStageDelegate
+                            sideStageDelegate: workspaceContainer.sideStageDelegate
+                            sideStageWidth: sideStage.panelWidth
+                            sideStageHandleWidth: sideStage.handleWidth
+                            sideStageX: sideStage.x
+                            itemIndex: appDelegate.itemIndex
+                            nextInStack: workspaceContainer.nextInStack
+                            animationDuration: priv.animationDuration
+                        }
+
+                        StagedRightEdgeMaths {
+                            id: stagedRightEdgeMaths
+                            sceneWidth: root.availableDesktopArea.width
+                            sceneHeight: appContainer.height
+                            isMainStageApp: workspaceContainer.mainStageDelegate == appDelegate
+                            isSideStageApp: workspaceContainer.sideStageDelegate == appDelegate
+                            sideStageWidth: sideStage.width
+                            sideStageOpen: sideStage.shown
+                            itemIndex: index
+                            nextInStack: workspaceContainer.nextInStack
+                            progress: 0
+                            targetHeight: spreadItem.stackHeight
+                            targetX: spreadMaths.targetX
+                            startY: appDelegate.fullscreen ? 0 : root.availableDesktopArea.y
+                            targetY: spreadMaths.targetY
+                            targetAngle: spreadMaths.targetAngle
+                            targetScale: spreadMaths.targetScale
+                            shuffledZ: stageMaths.itemZ
+                            breakPoint: spreadItem.rightEdgeBreakPoint
+                        }
+
+                        WindowedRightEdgeMaths {
+                            id: windowedRightEdgeMaths
+                            itemIndex: index
+                            startWidth: appDelegate.requestedWidth
+                            startHeight: appDelegate.requestedHeight
+                            targetHeight: spreadItem.stackHeight
+                            targetX: spreadMaths.targetX
+                            targetY: spreadMaths.targetY
+                            normalZ: appDelegate.normalZ
+                            targetAngle: spreadMaths.targetAngle
+                            targetScale: spreadMaths.targetScale
+                            breakPoint: spreadItem.rightEdgeBreakPoint
+                        }
+
+                        states: [
+                            State {
+                                name: "spread"; when: root.state == "spread"
+                                StateChangeScript { script: { decoratedWindow.cancelDrag(); } }
+                                PropertyChanges {
+                                    target: decoratedWindow;
+                                    showDecoration: false;
+                                    angle: spreadMaths.targetAngle
+                                    itemScale: spreadMaths.targetScale
+                                    scaleToPreviewSize: spreadItem.stackHeight
+                                    scaleToPreviewProgress: 1
+                                    hasDecoration: root.mode === "windowed"
+                                    shadowOpacity: spreadMaths.shadowOpacity
+                                    showHighlight: spreadItem.highlightedIndex === index
+                                    darkening: spreadItem.highlightedIndex >= 0
+                                    anchors.topMargin: dragArea.distance
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    x: spreadMaths.targetX
+                                    y: spreadMaths.targetY
+                                    z: index
+                                    height: spreadItem.spreadItemHeight
+                                    visible: spreadMaths.itemVisible
+                                }
+                                PropertyChanges { target: dragArea; enabled: true }
+                                PropertyChanges { target: windowInfoItem; opacity: spreadMaths.tileInfoOpacity; visible: spreadMaths.itemVisible }
+                                PropertyChanges { target: touchControls; enabled: false }
+                            },
+                            State {
+                                name: "stagedRightEdge"
+                                when: (root.mode == "staged" || root.mode == "stagedWithSideStage") && (root.state == "sideStagedRightEdge" || root.state == "stagedRightEdge" || rightEdgeFocusAnimation.running || hidingAnimation.running)
+                                PropertyChanges {
+                                    target: stagedRightEdgeMaths
+                                    progress: Math.max(rightEdgePushProgress, rightEdgeDragArea.draggedProgress)
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    x: stagedRightEdgeMaths.animatedX
+                                    y: stagedRightEdgeMaths.animatedY
+                                    z: stagedRightEdgeMaths.animatedZ
+                                    height: stagedRightEdgeMaths.animatedHeight
+                                    visible: appDelegate.x < root.width
+                                }
+                                PropertyChanges {
+                                    target: decoratedWindow
+                                    hasDecoration: false
+                                    angle: stagedRightEdgeMaths.animatedAngle
+                                    itemScale: stagedRightEdgeMaths.animatedScale
+                                    scaleToPreviewSize: spreadItem.stackHeight
+                                    scaleToPreviewProgress: stagedRightEdgeMaths.scaleToPreviewProgress
+                                    shadowOpacity: .3
+                                }
+                                // make sure it's visible but transparent so it fades in when we transition to spread
+                                PropertyChanges { target: windowInfoItem; opacity: 0; visible: true }
+                            },
+                            State {
+                                name: "windowedRightEdge"
+                                when: root.mode == "windowed" && (root.state == "windowedRightEdge" || rightEdgeFocusAnimation.running || hidingAnimation.running || rightEdgePushProgress > 0)
+                                PropertyChanges {
+                                    target: windowedRightEdgeMaths
+                                    swipeProgress: rightEdgeDragArea.dragging ? rightEdgeDragArea.progress : 0
+                                    pushProgress: rightEdgePushProgress
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    x: windowedRightEdgeMaths.animatedX
+                                    y: windowedRightEdgeMaths.animatedY
+                                    z: windowedRightEdgeMaths.animatedZ
+                                    height: stagedRightEdgeMaths.animatedHeight
+                                }
+                                PropertyChanges {
+                                    target: decoratedWindow
+                                    showDecoration: windowedRightEdgeMaths.decorationHeight
+                                    angle: windowedRightEdgeMaths.animatedAngle
+                                    itemScale: windowedRightEdgeMaths.animatedScale
+                                    scaleToPreviewSize: spreadItem.stackHeight
+                                    scaleToPreviewProgress: windowedRightEdgeMaths.scaleToPreviewProgress
+                                    shadowOpacity: .3
+                                }
+                                PropertyChanges {
+                                    target: opacityEffect;
+                                    opacityValue: windowedRightEdgeMaths.opacityMask
+                                    sourceItem: windowedRightEdgeMaths.opacityMask < 1 ? decoratedWindow : null
+                                }
+                            },
+                            State {
+                                name: "staged"; when: root.state == "staged"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    x: stageMaths.itemX
+                                    y: root.availableDesktopArea.y
+                                    visuallyMaximized: true
+                                    visible: appDelegate.x < root.width
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    requestedWidth: appContainer.width
+                                    requestedHeight: root.availableDesktopArea.height
+                                    restoreEntryValues: false
+                                }
+                                PropertyChanges {
+                                    target: decoratedWindow
+                                    hasDecoration: false
+                                }
+                                PropertyChanges {
+                                    target: resizeArea
+                                    enabled: false
+                                }
+                                PropertyChanges {
+                                    target: stageMaths
+                                    animateX: !focusAnimation.running && !rightEdgeFocusAnimation.running && itemIndex !== spreadItem.highlightedIndex && !inhibitSlideAnimation
+                                }
+                                PropertyChanges {
+                                    target: appDelegate.window
+                                    allowClientResize: false
+                                }
+                            },
+                            State {
+                                name: "stagedWithSideStage"; when: root.state == "stagedWithSideStage"
+                                PropertyChanges {
+                                    target: stageMaths
+                                    itemIndex: index
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    x: stageMaths.itemX
+                                    y: root.availableDesktopArea.y
+                                    z: stageMaths.itemZ
+                                    visuallyMaximized: true
+                                    visible: appDelegate.x < root.width
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    requestedWidth: stageMaths.itemWidth
+                                    requestedHeight: root.availableDesktopArea.height
+                                    restoreEntryValues: false
+                                }
+                                PropertyChanges {
+                                    target: decoratedWindow
+                                    hasDecoration: false
+                                }
+                                PropertyChanges {
+                                    target: resizeArea
+                                    enabled: false
+                                }
+                                PropertyChanges {
+                                    target: appDelegate.window
+                                    allowClientResize: false
+                                }
+                            },
+                            State {
+                                name: "maximized"; when: appDelegate.maximized && !appDelegate.minimized
+                                PropertyChanges {
+                                    target: appDelegate;
+                                    requestedX: root.availableDesktopArea.x;
+                                    requestedY: 0;
+                                    visuallyMinimized: false;
+                                    visuallyMaximized: true
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    requestedWidth: root.availableDesktopArea.width;
+                                    requestedHeight: appContainer.height;
+                                    restoreEntryValues: false
+                                }
+                                PropertyChanges { target: touchControls; enabled: true }
+                                PropertyChanges { target: decoratedWindow; windowControlButtonsVisible: false }
+                            },
+                            State {
+                                name: "fullscreen"; when: appDelegate.fullscreen && !appDelegate.minimized
+                                PropertyChanges {
+                                    target: appDelegate;
+                                    requestedX: 0
+                                    requestedY: 0
+                                }
+                                PropertyChanges {
+                                    target: appDelegate
+                                    requestedWidth: appContainer.width
+                                    requestedHeight: appContainer.height
+                                    restoreEntryValues: false
+                                }
+                                PropertyChanges { target: decoratedWindow; hasDecoration: false }
+                            },
+                            State {
+                                name: "normal";
+                                when: appDelegate.windowState == WindowStateStorage.WindowStateNormal
+                                PropertyChanges {
+                                    target: appDelegate
+                                    visuallyMinimized: false
+                                }
+                                PropertyChanges { target: touchControls; enabled: true }
+                                PropertyChanges { target: resizeArea; enabled: true }
+                                PropertyChanges { target: decoratedWindow; shadowOpacity: .3; windowControlButtonsVisible: true}
+                                PropertyChanges {
+                                    target: appDelegate
+                                    requestedWidth: windowedWidth
+                                    requestedHeight: windowedHeight
+                                    restoreEntryValues: false
+                                }
+                            },
+                            State {
+                                name: "restored";
+                                when: appDelegate.windowState == WindowStateStorage.WindowStateRestored
+                                extend: "normal"
+                                PropertyChanges {
+                                    restoreEntryValues: false
+                                    target: appDelegate;
+                                    windowedX: restoredX;
+                                    windowedY: restoredY;
+                                }
+                            },
+                            State {
+                                name: "maximizedLeft"; when: appDelegate.maximizedLeft && !appDelegate.minimized
+                                extend: "normal"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x
+                                    windowedY: root.availableDesktopArea.y
+                                    windowedWidth: root.availableDesktopArea.width / 2
+                                    windowedHeight: root.availableDesktopArea.height
+                                }
+                            },
+                            State {
+                                name: "maximizedRight"; when: appDelegate.maximizedRight && !appDelegate.minimized
+                                extend: "maximizedLeft"
+                                PropertyChanges {
+                                    target: appDelegate;
+                                    windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
+                                }
+                            },
+                            State {
+                                name: "maximizedTopLeft"; when: appDelegate.maximizedTopLeft && !appDelegate.minimized
+                                extend: "normal"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x
+                                    windowedY: root.availableDesktopArea.y
+                                    windowedWidth: root.availableDesktopArea.width / 2
+                                    windowedHeight: root.availableDesktopArea.height / 2
+                                }
+                            },
+                            State {
+                                name: "maximizedTopRight"; when: appDelegate.maximizedTopRight && !appDelegate.minimized
+                                extend: "maximizedTopLeft"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
+                                }
+                            },
+                            State {
+                                name: "maximizedBottomLeft"; when: appDelegate.maximizedBottomLeft && !appDelegate.minimized
+                                extend: "normal"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x
+                                    windowedY: root.availableDesktopArea.y + (root.availableDesktopArea.height / 2)
+                                    windowedWidth: root.availableDesktopArea.width / 2
+                                    windowedHeight: root.availableDesktopArea.height / 2
+                                }
+                            },
+                            State {
+                                name: "maximizedBottomRight"; when: appDelegate.maximizedBottomRight && !appDelegate.minimized
+                                extend: "maximizedBottomLeft"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x + (root.availableDesktopArea.width / 2)
+                                }
+                            },
+                            State {
+                                name: "maximizedHorizontally"; when: appDelegate.maximizedHorizontally && !appDelegate.minimized
+                                extend: "normal"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: root.availableDesktopArea.x; windowedY: windowedY
+                                    windowedWidth: root.availableDesktopArea.width; windowedHeight: windowedHeight
+                                }
+                            },
+                            State {
+                                name: "maximizedVertically"; when: appDelegate.maximizedVertically && !appDelegate.minimized
+                                extend: "normal"
+                                PropertyChanges {
+                                    target: appDelegate
+                                    windowedX: windowedX; windowedY: root.availableDesktopArea.y
+                                    windowedWidth: windowedWidth; windowedHeight: root.availableDesktopArea.height
+                                }
+                            },
+                            State {
+                                name: "minimized"; when: appDelegate.minimized
+                                PropertyChanges {
+                                    target: appDelegate
+                                    scale: units.gu(5) / appDelegate.width
+                                    opacity: 0;
+                                    visuallyMinimized: true
+                                    visuallyMaximized: false
+                                    x: -appDelegate.width / 2
+                                    y: root.height / 2
+                                }
+                            }
+                        ]
+
+                        transitions: [
+
+                            // These two animate applications into position from Staged to Desktop and back
+                            Transition {
+                                from: "staged,stagedWithSideStage"
+                                to: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight"
+                                enabled: appDelegate.animationsEnabled
+                                PropertyAction { target: appDelegate; properties: "visuallyMinimized,visuallyMaximized" }
+                                LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedX,requestedY,opacity,requestedWidth,requestedHeight,scale"; duration: priv.animationDuration }
+                            },
+                            Transition {
+                                from: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight"
+                                to: "staged,stagedWithSideStage"
+                                LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedX,requestedY,requestedWidth,requestedHeight"; duration: priv.animationDuration}
+                            },
+
+                            Transition {
+                                from: "normal,restored,maximized,maximizedHorizontally,maximizedVertically,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedBottomLeft,maximizedTopRight,maximizedBottomRight,staged,stagedWithSideStage,windowedRightEdge,stagedRightEdge";
+                                to: "spread"
+                                // DecoratedWindow wants the scaleToPreviewSize set before enabling scaleToPreview
+                                PropertyAction { target: appDelegate; properties: "z,visible" }
+                                PropertyAction { target: decoratedWindow; property: "scaleToPreviewSize" }
+                                LomiriNumberAnimation { target: appDelegate; properties: "x,y,height"; duration: priv.animationDuration }
+                                LomiriNumberAnimation { target: decoratedWindow; properties: "width,height,itemScale,angle,scaleToPreviewProgress"; duration: priv.animationDuration }
+                                LomiriNumberAnimation { target: windowInfoItem; properties: "opacity"; duration: priv.animationDuration }
+                            },
+                            Transition {
+                                from: "normal,staged"; to: "stagedWithSideStage"
+                                LomiriNumberAnimation { target: appDelegate; properties: "x,y,requestedWidth,requestedHeight"; duration: priv.animationDuration }
+                            },
+                            Transition {
+                                to: "windowedRightEdge"
+                                ScriptAction {
+                                    script: {
+                                        windowedRightEdgeMaths.startX = appDelegate.requestedX
+                                        windowedRightEdgeMaths.startY = appDelegate.requestedY
+
+                                        if (index == 1) {
+                                            var thisRect = { x: appDelegate.windowedX, y: appDelegate.windowedY, width: appDelegate.requestedWidth, height: appDelegate.requestedHeight }
+                                            var otherDelegate = appRepeater.itemAt(0);
+                                            var otherRect = { x: otherDelegate.windowedX, y: otherDelegate.windowedY, width: otherDelegate.requestedWidth, height: otherDelegate.requestedHeight }
+                                            var intersectionRect = MathUtils.intersectionRect(thisRect, otherRect)
+                                            var mappedInterSectionRect = appDelegate.mapFromItem(root, intersectionRect.x, intersectionRect.y)
+                                            opacityEffect.maskX = mappedInterSectionRect.x
+                                            opacityEffect.maskY = mappedInterSectionRect.y
+                                            opacityEffect.maskWidth = intersectionRect.width
+                                            opacityEffect.maskHeight = intersectionRect.height
+                                        }
+                                    }
+                                }
+                            },
+                            Transition {
+                                from: "stagedRightEdge"; to: "staged"
+                                enabled: rightEdgeDragArea.cancelled // only transition back to state if the gesture was cancelled, in the other cases we play the focusAnimations.
+                                SequentialAnimation {
+                                    ParallelAnimation {
+                                        LomiriNumberAnimation { target: appDelegate; properties: "x,y,height,width,scale"; duration: priv.animationDuration }
+                                        LomiriNumberAnimation { target: decoratedWindow; properties: "width,height,itemScale,angle,scaleToPreviewProgress"; duration: priv.animationDuration }
+                                    }
+                                    // We need to release scaleToPreviewSize at last
+                                    PropertyAction { target: decoratedWindow; property: "scaleToPreviewSize" }
+                                    PropertyAction { target: appDelegate; property: "visible" }
+                                }
+                            },
+                            Transition {
+                                from: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
+                                to: "minimized"
+                                SequentialAnimation {
+                                    ScriptAction { script: { fakeRectangle.stop(); } }
+                                    PropertyAction { target: appDelegate; property: "visuallyMaximized" }
+                                    PropertyAction { target: appDelegate; property: "visuallyMinimized" }
+                                    LomiriNumberAnimation { target: appDelegate; properties: "x,y,scale,opacity"; duration: priv.animationDuration }
+                                    PropertyAction { target: appDelegate; property: "visuallyMinimized" }
+                                }
+                            },
+                            Transition {
+                                from: "minimized"
+                                to: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
+                                SequentialAnimation {
+                                    PropertyAction { target: appDelegate; property: "visuallyMinimized,z" }
+                                    ParallelAnimation {
+                                        LomiriNumberAnimation { target: appDelegate; properties: "x"; from: -appDelegate.width / 2; duration: priv.animationDuration }
+                                        LomiriNumberAnimation { target: appDelegate; properties: "y,opacity"; duration: priv.animationDuration }
+                                        LomiriNumberAnimation { target: appDelegate; properties: "scale"; from: 0; duration: priv.animationDuration }
+                                    }
+                                    PropertyAction { target: appDelegate; property: "visuallyMaximized" }
+                                }
+                            },
+                            Transition {
+                                id: windowedTransition
+                                from: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen,minimized"
+                                to: ",normal,restored,maximized,maximizedLeft,maximizedRight,maximizedTopLeft,maximizedTopRight,maximizedBottomLeft,maximizedBottomRight,maximizedHorizontally,maximizedVertically,fullscreen"
+                                enabled: appDelegate.animationsEnabled
+                                SequentialAnimation {
+                                    ScriptAction { script: {
+                                            if (appDelegate.visuallyMaximized) visuallyMaximized = false; // maximized before -> going to restored
+                                        }
+                                    }
+                                    PropertyAction { target: appDelegate; property: "visuallyMinimized" }
+                                    LomiriNumberAnimation { target: appDelegate; properties: "requestedX,requestedY,windowedX,windowedY,opacity,scale,requestedWidth,requestedHeight,windowedWidth,windowedHeight";
+                                        duration: priv.animationDuration }
+                                    ScriptAction { script: {
+                                            fakeRectangle.stop();
+                                            appDelegate.visuallyMaximized = appDelegate.maximized; // reflect the target state
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+
+                        Binding {
+                            target: panelState
+                            property: "decorationsAlwaysVisible"
+                            value: appDelegate && appDelegate.maximized && touchControls.overlayShown
+                            restoreMode: Binding.RestoreBinding
+                        }
+
+                        WindowResizeArea {
+                            id: resizeArea
+                            objectName: "windowResizeArea"
+
+                            anchors.fill: appDelegate
+
+                            // workaround so that it chooses the correct resize borders when you drag from a corner ResizeGrip
+                            anchors.margins: touchControls.overlayShown ? borderThickness/2 : -borderThickness
+
+                            target: appDelegate
                             boundsItem: root.availableDesktopArea
+                            minWidth: units.gu(10)
+                            minHeight: units.gu(10)
+                            borderThickness: units.gu(2)
+                            enabled: false
+                            visible: enabled
+                            readyToAssesBounds: !appDelegate._constructing
+
+                            onPressed: {
+                                appDelegate.activate();
+                            }
+                        }
+
+                        DecoratedWindow {
+                            id: decoratedWindow
+                            objectName: "decoratedWindow"
+                            anchors.left: appDelegate.left
+                            anchors.top: appDelegate.top
+                            application: model.application
+                            surface: model.window.surface
+                            active: model.window.focused
+                            focus: true
+                            interactive: root.interactive
+                            showDecoration: 1
                             decorationHeight: priv.windowDecorationHeight
+                            maximizeButtonShown: appDelegate.canBeMaximized
+                            overlayShown: touchControls.overlayShown
+                            width: implicitWidth
+                            height: implicitHeight
+                            highlightSize: windowInfoItem.iconMargin
+                            boundsItem: root.availableDesktopArea
+                            panelState: root.panelState
+                            altDragEnabled: root.mode == "windowed"
+                            lightMode: root.lightMode
 
-                            z: childWindowRepeater.count - model.index
+                            requestedWidth: appDelegate.requestedWidth
+                            requestedHeight: appDelegate.requestedHeight
 
-                            onFocusChanged: {
-                                if (focus) {
-                                    // some child surface in this tree got focus.
-                                    // Ensure we also have it at the top-level hierarchy
-                                    appDelegate.claimFocus();
+                            onCloseClicked: { appDelegate.close(); }
+                            onMaximizeClicked: {
+                                if (appDelegate.canBeMaximized) {
+                                    appDelegate.anyMaximized ? appDelegate.requestRestore() : appDelegate.requestMaximize();
+                                }
+                            }
+                            onMaximizeHorizontallyClicked: {
+                                if (appDelegate.canBeMaximizedHorizontally) {
+                                    appDelegate.maximizedHorizontally ? appDelegate.requestRestore() : appDelegate.requestMaximizeHorizontally()
+                                }
+                            }
+                            onMaximizeVerticallyClicked: {
+                                if (appDelegate.canBeMaximizedVertically) {
+                                    appDelegate.maximizedVertically ? appDelegate.requestRestore() : appDelegate.requestMaximizeVertically()
+                                }
+                            }
+                            onMinimizeClicked: { appDelegate.requestMinimize(); }
+                            onDecorationPressed: { appDelegate.activate(); }
+                            onDecorationReleased: fakeRectangle.visible ? fakeRectangle.commit() : appDelegate.updateRestoredGeometry()
+
+                            onDragResizePressed: {
+                                appDelegate.activate();
+                                resizeArea.pressedChangedEx(true, mouse);
+                            }
+                            onDragResizeReleased: resizeArea.pressedChangedEx(false, mouse);
+                            onDragResizePositionChanged: resizeArea.positionChangedEx(mouse);
+
+                            property real angle: 0
+                            Behavior on angle { enabled: priv.closingIndex >= 0; LomiriNumberAnimation {} }
+                            property real itemScale: 1
+                            Behavior on itemScale { enabled: priv.closingIndex >= 0; LomiriNumberAnimation {} }
+
+                            transform: [
+                                Scale {
+                                    origin.x: 0
+                                    origin.y: decoratedWindow.implicitHeight / 2
+                                    xScale: decoratedWindow.itemScale
+                                    yScale: decoratedWindow.itemScale
+                                },
+                                Rotation {
+                                    origin { x: 0; y: (decoratedWindow.height / 2) }
+                                    axis { x: 0; y: 1; z: 0 }
+                                    angle: decoratedWindow.angle
+                                }
+                            ]
+                        }
+
+                        OpacityMask {
+                            id: opacityEffect
+                            anchors.fill: decoratedWindow
+                        }
+
+                        WindowControlsOverlay {
+                            id: touchControls
+                            anchors.fill: appDelegate
+                            target: appDelegate
+                            resizeArea: resizeArea
+                            enabled: false
+                            visible: enabled
+                            boundsItem: root.availableDesktopArea
+
+                            onFakeMaximizeAnimationRequested: if (!appDelegate.maximized) fakeRectangle.maximize(amount, true)
+                            onFakeMaximizeLeftAnimationRequested: if (!appDelegate.maximizedLeft) fakeRectangle.maximizeLeft(amount, true)
+                            onFakeMaximizeRightAnimationRequested: if (!appDelegate.maximizedRight) fakeRectangle.maximizeRight(amount, true)
+                            onFakeMaximizeTopLeftAnimationRequested: if (!appDelegate.maximizedTopLeft) fakeRectangle.maximizeTopLeft(amount, true);
+                            onFakeMaximizeTopRightAnimationRequested: if (!appDelegate.maximizedTopRight) fakeRectangle.maximizeTopRight(amount, true);
+                            onFakeMaximizeBottomLeftAnimationRequested: if (!appDelegate.maximizedBottomLeft) fakeRectangle.maximizeBottomLeft(amount, true);
+                            onFakeMaximizeBottomRightAnimationRequested: if (!appDelegate.maximizedBottomRight) fakeRectangle.maximizeBottomRight(amount, true);
+                            onStopFakeAnimation: fakeRectangle.stop();
+                            onDragReleased: fakeRectangle.visible ? fakeRectangle.commit() : appDelegate.updateRestoredGeometry()
+                        }
+
+                        WindowedFullscreenPolicy {
+                            id: windowedFullscreenPolicy
+                        }
+                        StagedFullscreenPolicy {
+                            id: stagedFullscreenPolicy
+                            active: root.mode == "staged" || root.mode == "stagedWithSideStage"
+                            surface: model.window.surface
+                        }
+
+                        SpreadDelegateInputArea {
+                            id: dragArea
+                            objectName: "dragArea"
+                            anchors.fill: decoratedWindow
+                            enabled: false
+                            closeable: true
+                            stage: root
+                            dragDelegate: fakeDragItem
+
+                            onClicked: {
+                                spreadItem.highlightedIndex = index;
+                                if (distance == 0) {
+                                    priv.goneToSpread = false;
+                                }
+                            }
+                            onClose: {
+                                priv.closingIndex = index
+                                appDelegate.close();
+                            }
+                        }
+
+                        WindowInfoItem {
+                            id: windowInfoItem
+                            objectName: "windowInfoItem"
+                            anchors { left: parent.left; top: decoratedWindow.bottom; topMargin: units.gu(1) }
+                            title: model.application.name
+                            iconSource: model.application.icon
+                            height: spreadItem.appInfoHeight
+                            opacity: 0
+                            z: 1
+                            visible: opacity > 0
+                            maxWidth: {
+                                var nextApp = appRepeater.itemAt(index + 1);
+                                if (nextApp) {
+                                    return Math.max(iconHeight, nextApp.x - appDelegate.x - units.gu(1))
+                                }
+                                return appDelegate.width;
+                            }
+
+                            onClicked: {
+                                spreadItem.highlightedIndex = index;
+                                priv.goneToSpread = false;
+                            }
+                        }
+
+                        MouseArea {
+                            id: closeMouseArea
+                            objectName: "closeMouseArea"
+                            anchors { left: parent.left; top: parent.top; leftMargin: -height / 2; topMargin: -height / 2 + spreadMaths.closeIconOffset }
+                            readonly property var mousePos: hoverMouseArea.mapToItem(appDelegate, hoverMouseArea.mouseX, hoverMouseArea.mouseY)
+                            readonly property bool shown: dragArea.distance == 0
+                                     && index == spreadItem.highlightedIndex
+                                     && mousePos.y < (decoratedWindow.height / 3)
+                                     && mousePos.y > -units.gu(4)
+                                     && mousePos.x > -units.gu(4)
+                                     && mousePos.x < (decoratedWindow.width * 2 / 3)
+                            opacity: shown ? 1 : 0
+                            visible: opacity > 0
+                            Behavior on opacity { LomiriNumberAnimation { duration: LomiriAnimation.SnapDuration } }
+                            height: units.gu(6)
+                            width: height
+
+                            onClicked: {
+                                priv.closingIndex = index;
+                                appDelegate.close();
+                            }
+                            Image {
+                                id: closeImage
+                                source: "graphics/window-close.svg"
+                                anchors.fill: closeMouseArea
+                                anchors.margins: units.gu(2)
+                                sourceSize.width: width
+                                sourceSize.height: height
+                            }
+                        }
+
+                        Item {
+                            // Group all child windows in this item so that we can fade them out together when going to the spread
+                            // (and fade them in back again when returning from it)
+                            readonly property bool stageOnProperState: root.state === "windowed"
+                                                                    || root.state === "staged"
+                                                                    || root.state === "stagedWithSideStage"
+
+                            // TODO: Is it worth the extra cost of layering to avoid the opacity artifacts of intersecting children?
+                            //       Btw, will involve more than uncommenting the line below as children won't necessarily fit this item's
+                            //       geometry. This is just a reference.
+                            //layer.enabled: opacity !== 0.0 && opacity !== 1.0
+
+                            opacity: stageOnProperState ? 1.0 : 0.0
+                            visible: opacity !== 0.0 // make it transparent to input as well
+                            Behavior on opacity { LomiriNumberAnimation {} }
+
+                            Repeater {
+                                id: childWindowRepeater
+                                model: appDelegate.surface ? appDelegate.surface.childSurfaceList : null
+
+                                delegate: ChildWindowTree {
+                                    surface: model.surface
+
+                                    // Account for the displacement caused by window decoration in the top-level surface
+                                    // Ie, the top-level surface is not positioned at (0,0) of this ChildWindow's parent (appDelegate)
+                                    displacementX: appDelegate.clientAreaItem.x
+                                    displacementY: appDelegate.clientAreaItem.y
+
+                                    boundsItem: root.availableDesktopArea
+                                    decorationHeight: priv.windowDecorationHeight
+
+                                    z: childWindowRepeater.count - model.index
+
+                                    onFocusChanged: {
+                                        if (focus) {
+                                            // some child surface in this tree got focus.
+                                            // Ensure we also have it at the top-level hierarchy
+                                            appDelegate.claimFocus();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2380,11 +2518,7 @@ FocusScope {
         background: root.background
         availableDesktopArea: root.availableDesktopArea
         onWorkspaceSelected: screensAndWorkspaces.activeWorkspace = selectedWorkspace;
-        onActiveChanged: {
-            if (!active) {
-                appContainer.focus = true;
-            }
-        }
+        onActiveChanged: appContainer.focus = !active;
     }
 
     PropertyAnimation {
@@ -2502,7 +2636,7 @@ FocusScope {
         onPressed: {
             function matchDelegate(obj) { return String(obj.objectName).indexOf("appDelegate") >= 0; }
 
-            var delegateAtCenter = Functions.itemAt(appContainer, x, y, matchDelegate);
+            var delegateAtCenter = Functions.itemAt(root.currentWorkspaceContainer, x, y, matchDelegate);
             if (!delegateAtCenter) return;
 
             appDelegate = delegateAtCenter;
