@@ -45,6 +45,10 @@ Rectangle {
         id: mouseEventSpy2
         target: UInput
     }
+    SignalSpy {
+        id: mouseEventSpy3
+        target: UInput
+    }
 
     LomiriTestCase {
         id: testCase
@@ -54,6 +58,7 @@ Rectangle {
         function init() {
             mouseEventSpy1.clear();
             mouseEventSpy2.clear();
+            mouseEventSpy3.clear();
         }
 
         function test_click() {
@@ -65,6 +70,73 @@ Rectangle {
             tap(touchPadArea)
             tryCompare(mouseEventSpy1, "count", 1)
             tryCompare(mouseEventSpy2, "count", 1)
+        }
+
+        // Test simultaneous 2-finger tap to right-click
+        function test_rightClick() {
+            mouseEventSpy1.signalName = "mousePressed"
+            mouseEventSpy2.signalName = "mouseReleased"
+
+            var touchPadArea = findChild(touchScreenPad, "twoFingerGestureArea");
+
+            var startX = touchPadArea.width / 2;
+            var startY = touchPadArea.height / 2;
+
+            var startX1 = startX - units.gu(1);
+            var startX2 = startX + units.gu(1);
+
+            var event = touchEvent(touchPadArea);
+            event.press(0, startX1, startY);
+            event.press(1, startX2, startY);
+            event.commit();
+            event.release(0, startX1, startY);
+            event.release(1, startX2, startY);
+            event.commit();
+
+            tryCompare(mouseEventSpy1, "count", 1);
+            tryCompare(mouseEventSpy2, "count", 1);
+
+            // Check if the button is the right button
+            var mouseButton1 = mouseEventSpy1.signalArguments[0][0];
+            var mouseButton2 = mouseEventSpy2.signalArguments[0][0];
+            compare(mouseButton1, UInput.ButtonRight, "Button pressed should be the right button");
+            compare(mouseButton2, UInput.ButtonRight, "Button released should be the right button");
+        }
+
+        // Test staggered 2-finger tap to right-click
+        function test_staggeredRightClick() {
+            mouseEventSpy1.signalName = "mousePressed"
+            mouseEventSpy2.signalName = "mouseReleased"
+
+            var touchPadArea = findChild(touchScreenPad, "touchPadArea");
+
+            var startX = touchPadArea.width / 2;
+            var startY = touchPadArea.height / 2;
+
+            var startX1 = startX - units.gu(1);
+            var startX2 = startX + units.gu(1);
+
+            var event = touchEvent(touchPadArea);
+            event.press(0, startX1, startY);
+            event.commit();
+            wait(500); // Delay the 2nd touch point
+            event.press(1, startX2, startY);
+            event.commit();
+            event.stationary(0);
+            event.release(1, startX2, startY);
+            event.commit();
+
+            tryCompare(mouseEventSpy1, "count", 1);
+            tryCompare(mouseEventSpy2, "count", 1);
+
+            // Check if the button is the right button
+            var mouseButton1 = mouseEventSpy1.signalArguments[0][0];
+            var mouseButton2 = mouseEventSpy2.signalArguments[0][0];
+            compare(mouseButton1, UInput.ButtonRight, "Button pressed should be the right button");
+            compare(mouseButton2, UInput.ButtonRight, "Button released should be the right button");
+
+            event.release(0, startX1, startY);
+            event.commit();
         }
 
         function test_doubleClick() {
@@ -104,6 +176,7 @@ Rectangle {
         function test_doubleTapAndHoldToDrag() {
             mouseEventSpy1.signalName = "mousePressed"
             mouseEventSpy2.signalName = "mouseReleased"
+            mouseEventSpy3.signalName = "mouseMoved"
 
             var touchPadArea = findChild(touchScreenPad, "touchPadArea");
 
@@ -113,12 +186,69 @@ Rectangle {
 
             tryCompare(mouseEventSpy1, "count", 1)
             tryCompare(mouseEventSpy2, "count", 0)
+            tryCompare(mouseEventSpy3, "count", 1)
             mouseRelease(touchPadArea)
             tryCompare(mouseEventSpy2, "count", 1)
         }
 
+        // Test right button dragging with 2-finger double tap then swipe gesture
+        function test_twoFingerDoubleTapAndHoldToDrag() {
+            mouseEventSpy1.signalName = "mousePressed"
+            mouseEventSpy2.signalName = "mouseReleased"
+            mouseEventSpy3.signalName = "mouseMoved"
+
+            var touchPadArea = findChild(touchScreenPad, "twoFingerGestureArea");
+
+            var startX = touchPadArea.width / 2;
+            var startY = touchPadArea.height / 2;
+
+            var startX1 = startX - units.gu(1);
+            var startX2 = startX + units.gu(1);
+
+            var event = touchEvent(touchPadArea);
+            event.press(0, startX1, startY);
+            event.press(1, startX2, startY);
+            event.commit();
+            event.release(0, startX1, startY);
+            event.release(1, startX2, startY);
+            event.commit();
+            event.press(0, startX1, startY);
+            event.press(1, startX2, startY);
+            event.commit();
+
+            // Check if mouse got pressed but not released
+            tryCompare(mouseEventSpy1, "count", 1);
+            tryCompare(mouseEventSpy2, "count", 0);
+
+            // Do some random swiping/dragging
+            event.move(0, startX1, startY + units.gu(5));
+            event.move(1, startX2, startY + units.gu(5));
+            event.commit();
+            event.move(0, startX1 + units.gu(5), startY);
+            event.move(1, startX2 + units.gu(5), startY);
+            event.commit();
+
+            // Check if the mouse moved
+            tryCompare(mouseEventSpy3, "count", 1);
+
+            // Release the both touches
+            event.release(0, startX1, startY + units.gu(5));
+            event.release(1, startX2, startY + units.gu(5));
+            event.commit();
+
+            // Check if mouse got released
+            tryCompare(mouseEventSpy2, "count", 1)
+
+            // Check if the button is the right button
+            var mouseButton1 = mouseEventSpy1.signalArguments[0][0];
+            var mouseButton2 = mouseEventSpy2.signalArguments[0][0];
+            compare(mouseButton1, UInput.ButtonRight, "Button pressed should be the right button");
+            compare(mouseButton2, UInput.ButtonRight, "Button released should be the right button");
+        }
+
+        // Test simultaneous 2-finger tap then swipe gesture
         function test_twoFingerScroll() {
-            var touchPadArea = findChild(touchScreenPad, "touchPadArea");
+            var touchPadArea = findChild(touchScreenPad, "twoFingerGestureArea");
 
             mouseEventSpy1.signalName = "mouseScrolled"
 
@@ -134,14 +264,71 @@ Rectangle {
             event.commit()
 
             for (var i = 0; i < 10; i++) {
-                event.move(0, startX1, startY + units.gu(i))
+                // We start the movement with units.gu(2) since the swipe event doesn't register until a certain threshold set by the gesture area
+                event.move(0, startX1, startY + units.gu(i + 2));
+                event.move(1, startX2, startY + units.gu(i + 2));
+                event.commit();
+
+                tryCompare(mouseEventSpy1, "count", i + 1);
+            }
+
+            event.release(0, startX1, startY + units.gu(13))
+            event.release(1, startX2, startY + units.gu(13));
+            event.commit();
+        }
+
+        // Test staggered 2-finger tap then swipe gesture
+        // We should also support lifting and repositioning one finger to continue scrolling
+        function test_staggeredTwoFingerScroll() {
+            var touchPadArea = findChild(touchScreenPad, "touchPadArea");
+
+            mouseEventSpy1.signalName = "mouseScrolled";
+
+            var startX = touchPadArea.width / 2;
+            var startY = touchPadArea.height / 2;
+
+            var startX1 = startX - units.gu(1);
+            var startX2 = startX + units.gu(1);
+
+            // Initial scroll with staggered 2-finger tap and swipe
+            var event = touchEvent(touchPadArea);
+            event.press(0, startX1, startY);
+            event.commit();
+            wait(500); // Delay the 2nd touch point
+            event.press(1, startX2, startY);
+            event.commit();
+
+            for (var i = 0; i < 10; i++) {
+                event.move(0, startX1, startY + units.gu(i));
                 event.move(1, startX2, startY + units.gu(i));
                 event.commit();
 
                 tryCompare(mouseEventSpy1, "count", i + 1);
             }
 
-            event.release(0, startX1, startY + units.gu(11))
+            // Release one finger then tap it again
+            event.stationary(0);
+            event.release(1, startX2, startY + units.gu(11));
+            event.commit();
+            wait(500); // Wait and reposition the 2nd touch point
+            event.stationary(0);
+            event.press(1, startX2, startY);
+            event.commit();
+
+            for (var i = 0; i < 10; i++) {
+                // Move the first touchpoint slightly, otherwise, scroll won't be triggered
+                // because MultiPointTouchArea's onUpdated event only fire up for touchpoints that moved
+                // In practice, first touchpoint doesn't really need to move
+                // but the system detects miniscule movements so it still technically moves
+                event.move(0, startX1, startY + 1);
+
+                event.move(1, startX2, startY + units.gu(i));
+                event.commit();
+
+                tryCompare(mouseEventSpy1, "count", i + 11);
+            }
+
+            event.release(0, startX1, startY + units.gu(11));
             event.release(1, startX2, startY + units.gu(11));
             event.commit();
         }
