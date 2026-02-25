@@ -1,0 +1,212 @@
+# Aethercast Plugin
+
+Qt 6.8.2 port of the Aethercast plugin from Lomiri. Provides QML access to Miracast wireless display functionality via DBus/Aethercast daemon.
+
+**Qt Version**: 6.8.2 (required)  
+**Platform**: Ubuntu 24.04.3 LTS
+
+---
+
+## Overview
+
+Monitors Miracast display casting status including scanning state, enabled status, connection state, and device information through Aethercast daemon via DBus. Enables QML applications to discover and connect to wireless displays.
+
+---
+
+## Build
+
+### Requirements
+
+- Qt 6.8.2
+- CMake 3.24+
+- Linux with DBus/Aethercast daemon
+
+### Build Plugin
+
+```bash
+cd plugins/Aethercast
+mkdir build && cd build
+cmake .. && make
+```
+
+Output: `libAethercast.so`, `libAethercastplugin.so`, `qmldir`
+
+### Build QML Tests
+
+```bash
+cd plugins/Aethercast/Tests/QMLTests
+mkdir build && cd build
+cmake .. && make
+./appQMLTests
+```
+
+### Build Unit Tests
+
+```bash
+cd plugins/Aethercast/Tests/UnitTests
+mkdir build && cd build
+cmake .. && make
+ctest --verbose
+```
+
+---
+
+## API
+
+### Properties (Read-only unless specified, Notifiable)
+
+| Property | Type | Access | Description |
+|----------|------|--------|-------------|
+| `scanning` | bool | Read-only | Aethercast is scanning for available displays |
+| `enabled` | bool | Read-write | Enable/disable Aethercast functionality |
+| `state` | QString | Read-only | Current connection state (Idle, Disconnected, Association, Configuration, Connected, Failure) |
+
+### Methods
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `setEnabled(bool)` | enabled | void | Enable or disable Aethercast |
+
+### Signals
+
+| Signal | Parameters | Description |
+|--------|-----------|-------------|
+| `scanningChanged(bool)` | isActive | Emitted when scanning state changes |
+| `enabledChanged(bool)` | enabled | Emitted when enabled state changes |
+| `stateChanged()` | - | Emitted when connection state changes |
+| `connectError(int)` | error | Emitted when a connection error occurs |
+| `connectedDevicesChanged()` | - | Emitted when connected devices list changes |
+| `disconnectedDevicesChanged()` | - | Emitted when available devices list changes |
+
+### Enumerations
+
+#### State Enum
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 1 | Idle | No active connection or scanning |
+| 2 | Disconnected | Display available but not connected |
+| 4 | Association | Attempting to associate with display |
+| 8 | Configuration | Configuring display connection |
+| 16 | Connected | Successfully connected to display |
+| 32 | Failure | Connection failed |
+
+#### Error Enum
+
+| Value | Name | Description |
+|-------|------|-------------|
+| 0 | None | No error |
+| 1 | Failed | Operation failed |
+| 2 | Already | Operation already in progress |
+| 3 | ParamInvalid | Invalid parameter provided |
+| 4 | InvalidState | Invalid state for operation |
+| 5 | NotConnected | Not connected to display |
+| 6 | NotReady | Device not ready |
+| 7 | Unknown | Unknown error |
+
+---
+
+## Qt5 to Qt6 Migration
+
+### CMakeLists.txt
+
+**Key Changes:**
+
+- Replaced `add_library(MODULE)` + `add_lomiri_plugin()` with `qt_add_qml_module()`
+- Changed `find_package(Qt5 ...)` to `find_package(Qt6 ...)`
+- Changed `target_link_libraries()` from `Qt5::` to `Qt6::` targets with `PRIVATE` keyword
+- `qt_add_qml_module()` automatically generates `qmldir`
+- Added `qt_add_dbus_interface()` for DBus introspection files
+
+### Header Files
+
+**Pattern (applies to all exposed classes):**
+
+**Qt5 (removed plugin factory code):**
+```cpp
+// plugin.cpp (DELETED)
+void SomePlugin::registerTypes(const char *uri) {
+    qmlRegisterType<ClassName>(uri, 1, 0, "ClassName");
+    qmlRegisterSingletonType<SingletonClass>(uri, 1, 0, "SingletonClass", ...);
+    qmlRegisterUncreatableType<ReadOnlyData>(uri, 1, 0, "ReadOnlyData", "ReadOnlyData cannot be created from QML");
+}
+```
+
+**Qt6 (macro-based registration):**
+```cpp
+// Each class header
+#include <qqmlintegration.h>
+
+// Regular creatable type
+class ClassName: public QObject {
+    Q_OBJECT
+    QML_ELEMENT     // Can be instantiated from QML
+    // ...
+};
+
+// Singleton type
+class SingletonClass: public QObject {
+    Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON   // Only one instance, accessible globally
+    // ...
+};
+
+// Uncreatable type (accessible but cannot be instantiated from QML)
+class ReadOnlyData: public QObject {
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("ReadOnlyData cannot be created from QML")
+    // ...
+};
+```
+
+**Why**: Qt6 uses compile-time macro-based registration instead of runtime type registration. This eliminates runtime overhead, reduces binary size, and removes the need for plugin factory classes.
+
+### Files Deleted
+
+- `plugin.h` — No longer needed (replaced by `QML_ELEMENT` macro)
+- `plugin.cpp` — No longer needed (replaced by `QML_ELEMENT` macro)
+- `qmldir` — Auto-generated by `qt_add_qml_module()`
+
+---
+
+## Testing
+
+### QML Testing
+
+Test project located in `Tests/QMLTests/`. Automatically discovers plugin build directory and runs tests.
+
+**Tests validate:**
+- Timer validates real-time signal emissions every 3 seconds
+- `scanning` (read-only property)
+- `enabled` (read-write property)
+- `state` (property)
+- Signal connections: `scanningChanged`, `enabledChanged`, `stateChanged`, `connectError`
+- DBus retrieves display data from Aethercast daemon
+
+**Features tested:**
+- Property read access
+- Property write access (enabled)
+- Signal emission handling
+- Real-time status monitoring
+- UI updates based on state changes
+
+### Unit Tests
+
+Tests validate:
+- ✓ Object creation and initialization
+- ✓ `scanning` property returns valid bool
+- ✓ `enabled` property returns valid bool
+- ✓ `state` property returns valid state string
+- ✓ `setEnabled()` method execution without errors
+- ✓ `scanningChanged` signal validity
+- ✓ `enabledChanged` signal validity
+- ✓ `stateChanged` signal validity
+- ✓ `connectError` signal validity
+
+**Expected result:**
+```
+100% tests passed, 0 tests failed
+```
+
