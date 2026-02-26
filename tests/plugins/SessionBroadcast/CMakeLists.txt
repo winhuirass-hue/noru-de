@@ -11,12 +11,19 @@ find_program(QDBUSXML2CPP_EXECUTABLE qdbusxml2cpp REQUIRED)
 
 macro(make_dbus_class NAME INTERFACE)
     if(${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor.h)
-        execute_process(COMMAND ${QDBUSXML2CPP_EXECUTABLE} -c ${NAME}Adaptor -a ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor ${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml ${INTERFACE}
-            OUTPUT_QUIET ERROR_QUIET)
+        execute_process(COMMAND ${QDBUSXML2CPP_EXECUTABLE} -c ${NAME}Adaptor -a ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor ${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml ${INTERFACE})
     endif()
 endmacro(make_dbus_class)
 
 make_dbus_class(Broadcast com.lomiri.Shell.Greeter.Broadcast)
+
+# Qt6 fix: Remove QStringList forward declaration (it's a using alias in Qt6, not a class)
+file(GLOB GENERATED_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/*Adaptor.h")
+foreach(HEADER ${GENERATED_HEADERS})
+    file(READ "${HEADER}" CONTENT)
+    string(REGEX REPLACE "class QStringList;" "" CONTENT "${CONTENT}")
+    file(WRITE "${HEADER}" "${CONTENT}")
+endforeach()
 
 add_definitions(-DSM_BUSNAME=sessionBus)
 
@@ -36,7 +43,7 @@ add_executable(MockBroadcastServer
     server.cpp
     BroadcastServer.cpp
 )
-target_link_libraries(MockBroadcastServer Qt6::Core Qt6::DBus)
+target_link_libraries(MockBroadcastServer Qt6::Core Qt6::DBus Qt6::Qml)
 install(TARGETS MockBroadcastServer
     DESTINATION "${SHELL_PRIVATE_LIBEXECDIR}/tests/plugins/SessionBroadcast"
 )
@@ -66,12 +73,18 @@ if(COMMAND add_lomiri_unittest)
     )
 else()
     set(TEST_PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
-    set(TEST_ENV "QML2_IMPORT_PATH=${TEST_PROJECT_ROOT}qml:${TEST_PROJECT_ROOT}plugins")
-    set(TEST_ENV "${TEST_ENV} LOMIRI_SOURCE_DIR=${TEST_PROJECT_ROOT}")
-
     enable_testing()
     add_test(NAME SessionBroadcastTest
-        COMMAND bash -c "${TEST_ENV} $<TARGET_FILE:MockBroadcastServer> & sleep 1 && ${TEST_ENV} $<TARGET_FILE:sessionbroadcasttestExec> ; pkill -f MockBroadcastServer"
+        COMMAND dbus-test-runner
+            --task $<TARGET_FILE:MockBroadcastServer>
+            --task-name server
+            --ignore-return
+            --task $<TARGET_FILE:sessionbroadcasttestExec>
+            --task-name client
+            --wait-for com.lomiri.Shell.Greeter.Broadcast
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    set_tests_properties(SessionBroadcastTest PROPERTIES
+        ENVIRONMENT "QML2_IMPORT_PATH=${TEST_PROJECT_ROOT}qml:${TEST_PROJECT_ROOT}plugins;LOMIRI_SOURCE_DIR=${TEST_PROJECT_ROOT}"
     )
 endif()
