@@ -1,18 +1,27 @@
-cmake_minimum_required(VERSION 3.24)
-project(GlobalShortcut-qml LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(GlobalShortcut-qml VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 COMPONENTS Quick Gui REQUIRED)
+set(QT_COMPONENTS Quick Gui)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
 
-file(GLOB GLOBALSHORTCUT_FILES "*.h" "*.cpp")
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
+
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp")
 
 qt_add_qml_module(GlobalShortcut-qml
     URI GlobalShortcut
     VERSION 1.0
     SOURCES
-    ${GLOBALSHORTCUT_FILES}
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
 )
 
-target_link_libraries(GlobalShortcut-qml PRIVATE Qt6::Quick Qt6::Gui)
+target_link_libraries(GlobalShortcut-qml PRIVATE ${QT_LIBS})
 
