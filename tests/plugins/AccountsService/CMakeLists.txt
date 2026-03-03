@@ -4,15 +4,15 @@ project(AccountsServiceTests)
 set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 COMPONENTS Core DBus Test Qml REQUIRED)
-include(FindPkgConfig)
+
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 
 find_program(QDBUSXML2CPP_EXECUTABLE qdbusxml2cpp REQUIRED)
 
 macro(make_dbus_class NAME INTERFACE)
     if(${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml IS_NEWER_THAN ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor.h)
-        execute_process(COMMAND ${QDBUSXML2CPP_EXECUTABLE} -c ${NAME}Adaptor -i types.h -a ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor ${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml ${INTERFACE}
-            OUTPUT_QUIET ERROR_QUIET)
+        execute_process(COMMAND ${QDBUSXML2CPP_EXECUTABLE} -c ${NAME}Adaptor -i types.h -a ${CMAKE_CURRENT_BINARY_DIR}/${NAME}Adaptor ${CMAKE_CURRENT_SOURCE_DIR}/interfaces.xml ${INTERFACE})
     endif()
 endmacro(make_dbus_class)
 
@@ -25,7 +25,6 @@ make_dbus_class(AccountsUser org.freedesktop.Accounts.User)
 make_dbus_class(AccountsPrivate com.lomiri.shell.AccountsService.Private)
 make_dbus_class(LscInput com.lomiri.SystemCompositor.Input)
 
-# Qt6 fix: Remove QStringList forward declaration (it's a using alias in Qt6, not a class)
 file(GLOB GENERATED_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/*Adaptor.h")
 foreach(HEADER ${GENERATED_HEADERS})
     file(READ "${HEADER}" CONTENT)
@@ -33,17 +32,21 @@ foreach(HEADER ${GENERATED_HEADERS})
     file(WRITE "${HEADER}" "${CONTENT}")
 endforeach()
 
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../include/paths.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/paths.h"
+)
+
 include_directories(
     ${GLIB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugins/AccountsService
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../plugins/AccountsService/build
-    )
+)
 
 link_libraries(
     ${GLIB_LIBRARIES}
-    )
+)
 
 add_definitions(-DSM_BUSNAME=sessionBus)
 
@@ -91,12 +94,18 @@ if(COMMAND add_lomiri_unittest)
     )
 else()
     set(TEST_PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
-    set(TEST_ENV "QML2_IMPORT_PATH=${TEST_PROJECT_ROOT}qml:${TEST_PROJECT_ROOT}plugins")
-    set(TEST_ENV "${TEST_ENV} LOMIRI_SOURCE_DIR=${TEST_PROJECT_ROOT}")
-
     enable_testing()
     add_test(NAME AccountsServiceTest
-        COMMAND bash -c "${TEST_ENV} $<TARGET_FILE:mock-server> & sleep 1 && ${TEST_ENV} $<TARGET_FILE:test-accountsservice> ; pkill -f mock-server"
+        COMMAND /usr/bin/dbus-test-runner
+            --task $<TARGET_FILE:mock-server>
+            --task-name server
+            --ignore-return
+            --task $<TARGET_FILE:test-accountsservice>
+            --task-name client
+            --wait-for org.freedesktop.Accounts
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    set_tests_properties(AccountsServiceTest PROPERTIES
+        ENVIRONMENT "QML2_IMPORT_PATH=${TEST_PROJECT_ROOT}qml:${TEST_PROJECT_ROOT}plugins;LOMIRI_SOURCE_DIR=${TEST_PROJECT_ROOT}"
     )
 endif()
