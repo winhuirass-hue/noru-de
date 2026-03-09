@@ -1469,6 +1469,8 @@ FocusScope {
                         function requestRestore() { model.window.requestState(Mir.RestoredState); }
 
                         function claimFocus() {
+                            appDelegate.focus = true;
+
                             if (root.state == "spread") {
                                 spreadItem.highlightedIndex = index
                                 // force pendingActivation so that when switching to staged mode, topLevelSurfaceList focus won't got to previous app ( case when apps are launched from outside )
@@ -1485,7 +1487,6 @@ FocusScope {
                                 }
                                 workspaceContainer.updateMainAndSideStageIndexes();
                             }
-                            appDelegate.focus = true;
 
                             // Don't set focusedAppDelegate (and signal mainAppChanged) unnecessarily
                             // which can happen after getting interactive again.
