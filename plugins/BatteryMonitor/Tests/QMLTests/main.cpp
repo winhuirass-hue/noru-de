@@ -7,8 +7,9 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-    // Add BatteryMonitor plugin build directory
+
     engine.addImportPath(PLUGIN_BUILD_DIR);
+
     const QUrl url(QStringLiteral("qrc:/QMLTests/main.qml"));
     QObject::connect(
         &engine,

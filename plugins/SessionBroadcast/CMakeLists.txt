@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
-project(SessionBroadcast-qml VERSION 0.1 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(SessionBroadcast VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -16,7 +16,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 
 file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h")
-file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "*.cpp")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp")
 
 add_definitions(-DSM_BUSNAME=systemBus)
 

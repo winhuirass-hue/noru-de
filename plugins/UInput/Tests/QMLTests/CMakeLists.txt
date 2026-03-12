@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
-
+cmake_minimum_required(VERSION 3.17)
 project(UInputQMLTests VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -27,7 +26,6 @@ if(QMLDIR_PATH)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${QMLDIR_PATH}" "${UINPUT_MODULE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PLUGIN_BUILD_DIR}/libUInput*" "${UINPUT_MODULE_DIR}/"
     )
-    
     target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 else()
     message(FATAL_ERROR "UInput plugin not found. Build plugin first: cd ../../ && mkdir build && cd build && cmake .. && make")
@@ -36,7 +34,7 @@ endif()
 qt_add_qml_module(appQMLTests
     URI QMLTests
     VERSION 1.0
-    QML_FILES main.qml 
+    QML_FILES main.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

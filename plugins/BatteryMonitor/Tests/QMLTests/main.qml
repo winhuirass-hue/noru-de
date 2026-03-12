@@ -1,23 +1,3 @@
-/**
- * @file main.qml
- * @brief BatteryMonitor Plugin QML Testing Example
- *
- * This QML file demonstrates how to test and access all Q_PROPERTY and Q_INVOKABLE
- * functions exposed by the BatteryMonitor plugin after porting from Qt5 to Qt6.
- *
- * Features tested:
- * - charging: Read-only property indicating if device is charging
- * - fullyCharged: Read-only property indicating 100% battery charge
- * - timeToFull: Read-only property with seconds to full charge (-1: no battery, -2: unavailable)
- * - state(): Invokable method returning battery state (0: UNKNOWN, 1: CHARGING, 2: DISCHARGING, 3: EMPTY, 4: FULLY_CHARGED)
- *
- * The Timer validates real-time signal emissions every 3 seconds.
- * DBus retrieves battery information from the system UPower daemon.
- *
- * Qt Version: 6.8.2 (required)
- * Platform: Ubuntu 24.04.3 LTS
- */
-
 import QtQuick
 import QtQuick.Window
 import BatteryMonitor 1.0

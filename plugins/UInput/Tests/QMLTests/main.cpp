@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     engine.addImportPath(PLUGIN_BUILD_DIR);
-        
+
     const QUrl url(QStringLiteral("qrc:/QMLTests/main.qml"));
     QObject::connect(
         &engine,

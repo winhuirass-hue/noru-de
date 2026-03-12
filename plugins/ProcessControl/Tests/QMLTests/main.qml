@@ -5,7 +5,7 @@ Window {
     width: 640
     height: 480
     visible: true
-    title: qsTr("ProcessControl Plugin Test")
+    title: qsTr("ProcessControl Test")
 
     Component.onCompleted: {
         console.log(ProcessControl.awakenProcesses)

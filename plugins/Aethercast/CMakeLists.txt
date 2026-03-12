@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(Aethercast-qml VERSION 0.1 LANGUAGES CXX)
+project(Aethercast VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 

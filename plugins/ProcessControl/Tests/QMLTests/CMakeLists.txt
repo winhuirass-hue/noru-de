@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
-
-project(QMLTests VERSION 0.1 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(ProcessControlQMLTests VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,8 +26,7 @@ if(QMLDIR_PATH)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${QMLDIR_PATH}" "${PROCESSCONTROL_MODULE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PLUGIN_BUILD_DIR}/libProcessControl*" "${PROCESSCONTROL_MODULE_DIR}/"
     )
-
-target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 else()
     message(FATAL_ERROR "ProcessControl plugin not found. Build plugin first: cd ../../ && mkdir build && cd build && cmake .. && make")
 endif()
@@ -43,7 +41,7 @@ qt_add_qml_module(appQMLTests
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 set_target_properties(appQMLTests PROPERTIES
-    #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appQMLTests
+#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appQMLTests
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE

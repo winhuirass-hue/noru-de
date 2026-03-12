@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(UInput-qml VERSION 0.1 LANGUAGES CXX)
+project(UInput VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 

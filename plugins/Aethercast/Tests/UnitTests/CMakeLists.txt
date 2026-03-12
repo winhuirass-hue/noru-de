@@ -34,7 +34,7 @@ target_include_directories(AethercastTest
 )
 
 target_link_libraries(AethercastTest 
-    PRIVATE 
+    PRIVATE
     Qt6::Test
     Qt6::DBus
     Qt6::Qml

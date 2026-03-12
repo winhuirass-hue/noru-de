@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
-
+cmake_minimum_required(VERSION 3.17)
 project(PowerdQMLTests VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -11,10 +10,8 @@ qt_add_executable(appQMLTests
     main.cpp
 )
 
-# Find plugin build directory (handles both Qt Creator nested dirs and terminal builds)
 file(GLOB_RECURSE QMLDIR_PATH "${CMAKE_SOURCE_DIR}/../../build/*/qmldir")
 if(NOT QMLDIR_PATH)
-    # Check for terminal build (direct build/ directory)
     if(EXISTS "${CMAKE_SOURCE_DIR}/../../build/qmldir")
         set(QMLDIR_PATH "${CMAKE_SOURCE_DIR}/../../build/qmldir")
     endif()
@@ -23,14 +20,12 @@ endif()
 if(QMLDIR_PATH)
     get_filename_component(PLUGIN_BUILD_DIR "${QMLDIR_PATH}" DIRECTORY)
     
-    # Create Powerd subdirectory in QMLTests folder
     set(POWERD_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Powerd")
     add_custom_command(TARGET appQMLTests PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${POWERD_MODULE_DIR}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${QMLDIR_PATH}" "${POWERD_MODULE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PLUGIN_BUILD_DIR}/libPowerd*" "${POWERD_MODULE_DIR}/"
     )
-    
     target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 else()
     message(FATAL_ERROR "Powerd plugin not found. Build plugin first: cd ../../ && mkdir build && cd build && cmake .. && make")
@@ -39,7 +34,7 @@ endif()
 qt_add_qml_module(appQMLTests
     URI QMLTests
     VERSION 1.0
-    QML_FILES main.qml 
+    QML_FILES main.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

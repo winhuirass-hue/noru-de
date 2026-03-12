@@ -1,16 +1,3 @@
-/**
- * @file main.qml
- * @brief Powerd Plugin QML Testing Example
- *
- * Tests Q_PROPERTY and Q_INVOKABLE functions of Powerd plugin (Qt6).
- *
- * Features tested:
- * - status: Read-only property (0: Off, 1: On)
- * - setStatus(): Invokable method
- *
- * Qt Version: 6.8.2 | Platform: Ubuntu 24.04.3 LTS
- */
-
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -20,7 +7,7 @@ Window {
     width: 400
     height: 300
     visible: true
-    title: "Powerd Plugin Test"
+    title: "Powerd Test"
 
     Column {
         anchors.centerIn: parent
@@ -86,8 +73,8 @@ Window {
         repeat: true
 
         onTriggered: {
-            console.log("Status:", (Powerd.status === Powerd.On ? "ON" : "OFF"), 
-                       "| Value:", Powerd.status)
+            console.log("Status:", (Powerd.status === Powerd.On ? "ON" : "OFF"),
+                        "| Value:", Powerd.status)
         }
     }
 }

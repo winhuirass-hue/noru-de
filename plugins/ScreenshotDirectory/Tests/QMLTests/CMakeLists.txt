@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.17)
-
 project(ScreenshotDirectoryQMLTests VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
@@ -27,8 +26,7 @@ if(QMLDIR_PATH)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${QMLDIR_PATH}" "${SCREENSHOT_MODULE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PLUGIN_BUILD_DIR}/libScreenshotDirectory*" "${SCREENSHOT_MODULE_DIR}/"
     )
-
-target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    target_compile_definitions(appQMLTests PRIVATE PLUGIN_BUILD_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 else()
     message(FATAL_ERROR "ScreenshotDirectory plugin not found. Build plugin first: cd ../../ && mkdir build && cd build && cmake .. && make")
 endif()

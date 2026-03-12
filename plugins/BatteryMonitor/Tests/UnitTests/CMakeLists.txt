@@ -14,7 +14,7 @@ add_executable(BatteryMonitorTest
 )
 
 target_link_libraries(BatteryMonitorTest 
-    PRIVATE 
+    PRIVATE
     Qt6::Test
     Qt6::DBus
     Qt6::Qml
