@@ -318,8 +318,8 @@ MouseArea {
         function onLogoutReady() {
             doOnClosedAllWindows = function(lomiriSessionService) {
                 return function() {
-                    Qt.quit();
                     lomiriSessionService.endSession();
+                    Qt.quit();
                 }
             }(lomiriSessionService);
             topLevelSurfaceList.closeAllWindows();
