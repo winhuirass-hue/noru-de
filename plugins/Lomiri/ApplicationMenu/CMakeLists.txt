@@ -1,16 +1,24 @@
-cmake_minimum_required(VERSION 3.24)
-project(ApplicationMenu-qml LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(ApplicationMenu VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 COMPONENTS DBus Qml Quick REQUIRED)
+set(QT_COMPONENTS DBus Qml Quick)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
+
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
+
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-file(GLOB APPLICATION_MENU_FILES "*.h" "*.cpp")
 
 qt_add_dbus_adaptor(DBUS_ADAPTOR_SRCS
     com.lomiri.MenuRegistrar.xml
@@ -21,10 +29,9 @@ qt_add_qml_module(ApplicationMenu-qml
     URI Lomiri.ApplicationMenu
     VERSION 0.1
     SOURCES
-    ${APPLICATION_MENU_FILES}
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
     ${DBUS_ADAPTOR_SRCS}
 )
 
-target_link_libraries(ApplicationMenu-qml
-    PRIVATE Qt6::DBus Qt6::Qml Qt6::Quick)
-
+target_link_libraries(ApplicationMenu-qml PRIVATE ${QT_LIBS})
