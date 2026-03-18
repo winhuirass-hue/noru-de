@@ -67,6 +67,10 @@ Item {
         property bool oskEnabled: true
     }
 
+    // We support delayed 2-finger gestures.
+    // This means touching with one finger then tapping or swiping with another finger to right-click or scroll.
+    // twoFingerGestureArea cannot support this since it requires both touches to be simultaneous for the gesture to be detected
+    // touchPadArea handles these gestures as well as the single taps for left-click
     MultiPointTouchArea {
         objectName: "touchPadArea"
         anchors.fill: parent
@@ -181,6 +185,62 @@ Item {
                 id: point2
             }
         ]
+    }
+
+    MultiTouchGestureArea {
+        id: twoFingerGestureArea
+        objectName: "twoFingerGestureArea"
+        anchors.fill: parent
+        enabled: !tutorial.running || tutorial.paused
+        enableDoubleClick: true
+        minimumTouchPoints: 2
+        maximumTouchPoints: 2
+
+        onDoubleClicked: UInput.pressMouse(UInput.ButtonRight)
+        onDoubleClickedReleased: UInput.releaseMouse(UInput.ButtonRight)
+        onClicked: {
+            if (!recognizedDrag) {
+                // Right-click
+                UInput.pressMouse(UInput.ButtonRight);
+                UInput.releaseMouse(UInput.ButtonRight);
+            }
+        }
+
+        onDragUpdated: {
+            if (recognizedDrag) {
+                // Allow dragging with right button similar to one-finger double tap for left button
+                if (isDoubleClick) {
+                    if (recognizedDrag) {
+                        const point = points[0];
+                        if (prevTouchPoint !== Qt.point(0, 0)) {
+                            const newX = (point.x - prevTouchPoint.x)
+                            const newY = (point.y - prevTouchPoint.y)
+                            UInput.moveMouse(newX, newY);
+                        }
+                    }
+                } else {
+                    scroll(points)
+                }
+            }
+        }
+
+        function scroll(touchPoints) {
+            var dh = 0;
+            var dv = 0;
+            var tp = touchPoints[0];
+            var tp2 = touchPoints[1];
+
+            dh += tp.x - prevTouchPoint.x;
+            dv += tp.y - prevTouchPoint.y;
+            dh += tp2.x - prevTouchPoint2.x;
+            dv += tp2.y - prevTouchPoint2.y;
+
+            // As we added up the movement of the two fingers, let's divide it again by 2
+            dh /= 2;
+            dv /= 2;
+
+            UInput.scrollMouse(dh, dv);
+        }
     }
 
     RowLayout {
