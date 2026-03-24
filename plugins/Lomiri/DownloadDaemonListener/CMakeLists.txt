@@ -1,14 +1,25 @@
-cmake_minimum_required(VERSION 3.24)
-project(DownloadDaemonListener LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(DownloadDaemonListener VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Qml Quick DBus Core)
+set(QT_COMPONENTS Qml Quick DBus Core)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
+
+set(CMAKE_BUILD_RPATH "/usr/local/lib")
+set(CMAKE_INSTALL_RPATH "/usr/local/lib")
+
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(DDLADAPTER REQUIRED ldm-common-qt6)
 
-file(GLOB DOWNLOAD_DAEMON_LISTENER_FILES "*.cpp" "*.h" "interface/*.cpp" "interface/*.h")
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h"   "interface/*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp" "interface/*.cpp")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -19,17 +30,16 @@ qt_add_qml_module(DownloadDaemonListener
     URI Lomiri.DownloadDaemonListener
     VERSION 0.1
     SOURCES
-    ${DOWNLOAD_DAEMON_LISTENER_FILES})
-
+    ${HEADER_FILES}
+    ${SOURCE_FILES})
 
 add_definitions(${DDLADAPTER_CFLAGS} ${DDLADAPTER_CFLAGS_OTHER})
 
 target_link_libraries(DownloadDaemonListener
     PRIVATE
-    Qt6::Qml Qt6::Quick Qt6::DBus Qt6::Core
+    ${QT_LIBS}
     ${DDLADAPTER_LIBRARIES}
 )
-
 
 
 
