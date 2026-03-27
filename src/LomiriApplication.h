@@ -23,6 +23,7 @@
 #include <QScopedPointer>
 
 #include "ApplicationArguments.h"
+#include "RootState.h"
 
 #ifdef LOMIRI_ENABLE_TOUCH_EMULATION
 #include "MouseTouchAdaptor.h"
@@ -48,6 +49,7 @@ private:
     #endif
 
     QQmlEngine *m_qmlEngine{nullptr};
+    RootState m_rootState;
 };
 
 #endif // LOMIRIAPPLICATION_H
