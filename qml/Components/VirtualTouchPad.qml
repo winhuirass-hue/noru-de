@@ -18,6 +18,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.1
 import Lomiri.Components 1.3
 import Qt.labs.settings 1.0
+import QtQuick.Window 2.2
 import Aethercast 1.0
 import UInput 0.1
 import "../Components"
@@ -26,6 +27,9 @@ Item {
     id: root
 
     property bool oskEnabled: false
+    property bool showRotateButton: false
+
+    signal rotate
 
     AethercastDisplays {
         id: aethercastDisplays
@@ -267,6 +271,30 @@ Item {
             anchors.margins: internalGu * 1.5
             name: "input-keyboard-symbolic"
             color: settings.oskEnabled ? LomiriColors.porcelain : LomiriColors.red
+        }
+    }
+
+    AbstractButton {
+        id: rotateButton
+        objectName: "rotateButton"
+        anchors { right: oskButton.left; top: parent.top; margins: internalGu * 2 }
+        height: internalGu * 6
+        width: height
+        visible: root.showRotateButton
+
+        onClicked: root.rotate()
+
+        Rectangle {
+            anchors.fill: parent
+            radius: width / 2
+            color: LomiriColors.inkstone
+        }
+
+        Icon {
+            anchors.fill: parent
+            anchors.margins: internalGu * 1.5
+            name: "view-rotate"
+            color: LomiriColors.porcelain
         }
     }
 
