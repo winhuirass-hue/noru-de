@@ -28,6 +28,10 @@ Rectangle {
     color: "white"
     opacity: 0.0
 
+    required property var shell
+
+    signal snapshotTaken(string path)
+
     ScreenshotDirectory {
         id: screenshotDirectory
         objectName: "screenGrabber"
@@ -39,6 +43,11 @@ Rectangle {
     }
 
     function capture(item) {
+        // Disallow spamming the lightdm home directory with screenshots
+        // without access for removal to them
+        if (shell.mode === "greeter")
+            return;
+
         d.target = item;
         visible = true;
         shutterSound.stop();
@@ -76,6 +85,7 @@ Rectangle {
                         } else {
                             console.log("ItemGrabber: Saving image to " + fileName);
                             result.saveToFile(fileName);
+                            root.snapshotTaken(fileName);
                         }
                     });
 

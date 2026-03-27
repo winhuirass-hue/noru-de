@@ -214,6 +214,19 @@ StyledItem {
 
     readonly property alias greeter: greeterLoader.item
 
+    readonly property var blurSource: {
+        if (!settings.enableBlur)
+            return null;
+
+        if (screenshotEditorContainer.visible)
+            return screenshotEditorContainer;
+
+        if (greeter.shown)
+            return greeter;
+
+        return stages;
+    }
+
     function activateApplication(appId) {
         topLevelSurfaceList.pendingActivation();
 
@@ -592,9 +605,9 @@ StyledItem {
             id: panel
             objectName: "panel"
             anchors.fill: parent //because this draws indicator menus
-            blurSource: settings.enableBlur ? (greeter.shown ? greeter : stages) : null
+            blurSource: shell.blurSource
+            z: screenshotEditor.visibility ? screenshotEditorContainer.z + 1 : 0
             lightMode: shell.lightMode
-
             mode: shell.usageScenario == "desktop" ? "windowed" : "staged"
             minimizedPanelHeight: units.gu(3)
             expandedPanelHeight: units.gu(7)
@@ -667,7 +680,8 @@ StyledItem {
             superTabPressed: physicalKeysMapper.superTabPressed
             panelWidth: units.gu(settings.launcherWidth)
             lockedVisible: (lockedByUser || shell.atDesktop) && lockAllowed
-            blurSource: settings.enableBlur ? (greeter.shown ? greeter : stages) : null
+            blurSource: shell.blurSource
+            z: screenshotEditor.visibility ? screenshotEditorContainer.z + 1 : 0
             topPanelHeight: panel.panelHeight
             lightMode: shell.lightMode
             drawerEnabled: !greeter.active && tutorial.launcherLongSwipeEnabled
@@ -857,6 +871,60 @@ StyledItem {
                 }
             }
         }
+
+        Item {
+            id: screenshotEditorContainer
+            anchors.fill: parent
+            z: itemGrabber.z - 2
+            visible: screenshotEditor.visibility
+
+            ScreenshotEditor {
+                id: screenshotEditor
+                anchors.fill: parent
+                anchors.topMargin: panel.panelHeight
+                enabled: !wizard.active
+
+                property string prevLauncherState : ""
+
+                // Don't store and restore the wrong state once the editor has been opened already
+                onVisibleChanged: {
+                    console.log("Visible changed: " + visible)
+
+                    if (visible) {
+                        prevLauncherState = launcher.state;
+                        launcher.switchToNextState("");
+                    } else {
+                        launcher.switchToNextState(prevLauncherState);
+                    }
+                }
+
+                // Make locking the screen abort the editing session, otherwise we
+                // would show the editor above the lockscreen.
+                Connections {
+                    target: greeter
+                    function onLockedChanged() {
+                        if (!screenshotEditor.visibility)
+                            return;
+
+                        if (greeter.locked)
+                            screenshotEditor.hide()
+                    }
+                }
+
+                Connections {
+                    target: panel
+
+                    // Hide the launcher if the indicator panel has been tapped
+                    function onFullyClosedChanged() {
+                        if (!screenshotEditor.visibility)
+                            return;
+
+                        if (panel.fullyClosed)
+                            launcher.switchToNextState("");
+                    }
+                }
+            }
+        }
     }
 
     Dialogs {
@@ -889,12 +957,19 @@ StyledItem {
     ItemGrabber {
         id: itemGrabber
         anchors.fill: parent
+        shell: shell
         z: dialogs.z + 10
         GlobalShortcut { shortcut: Qt.Key_Print; onTriggered: itemGrabber.capture(shell) }
         Connections {
             target: stage
             ignoreUnknownSignals: true
             function onItemSnapshotRequested(item) { itemGrabber.capture(item) }
+        }
+        onSnapshotTaken: {
+            if (!settings.enableScreenshotEditor)
+                return;
+
+            screenshotEditor.show(path)
         }
     }
 
