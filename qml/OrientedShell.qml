@@ -322,12 +322,14 @@ Item {
                 return "desktop";
             } else if (deviceConfiguration.category === "phone") {
                 return "phone";
-            } else if (deviceConfiguration.category === "tablet") {
+            } else if (deviceConfiguration.category === "tablet") {
                 return "tablet";
-            } else {
+            } else {
                 if (screen.formFactor === Screen.Tablet) {
                     return "tablet";
-                } else if (screen.formFactor === Screen.Phone) {
+                } else if (shell.hasTouchscreen) {
+                    return "tablet";
+                } else if (screen.formFactor === Screen.Phone) {
                     return "phone";
                 } else {
                     return "desktop";
