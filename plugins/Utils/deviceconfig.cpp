@@ -18,12 +18,23 @@
 #include "deviceconfig.h"
 
 #include <deviceinfo.h>
+#include <QFile>
 #include <QDebug>
+#include <QFileSystemWatcher>
 
 DeviceConfig::DeviceConfig(QObject *parent):
     QObject(parent),
     m_info(std::make_unique<DeviceInfo>())
 {
+    QString hdmFilePath =  QString::fromStdString(m_info->get("HBMSysfsPath", ""));
+    if(!hdmFilePath.isEmpty()) {
+        QFileSystemWatcher *watcher = new QFileSystemWatcher(this);
+        watcher->addPath(hdmFilePath);
+        connect(watcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+            Q_UNUSED(path);
+            Q_EMIT highBrightnessModeChanged();
+        });
+    }
 }
 
 DeviceConfig::~DeviceConfig() = default;
@@ -112,4 +123,63 @@ Qt::ScreenOrientation DeviceConfig::stringToOrientation(const std::string &orien
 bool DeviceConfig::supportsMultiColorLed() const
 {
     return m_info->contains("supportsMultiColorLed");
+}
+
+quint8 DeviceConfig::sensorLocationX() const
+{
+    return QString::fromStdString(m_info->get("udfpLocationX", "0")).toUInt();
+}
+
+quint8 DeviceConfig::sensorLocationY() const
+{
+    return QString::fromStdString(m_info->get("udfpLocationY", "0")).toUInt();
+}
+
+quint8 DeviceConfig::sensorRadius() const
+{
+    return QString::fromStdString(m_info->get("udfpSensorRadius", "0")).toUInt();
+}
+
+bool DeviceConfig::highBrightnessMode() const
+{
+    QString hdmFilePath =  QString::fromStdString(m_info->get("HBMSysfsPath", ""));
+    if(hdmFilePath.isEmpty()) {
+        return false;
+    }
+
+    QFile hdmFile(hdmFilePath);
+    if (!hdmFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream in(&hdmFile);
+    QString content = in.readAll();
+    if(content == "1") {
+        return true;
+    }
+    return false;
+}
+
+void DeviceConfig::setHighBrightnessMode(bool newHighBrightnessMode)
+{
+    QString enableHighBrightnessMode = "0";
+    QString hdmFilePath =  QString::fromStdString(m_info->get("HBMSysfsPath", ""));
+    if(hdmFilePath.isEmpty()) {
+        return;
+    }
+
+    QFile file(hdmFilePath);
+    if(!file.exists()) {
+        return;
+    }
+
+    if(newHighBrightnessMode) {
+        enableHighBrightnessMode = "1";
+    }
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << enableHighBrightnessMode;
+        file.close();
+    }
 }
