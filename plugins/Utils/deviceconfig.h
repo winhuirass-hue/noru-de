@@ -49,6 +49,8 @@ public:
     Qt::ScreenOrientation invertedPortraitOrientation() const;
     QString category() const;
     bool supportsMultiColorLed() const;
+    Q_INVOKABLE QString getProp(QString prop, QString defaultValue = QString()) const;
+
 
 // for tests
     Q_INVOKABLE void refresh() { Q_EMIT changed(); }

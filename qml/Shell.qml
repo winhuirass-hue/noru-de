@@ -184,6 +184,11 @@ StyledItem {
 
     property real edgeSize: units.gu(settings.edgeDragWidth)
 
+    DeviceConfig {
+        id: extDisplayConfiguration
+        property double panelTitleHolderLeftMargin: extDisplayConfiguration.getProp("screenСurvatureRadius", "0")
+    }
+
     ImageResolver {
         id: wallpaperResolver
         objectName: "wallpaperResolver"
