@@ -3,14 +3,19 @@
 # Eventually this should be dropped in favor of the upstream
 # QInputInfo API.
 
-cmake_minimum_required(VERSION 3.24)
-project(InputInfo LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.17)
+project(InputInfo VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS Core Quick Qml REQUIRED)
+set(QT_COMPONENTS Core Quick Qml)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
+
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUDEV REQUIRED libudev)
@@ -23,19 +28,21 @@ include_directories(
     ${LIBEVDEV_INCLUDE_DIRS}
 )
 
-file(GLOB INPUTINFO_FILES "*.h" "*.cpp" "linux/*.h" "linux/*.cpp")
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h" "linux/*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp" "linux/*.cpp")
 
 qt_add_qml_module(InputInfo
     URI Lomiri.InputInfo
     VERSION 0.1
     SOURCES
-    ${INPUTINFO_FILES}
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
 )
 
 target_link_libraries(InputInfo
     PRIVATE
     ${LIBUDEV_LDFLAGS}
     ${LIBEVDEV_LDFLAGS}
-    Qt6::Core Qt6::Quick Qt6::Qml
+    ${QT_LIBS}
 )
 
