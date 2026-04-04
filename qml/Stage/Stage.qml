@@ -1269,7 +1269,7 @@ FocusScope {
                                                      maximizedTopLeft || maximizedTopRight || maximizedBottomLeft || maximizedBottomRight
 
                 readonly property bool minimized: windowState & WindowStateStorage.WindowStateMinimized
-                readonly property bool fullscreen: windowState === WindowStateStorage.WindowStateFullscreen
+                readonly property bool fullscreen: windowState & WindowStateStorage.WindowStateFullscreen
 
                 readonly property bool canBeMaximized: canBeMaximizedHorizontally && canBeMaximizedVertically
                 readonly property bool canBeMaximizedLeftRight: (maximumWidth == 0 || maximumWidth >= appContainer.width/2) &&
@@ -1783,14 +1783,14 @@ FocusScope {
                         PropertyChanges {
                             target: appDelegate
                             x: stageMaths.itemX
-                            y: root.availableDesktopArea.y
+                            y: appDelegate.fullscreen ? 0 : root.availableDesktopArea.y
                             visuallyMaximized: true
                             visible: appDelegate.x < root.width
                         }
                         PropertyChanges {
                             target: appDelegate
                             requestedWidth: appContainer.width
-                            requestedHeight: root.availableDesktopArea.height
+                            requestedHeight: appDelegate.fullscreen ? appContainer.height : root.availableDesktopArea.height
                             restoreEntryValues: false
                         }
                         PropertyChanges {
