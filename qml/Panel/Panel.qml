@@ -457,7 +457,7 @@ Item {
 
                 height: parent.height
                 expanded: indicators.expanded
-                selected: ListView.isCurrentItem
+                selected: index == indicators.currentMenuIndex
 
                 identifier: model.identifier
                 busName: indicatorProperties.busName
@@ -468,6 +468,9 @@ Item {
                 Behavior on opacity { LomiriNumberAnimation { duration: LomiriAnimation.SnapDuration } }
 
                 width: ((expanded || indicatorVisible) && !hideSessionIndicator && !hideKeyboardIndicator) ? implicitWidth : 0
+                onWidthChanged: {
+                    indicators.recalculateItems();
+                }
 
                 Behavior on width { LomiriNumberAnimation { duration: LomiriAnimation.SnapDuration } }
             }

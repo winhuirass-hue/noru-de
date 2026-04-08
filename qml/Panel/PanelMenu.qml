@@ -93,6 +93,10 @@ Showable {
 
     onUnitProgressChanged: d.updateState()
 
+    function recalculateItems() {
+        bar.recalculateItems();
+    }
+
     BackgroundBlur {
         x: 0
         y: 0
