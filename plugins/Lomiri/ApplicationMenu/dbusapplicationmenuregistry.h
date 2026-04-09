@@ -23,6 +23,8 @@ class DBusApplicationMenuRegistry : public ApplicationMenuRegistry,
                                     protected QDBusContext
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 public:
     ~DBusApplicationMenuRegistry();
     static ApplicationMenuRegistry* instance();

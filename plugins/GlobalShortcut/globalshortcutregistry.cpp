@@ -47,12 +47,12 @@ GlobalShortcutList GlobalShortcutRegistry::shortcuts() const
     return m_shortcuts;
 }
 
-bool GlobalShortcutRegistry::hasShortcut(const QVariant &seq) const
+bool GlobalShortcutRegistry::hasShortcut(int &seq) const
 {
     return m_shortcuts.contains(seq);
 }
 
-void GlobalShortcutRegistry::addShortcut(const QVariant &seq, GlobalShortcut *sc)
+void GlobalShortcutRegistry::addShortcut(int seq, GlobalShortcut *sc)
 {
     if (sc) {
         if (!m_shortcuts.contains(seq)) { // create a new entry
@@ -69,7 +69,7 @@ void GlobalShortcutRegistry::addShortcut(const QVariant &seq, GlobalShortcut *sc
 
 void GlobalShortcutRegistry::removeShortcut(QObject *obj)
 {
-    QMutableMapIterator<QVariant, QVector<QPointer<GlobalShortcut>>> it(m_shortcuts);
+    QMutableMapIterator<int, QVector<QPointer<GlobalShortcut>>> it(m_shortcuts);
     while (it.hasNext()) {
         it.next();
         GlobalShortcut * scObj = static_cast<GlobalShortcut *>(obj);
@@ -99,7 +99,7 @@ bool GlobalShortcutRegistry::eventFilter(QObject *obj, QEvent *event)
                         keyEvent->isAutoRepeat(),
                         keyEvent->count());
 
-        int seq = keyEvent->key() + keyEvent->modifiers();
+        int seq = keyEvent->key() | static_cast<int>(keyEvent->modifiers());
         bool acceptedAtLeastOnce = false;
         if (m_shortcuts.contains(seq)) {
             const auto shortcuts = m_shortcuts.value(seq);

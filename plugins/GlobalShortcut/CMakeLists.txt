@@ -1,10 +1,27 @@
-set(globalshortcutplugin_SRCS
-    globalshortcut.cpp
-    globalshortcutregistry.cpp
-    plugin.cpp)
+cmake_minimum_required(VERSION 3.17)
+project(GlobalShortcut VERSION 0.1 LANGUAGES CXX)
 
-add_library(GlobalShortcut-qml SHARED ${globalshortcutplugin_SRCS})
+set(CMAKE_AUTOMOC ON)
 
-target_link_libraries(GlobalShortcut-qml Qt5::Quick Qt5::Gui)
+set(QT_COMPONENTS Quick Gui)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
 
-add_lomiri_plugin(GlobalShortcut 1.0 GlobalShortcut TARGETS GlobalShortcut-qml)
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
+
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp")
+
+qt_add_qml_module(GlobalShortcut-qml
+    URI GlobalShortcut
+    VERSION 1.0
+    SOURCES
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
+)
+
+target_link_libraries(GlobalShortcut-qml PRIVATE ${QT_LIBS})
+

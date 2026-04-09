@@ -20,7 +20,7 @@ set_target_properties(${LIB_NAME} PROPERTIES
     SOVERSION ${SOVERSION}
     )
 
-target_link_libraries(${LIB_NAME} Qt5::DBus)
+target_link_libraries(${LIB_NAME} Qt6::DBus)
 
 # install library
 install(TARGETS ${LIB_NAME}

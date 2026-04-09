@@ -18,6 +18,7 @@
 #define DBUSLOMIRISESSIONSERVICE_H
 
 #include <QDBusObjectPath>
+#include <qqmlintegration.h>
 
 #include "lomiridbusobject.h"
 
@@ -34,6 +35,8 @@ Q_DECLARE_METATYPE(QList<QDBusObjectPath>)
 class DBusLomiriSessionService : public LomiriDBusObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
     Q_CLASSINFO("D-Bus Interface", "com.lomiri.Shell.Session")
 
 public:

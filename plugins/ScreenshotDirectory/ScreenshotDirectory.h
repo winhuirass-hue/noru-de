@@ -19,10 +19,12 @@
 
 #include <QObject>
 #include <QString>
+#include <qqmlintegration.h>
 
 class ScreenshotDirectory: public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     explicit ScreenshotDirectory(QObject *parent = 0);

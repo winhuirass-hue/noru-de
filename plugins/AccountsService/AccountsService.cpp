@@ -107,7 +107,7 @@ AccountsService::AccountsService(QObject* parent, const QString &user)
     registerProperty(IFACE_UBUNTU_SECURITY, PROP_ENABLE_FINGERPRINT_IDENTIFICATION, QStringLiteral("enableFingerprintIdentificationChanged"));
     registerProperty(IFACE_UBUNTU_SECURITY, PROP_ENABLE_LAUNCHER_WHILE_LOCKED, QStringLiteral("enableLauncherWhileLockedChanged"));
     registerProperty(IFACE_UBUNTU_SECURITY, PROP_ENABLE_INDICATORS_WHILE_LOCKED, QStringLiteral("enableIndicatorsWhileLockedChanged"));
-    registerProperty(IFACE_UBUNTU_SECURITY, PROP_HIDE_NOTIFICATION_CONTENT_WHILE_LOCKED, QStringLiteral("hideNotificationContentWhileLocked"));
+    registerProperty(IFACE_UBUNTU_SECURITY, PROP_HIDE_NOTIFICATION_CONTENT_WHILE_LOCKED, QStringLiteral("hideNotificationContentWhileLockedChanged"));
     registerProperty(IFACE_UBUNTU_SECURITY, PROP_PASSWORD_DISPLAY_HINT, QStringLiteral("passwordDisplayHintChanged"));
     registerProperty(IFACE_UBUNTU_SECURITY, PROP_PINCODE_LENGTH, QStringLiteral("pincodeLengthChanged"));
     registerProperty(IFACE_UBUNTU_SECURITY_OLD, PROP_STATS_WELCOME_SCREEN, QStringLiteral("statsWelcomeScreenChanged"));

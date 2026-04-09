@@ -1,18 +1,49 @@
-add_definitions(-DSM_BUSNAME=systemBus)
-include_directories(${GLIB_INCLUDE_DIRS})
+cmake_minimum_required(VERSION 3.17)
+project(AccountsService VERSION 0.1 LANGUAGES CXX)
 
-add_library(AccountsService-qml MODULE
-    AccountsService.cpp
-    AccountsServiceDBusAdaptor.cpp
-    plugin.cpp
-    )
+set(CMAKE_AUTOMOC ON)
+
+add_definitions(-DSM_BUSNAME=systemBus)
+
+set(QT_COMPONENTS DBus Qml)
+set(QT_PACKAGE Qt6)
+set(QT_LIBS)
+foreach(comp ${QT_COMPONENTS})
+    list(APPEND QT_LIBS ${QT_PACKAGE}::${comp})
+endforeach()
+
+find_package(${QT_PACKAGE} REQUIRED COMPONENTS ${QT_COMPONENTS})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+
+file(GLOB HEADER_FILES  CONFIGURE_DEPENDS "*.h")
+file(GLOB SOURCE_FILES  CONFIGURE_DEPENDS "*.cpp")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../include/paths.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/paths.h"
+)
+
+qt_add_qml_module(AccountsService-qml
+    URI AccountsService
+    VERSION 0.1
+    SOURCES
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
+)
+
+target_include_directories(AccountsService-qml
+    PRIVATE
+    ${GLIB_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 target_link_libraries(AccountsService-qml
-    Qt5::DBus Qt5::Qml
+    PRIVATE
+    ${QT_LIBS}
     ${GLIB_LIBRARIES}
-    )
-
-add_lomiri_plugin(AccountsService 0.1 AccountsService TARGETS AccountsService-qml)
+)
 
 set(DBUS_IFACE_DIR "${CMAKE_INSTALL_FULL_DATADIR}/dbus-1/interfaces")
 set(ACCOUNTS_IFACE_DIR "${CMAKE_INSTALL_FULL_DATADIR}/accountsservice/interfaces")

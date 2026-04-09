@@ -19,6 +19,7 @@
 
 #include <gio/gio.h>
 #include <QtCore/QObject>
+#include <qqmlintegration.h>
 
 /**
  * @brief The OrientationLock class exports orientation lock related properties to QML
@@ -29,6 +30,8 @@
 class OrientationLock : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
 
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(Qt::ScreenOrientation savedOrientation READ savedOrientation WRITE setSavedOrientation

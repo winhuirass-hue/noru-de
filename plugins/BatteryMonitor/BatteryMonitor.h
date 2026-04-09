@@ -23,6 +23,7 @@
 #include <QDBusInterface>
 #include <QDBusConnection>
 #include <QDBusObjectPath>
+#include <qqmlintegration.h>
 
 #define GET "Get"
 #define UPOWER_PROPERTIES "org.freedesktop.UPower.Device"
@@ -42,6 +43,8 @@ enum {
 
 class BatteryMonitor: public QObject {
   Q_OBJECT
+  QML_ELEMENT
+  QML_SINGLETON
   Q_PROPERTY(qint64 timeToFull READ timeToFull NOTIFY timeToFullChanged)
   Q_PROPERTY(bool charging READ charging NOTIFY chargingChanged)
   Q_PROPERTY(bool fullyCharged READ isFullyCharged NOTIFY fullyChargedChanged)

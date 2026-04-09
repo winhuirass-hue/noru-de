@@ -44,7 +44,7 @@
 QDeclarativeInputDeviceModel::QDeclarativeInputDeviceModel(QObject *parent) :
     QAbstractListModel(parent),
     deviceInfo(new QInputDeviceManager),
-    currentFilter(QInputDevice::Unknown)
+    currentFilter(LomiriInputDevice::Unknown)
 {
     connect(deviceInfo,SIGNAL(ready()),this,SLOT(updateDeviceList()));
     connect(deviceInfo, &QInputDeviceManager::deviceAdded,this,&QDeclarativeInputDeviceModel::addedDevice);
@@ -98,7 +98,7 @@ int QDeclarativeInputDeviceModel::rowCount(const QModelIndex &parent) const
 int QDeclarativeInputDeviceModel::indexOf(const QString &devicePath) const
 {
     int idx(-1);
-    Q_FOREACH (QInputDevice *device, inputDevices) {
+    Q_FOREACH (LomiriInputDevice *device, inputDevices) {
         idx++;
         if (device->devicePath() == devicePath) return idx;
     }
@@ -106,7 +106,7 @@ int QDeclarativeInputDeviceModel::indexOf(const QString &devicePath) const
     return -1;
 }
 
-QInputDevice *QDeclarativeInputDeviceModel::get(int index) const
+LomiriInputDevice *QDeclarativeInputDeviceModel::get(int index) const
 {
     if (index < 0 || index > inputDevices.count())
         return 0;
@@ -115,7 +115,7 @@ QInputDevice *QDeclarativeInputDeviceModel::get(int index) const
 
 void QDeclarativeInputDeviceModel::updateDeviceList()
 {
-    QVector <QInputDevice *> newDevices = deviceInfo->deviceListOfType(currentFilter);
+    QVector <LomiriInputDevice *> newDevices = deviceInfo->deviceListOfType(currentFilter);
 
     int numNew = newDevices.count();
 
@@ -129,7 +129,7 @@ void QDeclarativeInputDeviceModel::updateDeviceList()
             Q_EMIT countChanged();
         } else if (i != j) {
             // changed its position -> move it
-            QInputDevice* device = inputDevices.value(j);
+            LomiriInputDevice* device = inputDevices.value(j);
             beginMoveRows(QModelIndex(), j, j, QModelIndex(), i);
             inputDevices.remove(j);
             inputDevices.insert(i, device);
@@ -177,7 +177,7 @@ QHash<int,QByteArray> QDeclarativeInputDeviceModel::roleNames() const
 /*
  * Returns the currently set device filter.
  * */
-QInputDevice::InputType QDeclarativeInputDeviceModel::deviceFilter()
+LomiriInputDevice::InputType QDeclarativeInputDeviceModel::deviceFilter()
 {
     return currentFilter;
 }
@@ -185,7 +185,7 @@ QInputDevice::InputType QDeclarativeInputDeviceModel::deviceFilter()
 /*
  * Sets the current  input device filter to filter.
  * */
-void QDeclarativeInputDeviceModel::setDeviceFilter(QInputDevice::InputType filter)
+void QDeclarativeInputDeviceModel::setDeviceFilter(LomiriInputDevice::InputType filter)
 {
     if (filter != currentFilter) {
         deviceInfo->setDeviceFilter(filter);

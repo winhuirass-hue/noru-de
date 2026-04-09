@@ -78,7 +78,7 @@ private Q_SLOTS:
         QCoreApplication::processEvents(); // to let the service register on DBus
 
         // .. because QSignalSpy checks the signal signature like this: "if (((aSignal[0] - '0') & 0x03) != QSIGNAL_CODE)"
-        QSignalSpy spy(&dbusLomiriSessionService, qPrintable(signal.prepend(QSIGNAL_CODE)));
+        QSignalSpy spy(&dbusLomiriSessionService, qPrintable(signal.prepend(QChar(QSIGNAL_CODE))));
 
         QDBusReply<void> reply = dbusLomiriSession->call(method);
         QCOMPARE(reply.isValid(), true);
@@ -197,7 +197,7 @@ private Q_SLOTS:
         // Spy on the given signal on the /com/lomiri/Shell/Session object
         // as proof we are actually calling the actual method.
         // .. because QSignalSpy checks the signal signature like this: "if (((aSignal[0] - '0') & 0x03) != QSIGNAL_CODE)"
-        QSignalSpy spy(&dbusLomiriSessionService, qPrintable(signal.prepend(QSIGNAL_CODE)));
+        QSignalSpy spy(&dbusLomiriSessionService, qPrintable(signal.prepend(QChar(QSIGNAL_CODE))));
 
         DBusGnomeSessionManagerDialogWrapper dbusGnomeSessionManagerDialogWrapper;
         QCoreApplication::processEvents(); // to let the service register on DBus
