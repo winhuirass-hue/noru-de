@@ -203,6 +203,18 @@ Showable {
         }
     }
 
+    Rectangle {
+        id: usfpSensorAred
+        objectName: "usfpSensorAred"
+        color: "white"
+        width: 100
+        height: 100
+        x: 540
+        y: 2158
+        radius: width/2
+        z: 9999
+    }
+
     Item {
         id: emergencyCallRow
 

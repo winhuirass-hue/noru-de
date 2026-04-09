@@ -264,6 +264,13 @@ StyledItem {
         id: volumeControl
     }
 
+    UDFPSComponent{
+        id: udfps
+        width: shell.width
+        height: shell.height
+        z: 9
+    }
+
     PhysicalKeysMapper {
         id: physicalKeysMapper
         objectName: "physicalKeysMapper"
