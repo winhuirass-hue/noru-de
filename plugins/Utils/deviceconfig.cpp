@@ -113,3 +113,8 @@ bool DeviceConfig::supportsMultiColorLed() const
 {
     return m_info->contains("supportsMultiColorLed");
 }
+
+bool DeviceConfig::supportsRebootToRecovery() const
+{
+    return m_info->contains("supportsRebootToRecovery");
+}

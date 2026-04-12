@@ -36,11 +36,19 @@ MouseArea {
     property string usageScenario
     property size screenSize: Qt.size(Screen.width, Screen.height)
     property bool hasKeyboard: false
+    property alias deviceConfiguration: _deviceConfiguration
 
     signal powerOffClicked();
 
     function showPowerDialog() {
         d.showPowerDialog();
+    }
+
+    DeviceConfiguration {
+        id: _deviceConfiguration
+
+        // Override for convergence to set scale etc for second monitor
+        overrideName: root.overrideDeviceName
     }
 
     property var doOnClosedAllWindows: function() {}
@@ -265,6 +273,21 @@ MouseArea {
                     doOnClosedAllWindows = function(lomiriSessionService, powerDialog) {
                         return function() {
                             lomiriSessionService.reboot();
+                            powerDialog.hide();
+                        }
+                    }(lomiriSessionService, powerDialog);
+                    topLevelSurfaceList.closeAllWindows();
+                }
+            }
+            Button {
+                width: parent.width
+                text: i18n.ctr("Button: Restart the system to Recovery", "Restart to Recovery")
+                visible: deviceConfiguration.supportsRebootToRecovery
+                enabled: deviceConfiguration.supportsRebootToRecovery
+                onClicked: {
+                    doOnClosedAllWindows = function(lomiriSessionService, powerDialog) {
+                        return function() {
+                            lomiriSessionService.rebootToRecovery();
                             powerDialog.hide();
                         }
                     }(lomiriSessionService, powerDialog);
