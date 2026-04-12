@@ -86,12 +86,12 @@ Item {
             var surface = drag.source.surface;
             drag.source.surface = null;
             var workspace = listView.model.get(listView.hoveredWorkspaceIndex);
-            WorkspaceManager.moveSurfaceToWorkspace(surface, workspace);
             drop.accept(Qt.MoveAction)
             if (listView.hoveredHalf == "right") {
                 root.closeSpread();
                 workspace.activate();
             }
+            WorkspaceManager.moveSurfaceToWorkspace(surface, workspace);
             surface.activate();
             listView.hoveredWorkspaceIndex = -1
         }

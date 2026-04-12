@@ -116,7 +116,8 @@ Showable {
                 show();
                 d.startUnlock(false /* toTheRight */);
             }
-        } else {
+        // Let's not dismiss the cover page if there's no focused app anyway
+        } else if (appId !== "") {
             d.startUnlock(false /* toTheRight */);
         }
     }
