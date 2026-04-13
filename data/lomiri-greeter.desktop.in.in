@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Lomiri Greeter
-Comment=The converged Lomiri shell's Greeter
+Comment=The desktop-first Lomiri-based shell's Greeter
 Exec=@CMAKE_INSTALL_FULL_BINDIR@/lomiri-greeter-wrapper @CMAKE_INSTALL_FULL_BINDIR@/lomiri --mode=greeter
 X-LightDM-Session-Type=mir
 X-Lomiri-Touch=true

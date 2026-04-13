@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Lomiri
-Comment=The converged Lomiri shell
+Comment=The desktop-first Lomiri-based shell
 Exec=@CMAKE_INSTALL_FULL_BINDIR@/lomiri
 Terminal=false
 NoDisplay=true

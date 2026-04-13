@@ -26,7 +26,7 @@ msgid "Lomiri"
 msgstr "Lomiri"
 
 #: data/lomiri.desktop.in:5
-msgid "The converged Lomiri shell"
+msgid "The desktop-first Lomiri-based shell"
 msgstr "Ujedinjena Lomiri ljuska"
 
 #: data/lomiri-greeter.desktop.in:4
@@ -34,7 +34,7 @@ msgid "Lomiri Greeter"
 msgstr "Lomiri ekran prijave"
 
 #: data/lomiri-greeter.desktop.in:5
-msgid "The converged Lomiri shell's Greeter"
+msgid "The desktop-first Lomiri-based shell's Greeter"
 msgstr "Ekran prijave ujedinjene Lomiri ljuske"
 
 #: data/indicators-client.desktop.in:4

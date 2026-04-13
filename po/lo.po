@@ -24,7 +24,7 @@ msgid "Lomiri"
 msgstr "Lomiri"
 
 #: data/lomiri.desktop.in:5
-msgid "The converged Lomiri shell"
+msgid "The desktop-first Lomiri-based shellased shellased shellased shell"
 msgstr "ເປືອກຫຸ້ມລະບົບ Lomiri ແບບເຊື່ອມໂຍງ"
 
 #: data/lomiri-greeter.desktop.in:4
@@ -32,7 +32,7 @@ msgid "Lomiri Greeter"
 msgstr "ຕົວຕ້ອນຮັບ Lomiri"
 
 #: data/lomiri-greeter.desktop.in:5
-msgid "The converged Lomiri shell's Greeter"
+msgid "The desktop-first Lomiri-based shellased shellased shellased shell's Greeter"
 msgstr "ຕົວຕ້ອນຮັບຂອງເປືອກຫຸ້ມລະບົບ Lomiri ແບບເຊື່ອມໂຍງ"
 
 #: data/indicators-client.desktop.in:4

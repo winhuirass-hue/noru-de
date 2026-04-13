@@ -26,7 +26,7 @@ msgid "Lomiri"
 msgstr "Lomiri"
 
 #: data/lomiri.desktop.in:5
-msgid "The converged Lomiri shell"
+msgid "The desktop-first Lomiri-based shellased shell"
 msgstr "Конвергентная оболочка Lomiri"
 
 #: data/lomiri-greeter.desktop.in:4
@@ -34,7 +34,7 @@ msgid "Lomiri Greeter"
 msgstr "Приветственное окно Lomiri"
 
 #: data/lomiri-greeter.desktop.in:5
-msgid "The converged Lomiri shell's Greeter"
+msgid "The desktop-first Lomiri-based shellased shell's Greeter"
 msgstr "Приветственный экран конвергентной оболочки Lomiri"
 
 #: data/indicators-client.desktop.in:4
