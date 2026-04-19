@@ -1,0 +1,13 @@
+# File map for this WM theme.
+# Paths are relative to this theme directory.
+
+# Window controls
+close = "close.svg"
+close_hover = "close_hover.svg"
+minimize = "minimize.svg"
+maximize = "maximize.svg"
+restore = "restore.svg"
+
+# Titlebar background
+# Use titlebar (png) and/or titlebar_svg (svg)
+titlebar_svg = "titlebar.svg"
