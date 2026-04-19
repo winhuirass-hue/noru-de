@@ -591,7 +591,7 @@ PanelUI {
             }
         }
 
-        function test_windowedApplicationMenuBarShowOnMouseHover() {
+        function test_windowedApplicationMenuBarVisibleInWindowedMode() {
             panelState.title = "Fake Title";
             panel.mode = "windowed";
             mouseEmulation.checked = false;
@@ -600,8 +600,8 @@ PanelUI {
             var appMenuRow = findChild(panel.applicationMenus, "panelRow"); verify(appMenuRow);
             var menuBarLoader = findChild(panel, "menuBarLoader"); verify(menuBarLoader);
 
-            tryCompare(appTitle, "visible", true, undefined, "App title should be visible");
-            tryCompare(menuBarLoader, "visible", false, undefined, "App menu bar should not be visible");
+            tryCompare(appTitle, "visible", false, undefined, "App title should be hidden when global menu is shown");
+            tryCompare(menuBarLoader, "visible", true, undefined, "App menu bar should be visible in windowed mode");
 
             mouseMove(panel, panel.width/2, panel.panelHeight);
 
@@ -610,8 +610,8 @@ PanelUI {
             var appMenuBarLoader = findChild(panel, "menuBarLoader")
             tryVerify(function() {return appMenuBarLoader.item});
             var appMenuBar = appMenuBarLoader.item
-            tryCompare(appTitle, "visible", false, undefined, "App title should not be visible on mouse hover");
-            tryCompare(appMenuBar, "visible", true, undefined, "App menu bar should be visible on mouse hover");
+            tryCompare(appTitle, "visible", false, undefined, "App title should remain hidden on mouse hover");
+            tryCompare(appMenuBar, "visible", true, undefined, "App menu bar should remain visible on mouse hover");
         }
 
         function test_windowedApplicationMenuShowOnMouseHoverWhenDecorationsShown() {
@@ -623,8 +623,8 @@ PanelUI {
             var appMenuRow = findChild(panel.applicationMenus, "panelRow"); verify(appMenuRow);
             var menuBarLoader = findChild(panel, "menuBarLoader"); verify(menuBarLoader);
 
-            tryCompare(appTitle, "visible", true, undefined, "App title should be visible");
-            tryCompare(menuBarLoader, "visible", false, undefined, "App menu bar should not be visible");
+            tryCompare(appTitle, "visible", true, undefined, "App title should be visible before decorations are shown");
+            tryCompare(menuBarLoader, "visible", true, undefined, "App menu bar should be visible");
 
             mouseMove(panel, panel.width/2, panel.panelHeight);
 
@@ -638,6 +638,17 @@ PanelUI {
 
             tryCompare(appTitle, "visible", false, undefined, "App title should not be visible on mouse hover");
             tryCompare(appMenuBar, "visible", true, undefined, "App menu bar should be visible on mouse hover");
+        }
+
+        function test_trayIndicatorOpensIndicatorsInWindowedMode() {
+            panel.mode = "windowed";
+            panel.hasKeyboard = true;
+
+            var trayIndicator = findChild(panel, "trayIndicator"); verify(trayIndicator);
+            tryCompare(trayIndicator, "visible", true, undefined, "Tray indicator should be visible in windowed desktop mode");
+
+            mouseClick(trayIndicator, trayIndicator.width / 2, trayIndicator.height / 2);
+            tryCompare(panel.indicators, "fullyOpened", true, undefined, "Indicators should open from tray indicator");
         }
 
         function test_keyboardNavigation_data() {

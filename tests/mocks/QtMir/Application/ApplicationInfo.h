@@ -42,6 +42,8 @@ class ApplicationInfo : public ApplicationInfoInterface {
 
     // Only exists in this mock
     Q_PROPERTY(QString screenshot READ screenshot CONSTANT)
+    // Only exists in this mock
+    Q_PROPERTY(bool mockServerSideDecoration READ serverSideDecoration WRITE setServerSideDecoration NOTIFY serverSideDecorationChanged)
 
 public:
     ApplicationInfo(QObject *parent = nullptr);
@@ -75,7 +77,8 @@ public:
     QString splashTitle() const override { return QString(); }
     QUrl splashImage() const override { return QUrl(); }
     bool splashShowHeader() const override { return false; }
-    bool serverSideDecoration() const override { return false; }
+    bool serverSideDecoration() const override;
+    Q_INVOKABLE void setServerSideDecoration(bool value);
     QColor splashColor() const override { return QColor(0,0,0,0); }
     QColor splashColorHeader() const override { return QColor(0,0,0,0); }
     QColor splashColorFooter() const override { return QColor(0,0,0,0); }
@@ -117,6 +120,7 @@ public:
 Q_SIGNALS:
     void fullscreenChanged(bool value);
     void manualSurfaceCreationChanged(bool value);
+    void serverSideDecorationChanged(bool value);
     void closed();
 
 public Q_SLOTS:
@@ -151,6 +155,7 @@ private:
     QList<MirSurface*> m_closingSurfaces;
     bool m_manualSurfaceCreation{false};
     Mir::ShellChrome m_shellChrome{Mir::NormalChrome};
+    bool m_serverSideDecoration{true};
     QUrl m_qmlFilePath;
 };
 

@@ -16,6 +16,7 @@
 
 import QtQuick 2.15
 import QtQuick.Layouts 1.1
+import QtCore 5.15
 import Lomiri.Components 1.3
 import QtMir.Application 0.1
 import "../Components"
@@ -37,6 +38,8 @@ MouseArea {
     property alias windowControlButtonsVisible: buttons.visible
     property PanelState panelState
     property bool lightMode : false
+    readonly property string wmThemeUserPath: "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.config/noru/themes/wm/"
+    readonly property string wmThemeSystemPath: "file:///usr/share/noru/wm/"
 
     readonly property real buttonsWidth: buttons.width + row.spacing
 
@@ -74,7 +77,25 @@ MouseArea {
         id: background
         anchors.fill: parent
         radius: units.gu(.5)
-        color: root.lightMode ? "#FFFFFF" : "#000000"
+        color: titlebarResolver.resolvedImage === "" ? (root.lightMode ? "#FFFFFF" : "#000000") : "transparent"
+
+        ImageResolver {
+            id: titlebarResolver
+            candidates: [
+                root.wmThemeUserPath + "titlebar.png",
+                root.wmThemeUserPath + "titlebar.svg",
+                root.wmThemeSystemPath + "titlebar.png",
+                root.wmThemeSystemPath + "titlebar.svg",
+                ""
+            ]
+        }
+
+        Image {
+            anchors.fill: parent
+            source: titlebarResolver.resolvedImage
+            visible: source !== ""
+            fillMode: Image.Stretch
+        }
     }
 
     Rectangle {

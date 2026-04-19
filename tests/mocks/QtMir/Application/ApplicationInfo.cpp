@@ -222,6 +222,20 @@ void ApplicationInfo::setIcon(const QUrl &value)
     }
 }
 
+bool ApplicationInfo::serverSideDecoration() const
+{
+    return m_serverSideDecoration;
+}
+
+void ApplicationInfo::setServerSideDecoration(bool value)
+{
+    if (m_serverSideDecoration == value)
+        return;
+
+    m_serverSideDecoration = value;
+    Q_EMIT serverSideDecorationChanged(value);
+}
+
 void ApplicationInfo::setState(State value)
 {
     if (value != m_state) {

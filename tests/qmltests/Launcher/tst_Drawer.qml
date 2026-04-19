@@ -192,6 +192,19 @@ StyledItem {
             tryCompare(launcher, "state", "");
         }
 
+        function test_dashAliasAndSize() {
+            var drawer = findChild(launcher, "drawer");
+            verify(!!drawer);
+
+            compare(launcher.dash, drawer);
+
+            launcher.dashWidth = units.gu(30);
+            tryCompare(drawer, "width", units.gu(30));
+
+            launcher.dashWidth = units.gu(200);
+            tryCompare(drawer, "width", launcher.width);
+        }
+
         function test_launchAppFromDrawer() {
             dragDrawerIntoView();
 

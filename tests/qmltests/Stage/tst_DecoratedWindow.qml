@@ -268,5 +268,20 @@ Rectangle {
             loader.item.showHighlight = true;
             tryCompare(highlightRect, "visible", true)
         }
+
+        function test_clientSideTitlebarForMirComposer_data() {
+            return [
+                { tag: "regular app", appId: "gallery-app", serverSideDecoration: true, expectsDecoration: true },
+                { tag: "csd app", appId: "mir-composer", serverSideDecoration: false, expectsDecoration: false }
+            ];
+        }
+
+        function test_clientSideTitlebarForMirComposer(data) {
+            restartWithApp(data.appId);
+            root.fakeApplication.setServerSideDecoration(data.serverSideDecoration);
+            var decoration = findChild(loader.item, "appWindowDecoration");
+            verify(decoration);
+            tryCompare(decoration, "visible", data.expectsDecoration);
+        }
     }
 }
