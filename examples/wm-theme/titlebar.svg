@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="1200" height="48"
+     viewBox="0 0 1200 48"
+     preserveAspectRatio="none">
+
+  <!-- Rounded top, flat bottom, fully opaque -->
+  <path d="
+    M 10 0
+    H 1190
+    A 10 10 0 0 1 1200 10
+    V 44
+    H 0
+    V 10
+    A 10 10 0 0 1 10 0
+    Z"
+    fill="#4a4f5f"/>
+
+  <!-- 4px bottom separator -->
+  <rect x="0" y="44" width="1200" height="4"
+        fill="#343845"/>
+</svg>
