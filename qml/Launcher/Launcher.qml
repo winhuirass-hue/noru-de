@@ -39,6 +39,7 @@ FocusScope {
     property bool lightMode : false
 
     property int panelWidth: units.gu(10)
+    property int dashWidth: units.gu(81)
     property int dragAreaWidth: units.gu(1)
     property real progress: dragArea.dragging && dragArea.touchPosition.x > panelWidth ?
                                 (width * (dragArea.touchPosition.x-panelWidth) / (width - panelWidth)) : 0
@@ -54,6 +55,8 @@ FocusScope {
 
     readonly property bool shown: panel.x > -panel.width
     readonly property bool drawerShown: drawer.x == 0
+    readonly property bool dashShown: drawerShown
+    readonly property alias dash: drawer
 
     // emitted when an application is selected
     signal launcherApplicationSelected(string appId)
@@ -213,6 +216,10 @@ FocusScope {
                 switchToNextState("visible");
         else
             switchToNextState("drawer");
+    }
+
+    function toggleDash(focusInputField, onlyOpen, alsoToggleLauncher) {
+        toggleDrawer(focusInputField, onlyOpen, alsoToggleLauncher);
     }
 
     Keys.onPressed: {
@@ -412,7 +419,7 @@ FocusScope {
             right: parent.left
         }
         background: root.background
-        width: Math.min(root.width, units.gu(81))
+        width: Math.min(root.width, Math.max(panel.width, root.dashWidth))
         panelWidth: panel.width
         allowSlidingAnimation: !dragArea.dragging && !launcherDragArea.drag.active && panel.animate
         lightMode: root.lightMode

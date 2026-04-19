@@ -112,8 +112,8 @@ Item {
         property bool showWindowDecorationControls: (revealControls && panelState.decorationsVisible) ||
                                                     panelState.decorationsAlwaysVisible
 
-        property bool showPointerMenu: revealControls &&
-                                       (panelState.decorationsVisible || mode == "windowed")
+        property bool showPointerMenu: (mode == "windowed" && enablePointerMenu && !greeterShown) ||
+                                       (revealControls && (panelState.decorationsVisible || mode == "windowed"))
 
         property bool enablePointerMenu: applicationMenus.available &&
                                          applicationMenus.model
@@ -365,7 +365,7 @@ Item {
             anchors {
                 left: parent.left
                 leftMargin: units.gu(1)
-                right: __indicators.left
+                right: trayIndicator.left
                 rightMargin: units.gu(1)
             }
             height: root.minimizedPanelHeight
@@ -406,6 +406,33 @@ Item {
                 opacity: !__applicationMenus.expanded && d.enableTouchMenus && !callHint.visible
                 Behavior on opacity { NumberAnimation { duration: LomiriAnimation.SnapDuration } }
                 visible: opacity !== 0
+            }
+        }
+
+        MouseArea {
+            id: trayIndicator
+            objectName: "trayIndicator"
+            anchors {
+                right: __indicators.left
+                rightMargin: units.gu(1)
+                verticalCenter: parent.verticalCenter
+            }
+            width: units.gu(2.5)
+            height: root.minimizedPanelHeight
+            hoverEnabled: true
+            visible: root.mode == "windowed"
+                     && root.hasKeyboard
+                     && !callHint.visible
+                     && !__indicators.expanded
+            enabled: visible
+
+            onClicked: __indicators.show()
+
+            Label {
+                anchors.centerIn: parent
+                text: "⋮"
+                fontSize: "large"
+                color: parent.containsMouse ? theme.palette.normal.activity : theme.palette.normal.backgroundText
             }
         }
 
