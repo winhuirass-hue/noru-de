@@ -1,61 +1,54 @@
 # Noru WM theme example
 
-This folder is an example **Emerald-like** window-manager theme for Mir/Lomiri decorations.
+This folder is an example **Emerald-like** window-manager theme for Mir/Lomiri decorations, using the new WM theme layout.
 
-## Install paths
+## WM config + theme layout
 
-You can install a theme in either location:
+Noru now reads the active WM theme from `config.toml`:
 
-- Per-user: `~/.config/noru/themes/wm/`
-- System-wide: `/usr/share/noru/wm/`
+- User config: `~/.config/noru/wm/config.toml`
+- System config: `/usr/share/noru/wm/config.toml`
 
-Per-user files override system-wide files.
+`config.toml` must define:
 
-## Supported files
-
-- `titlebar.png` or `titlebar.svg`
-- `close.svg`
-- `close_hover.svg` (optional, used while hovering close button)
-- `minimize.svg`
-- `maximize.svg`
-- `restore.svg`
-
-## Quick test
-
-```bash
-mkdir -p ~/.config/noru/themes/wm
-cp examples/wm-theme/* ~/.config/noru/themes/wm/
+```toml
+theme = "<theme name>"
 ```
 
-Then restart Lomiri/Mir session.
+Theme assets are loaded from:
 
-# Noru WM theme example
+- User theme dir: `~/.config/noru/wm/<theme name>/`
+- System theme dir: `/usr/share/noru/wm/<theme name>/`
 
-This folder is an example **Emerald-like** window-manager theme for Mir/Lomiri decorations.
+Each theme directory should contain an `index.toml` file that maps asset names to files.
 
-## Install paths
+## Supported `index.toml` keys
 
-You can install a theme in either location:
+- `close`
+- `close_hover`
+- `minimize`
+- `maximize`
+- `restore`
+- `titlebar` (PNG)
+- `titlebar_svg` (SVG)
 
-- Per-user: `~/.config/noru/themes/wm/`
-- System-wide: `/usr/share/noru/wm/`
+## Example files in this folder
 
-Per-user files override system-wide files.
-
-## Supported files
-
-- `titlebar.png` or `titlebar.svg`
-- `close.svg`
-- `close_hover.svg` (optional, used while hovering close button)
-- `minimize.svg`
-- `maximize.svg`
-- `restore.svg`
+- `config.toml`
+- `emerald/index.toml`
+- `emerald/titlebar.svg`
+- `emerald/close.svg`
+- `emerald/close_hover.svg`
+- `emerald/minimize.svg`
+- `emerald/maximize.svg`
+- `emerald/restore.svg`
 
 ## Quick test
 
 ```bash
-mkdir -p ~/.config/noru/themes/wm
-cp examples/wm-theme/* ~/.config/noru/themes/wm/
+mkdir -p ~/.config/noru/wm/emerald
+cp examples/wm-theme/config.toml ~/.config/noru/wm/config.toml
+cp examples/wm-theme/emerald/* ~/.config/noru/wm/emerald/
 ```
 
 Then restart Lomiri/Mir session.
