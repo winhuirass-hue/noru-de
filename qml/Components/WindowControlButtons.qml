@@ -51,36 +51,18 @@ Row {
         width: height
         onClicked: root.closeClicked()
         visible: root.closeButtonShown
-            ImageResolver {
-            id: closeIconResolver
-            candidates: [
-                root.wmThemeUserPath + "close.svg",
-                root.wmThemeSystemPath + "close.svg",
-                "graphics/window-close.svg"
-            ]
-        }
-
-
-        ImageResolver {
-            id: closeIconResolver
-            candidates: [
-                root.wmThemeUserPath + "close.svg",
-                root.wmThemeSystemPath + "close.svg",
-                "graphics/window-close.svg"
-            ]
-        }
 
         Rectangle {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
             radius: height / 2
-            color: theme.palette.normal.negative
-            visible: parent.containsMouse && !overlayShown
+            color: closeWindowButton.pressed ? "#B02828" : theme.palette.normal.negative
+            visible: (parent.containsMouse || closeWindowButton.pressed) && !overlayShown
         }
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: closeIconResolver.resolvedImage
+            source: "graphics/window-close.svg"
             color: root.active ? root.color : LomiriColors.jet
         }
     }
@@ -107,13 +89,13 @@ Row {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
             radius: height / 2
-            color: root.active ? LomiriColors.graphite : LomiriColors.ash
-            visible: parent.containsMouse && !overlayShown
+            color: minimizeWindowButton.pressed ? LomiriColors.slate : (root.active ? LomiriColors.graphite : LomiriColors.ash)
+            visible: (parent.containsMouse || minimizeWindowButton.pressed) && !overlayShown
         }
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: minimizeIconResolver.resolvedImage
+            source: "graphics/window-minimize.svg"
             color: root.active ? root.color : LomiriColors.slate
         }
     }
@@ -158,13 +140,13 @@ Row {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
             radius: height / 2
-            color: root.active ? LomiriColors.graphite : LomiriColors.ash
-            visible: parent.containsMouse && !overlayShown
+            color: maximizeWindowButton.pressed ? LomiriColors.slate : (root.active ? LomiriColors.graphite : LomiriColors.ash)
+            visible: (parent.containsMouse || maximizeWindowButton.pressed) && !overlayShown
         }
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: root.windowIsMaximized ? restoreIconResolver.resolvedImage : maximizeIconResolver.resolvedImage
+            source: root.windowIsMaximized ? "graphics/window-window.svg" : "graphics/window-maximize.svg"
             color: root.active ? root.color : LomiriColors.slate
         }
     }

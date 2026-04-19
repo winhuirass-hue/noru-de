@@ -83,6 +83,11 @@ FocusScope {
     property alias altDragEnabled: altDragHandler.enabled
 
     property Item windowMargins
+    readonly property bool usesServerSideDecoration: !application
+                                                     || application.serverSideDecoration === undefined
+                                                     || application.serverSideDecoration === null
+                                                     ? true
+                                                     : application.serverSideDecoration
 
     signal closeClicked()
     signal maximizeClicked()
@@ -101,10 +106,10 @@ FocusScope {
 
     QtObject {
         id: d
-        property int requestedDecorationHeight: root.hasDecoration ? decoration.height : 0
+        property int requestedDecorationHeight: (root.hasDecoration && root.usesServerSideDecoration) ? decoration.height : 0
         Behavior on requestedDecorationHeight { enabled: root.animateDecoration; LomiriNumberAnimation { } }
 
-        property int visibleDecorationHeight: root.hasDecoration ? root.showDecoration * decoration.height : 0
+        property int visibleDecorationHeight: (root.hasDecoration && root.usesServerSideDecoration) ? root.showDecoration * decoration.height : 0
         Behavior on visibleDecorationHeight { enabled: root.animateDecoration; LomiriNumberAnimation { } }
     }
 
@@ -230,7 +235,7 @@ FocusScope {
         panelState: root.panelState
         lightMode: root.lightMode
 
-        opacity: root.hasDecoration ? Math.min(1, root.showDecoration) : 0
+        opacity: (root.hasDecoration && root.usesServerSideDecoration) ? Math.min(1, root.showDecoration) : 0
         Behavior on opacity { LomiriNumberAnimation { } }
         visible: opacity > 0 // don't eat input when decoration is fully translucent
 

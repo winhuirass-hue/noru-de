@@ -77,25 +77,7 @@ MouseArea {
         id: background
         anchors.fill: parent
         radius: units.gu(.5)
-        color: titlebarResolver.resolvedImage === "" ? (root.lightMode ? "#FFFFFF" : "#000000") : "transparent"
-
-        ImageResolver {
-            id: titlebarResolver
-            candidates: [
-                root.wmThemeUserPath + "titlebar.png",
-                root.wmThemeUserPath + "titlebar.svg",
-                root.wmThemeSystemPath + "titlebar.png",
-                root.wmThemeSystemPath + "titlebar.svg",
-                ""
-            ]
-        }
-
-        Image {
-            anchors.fill: parent
-            source: titlebarResolver.resolvedImage
-            visible: source !== ""
-            fillMode: Image.Stretch
-        }
+        color: root.lightMode ? "#FFFFFF" : "#000000"
     }
 
     Rectangle {
