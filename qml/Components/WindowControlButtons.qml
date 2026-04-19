@@ -15,6 +15,7 @@
  */
 
 import QtQuick 2.15
+import QtCore 5.15
 import Lomiri.Components 1.3
 
 Row {
@@ -33,6 +34,8 @@ Row {
     property bool overlayShown
 
     readonly property color color: theme.palette.normal.baseText
+    readonly property string wmThemeUserPath: "file://" + StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.config/noru/themes/wm/"
+    readonly property string wmThemeSystemPath: "file:///usr/share/noru/wm/"
 
     signal closeClicked()
     signal minimizeClicked()
@@ -48,6 +51,15 @@ Row {
         width: height
         onClicked: root.closeClicked()
         visible: root.closeButtonShown
+            ImageResolver {
+            id: closeIconResolver
+            candidates: [
+                root.wmThemeUserPath + "close.svg",
+                root.wmThemeSystemPath + "close.svg",
+                "graphics/window-close.svg"
+            ]
+        }
+
 
         Rectangle {
             anchors.fill: parent
