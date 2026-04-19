@@ -61,6 +61,15 @@ Row {
         }
 
 
+        ImageResolver {
+            id: closeIconResolver
+            candidates: [
+                root.wmThemeUserPath + "close.svg",
+                root.wmThemeSystemPath + "close.svg",
+                "graphics/window-close.svg"
+            ]
+        }
+
         Rectangle {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
@@ -71,7 +80,7 @@ Row {
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: "graphics/window-close.svg"
+            source: closeIconResolver.resolvedImage
             color: root.active ? root.color : LomiriColors.jet
         }
     }
@@ -85,6 +94,15 @@ Row {
         onClicked: root.minimizeClicked()
         visible: root.minimizeButtonVisible
 
+        ImageResolver {
+            id: minimizeIconResolver
+            candidates: [
+                root.wmThemeUserPath + "minimize.svg",
+                root.wmThemeSystemPath + "minimize.svg",
+                "graphics/window-minimize.svg"
+            ]
+        }
+
         Rectangle {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
@@ -95,7 +113,7 @@ Row {
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: "graphics/window-minimize.svg"
+            source: minimizeIconResolver.resolvedImage
             color: root.active ? root.color : LomiriColors.slate
         }
     }
@@ -118,6 +136,24 @@ Row {
             }
         }
 
+        ImageResolver {
+            id: maximizeIconResolver
+            candidates: [
+                root.wmThemeUserPath + "maximize.svg",
+                root.wmThemeSystemPath + "maximize.svg",
+                "graphics/window-maximize.svg"
+            ]
+        }
+
+        ImageResolver {
+            id: restoreIconResolver
+            candidates: [
+                root.wmThemeUserPath + "restore.svg",
+                root.wmThemeSystemPath + "restore.svg",
+                "graphics/window-window.svg"
+            ]
+        }
+
         Rectangle {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(3) : 0
@@ -128,7 +164,7 @@ Row {
         Icon {
             anchors.fill: parent
             anchors.margins: windowIsMaximized ? units.dp(6) : units.dp(3)
-            source: root.windowIsMaximized ? "graphics/window-window.svg" : "graphics/window-maximize.svg"
+            source: root.windowIsMaximized ? restoreIconResolver.resolvedImage : maximizeIconResolver.resolvedImage
             color: root.active ? root.color : LomiriColors.slate
         }
     }
