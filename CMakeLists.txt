@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.7.0)
+cmake_minimum_required (VERSION 3.21)
 
 # Default install location. Must be set here, before setting the project.
 if (NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -76,18 +76,21 @@ add_custom_target(cppcheck COMMAND cppcheck --enable=all -q --error-exitcode=2
                                        ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
 
 include(FindPkgConfig)
-find_package(Qt5Core 5.6 REQUIRED)
-find_package(Qt5Qml 5.6 REQUIRED)
-find_package(Qt5Quick 5.6 REQUIRED)
-find_package(Qt5Gui 5.6 REQUIRED)
-find_package(Qt5DBus 5.6 REQUIRED)
-find_package(Qt5Concurrent 5.6 REQUIRED)
-find_package(Qt5Sql 5.6 REQUIRED)
-find_package(Qt5Test 5.6 REQUIRED)
-find_package(Qt5Svg 5.6 REQUIRED)
-find_package(Qt5Network 5.6 REQUIRED)
-find_package(Qt5Xml 5.6 REQUIRED)
-find_package(Intl REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS
+  Core
+  Gui
+  Qml
+  Quick
+  DBus
+  Concurrent
+  Sql
+  Test
+  Svg
+  Network
+  Xml
+  WaylandClient
+  Core5Compat
+)
 
 pkg_check_modules(APPLICATION_API REQUIRED lomiri-shell-application=28)
 pkg_check_modules(GEONAMES REQUIRED geonames>=0.2)
