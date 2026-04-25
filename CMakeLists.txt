@@ -76,17 +76,24 @@ add_custom_target(cppcheck COMMAND cppcheck --enable=all -q --error-exitcode=2
                                        ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/tests)
 
 include(FindPkgConfig)
-find_package(Qt5Core 5.6 REQUIRED)
-find_package(Qt5Qml 5.6 REQUIRED)
-find_package(Qt5Quick 5.6 REQUIRED)
-find_package(Qt5Gui 5.6 REQUIRED)
-find_package(Qt5DBus 5.6 REQUIRED)
-find_package(Qt5Concurrent 5.6 REQUIRED)
-find_package(Qt5Sql 5.6 REQUIRED)
-find_package(Qt5Test 5.6 REQUIRED)
-find_package(Qt5Svg 5.6 REQUIRED)
-find_package(Qt5Network 5.6 REQUIRED)
-find_package(Qt5Xml 5.6 REQUIRED)
+
+# Qt6 requires finding the top-level Qt6 package first so that its CMake
+# integration (e.g. qt_standard_project_setup, version variables) is available
+# before individual component find_package calls.
+find_package(Qt6 6.2 REQUIRED COMPONENTS Core)
+qt_standard_project_setup()
+
+find_package(Qt6Core       6.2 REQUIRED)
+find_package(Qt6Qml        6.2 REQUIRED)
+find_package(Qt6Quick      6.2 REQUIRED)
+find_package(Qt6Gui        6.2 REQUIRED)
+find_package(Qt6DBus       6.2 REQUIRED)
+find_package(Qt6Concurrent 6.2 REQUIRED)
+find_package(Qt6Sql        6.2 REQUIRED)
+find_package(Qt6Test       6.2 REQUIRED)
+find_package(Qt6Svg        6.2 REQUIRED)
+find_package(Qt6Network    6.2 REQUIRED)
+find_package(Qt6Xml        6.2 REQUIRED)
 find_package(Intl REQUIRED)
 
 pkg_check_modules(APPLICATION_API REQUIRED lomiri-shell-application=28)
@@ -101,18 +108,21 @@ pkg_check_modules(UAL REQUIRED lomiri-app-launch-0>=0.1.5)
 pkg_check_modules(LOMIRIGESTURES REQUIRED LomiriGestures)
 pkg_check_modules(DEVICEINFO REQUIRED deviceinfo)
 pkg_check_modules(LOMIRISCHEMA REQUIRED lomiri-schemas>=0.1.5)
-pkg_check_modules(LIBLIGHTDM REQUIRED liblightdm-qt5-3)
+# Qt6 variant of the LightDM Qt binding
+pkg_check_modules(LIBLIGHTDM REQUIRED liblightdm-qt6-3)
 
 option(WITH_MIR2 "Build against Mir 2" OFF)
 
 if (WITH_MIR2)
-    pkg_check_modules(QTMIRSERVER REQUIRED qt5mir2server>=0.6.0)
+    # Qt6 Mir server packages
+    pkg_check_modules(QTMIRSERVER REQUIRED qt6mir2server>=0.6.0)
     pkg_check_modules(MIRAL REQUIRED miral>=3.0)
     pkg_check_modules(MIROIL REQUIRED miroil)
 
     add_definitions(-DWITH_MIR2=1)
 else()
-    pkg_check_modules(QTMIRSERVER REQUIRED qt5mir1server>=0.6.0)
+    # Qt6 Mir server packages
+    pkg_check_modules(QTMIRSERVER REQUIRED qt6mir1server>=0.6.0)
     pkg_search_module(MIRAL REQUIRED mir1al miral<3.0)
 endif()
 
@@ -153,7 +163,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-permissive -pedantic -Wall -Wextra")
 
-set (CMAKE_CXX_STANDARD 17)
+# Qt6 requires C++20 as its minimum supported standard.
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "release" OR "${CMAKE_BUILD_TYPE}" STREQUAL "relwithdebinfo")
     option(Werror "Treat warnings as errors" ON)
@@ -165,6 +177,9 @@ if (Werror)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 
+# gtk and lomiri-core (actually sigc++) do not like Qt defining macros named
+# "signals" and "slots"
+add_definitions(-DQT_NO_KEYWORDS)
 
 # Save a few container detach and conversions
 add_definitions(-DQT_STRICT_ITERATORS)
