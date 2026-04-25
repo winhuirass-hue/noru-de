@@ -23,7 +23,7 @@ import "../Components"
 import Qt.labs.settings 1.0
 import GSettings  1.0
 import AccountsService 0.1
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 FocusScope {
     id: root

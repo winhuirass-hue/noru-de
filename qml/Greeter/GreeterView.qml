@@ -17,7 +17,7 @@
 
 import QtQuick 2.15
 import QtQuick.Window 2.2
-import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffectscts
 import Lomiri.Components 1.3
 import Lomiri.Telephony 0.1 as Telephony
 import "../Components"

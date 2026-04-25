@@ -15,7 +15,7 @@
  */
 
 import QtQuick 2.15
-import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
 import Powerd 0.1
 import Lomiri.Components 1.3
 import Lomiri.Components.ListItems 1.3 as ListItem

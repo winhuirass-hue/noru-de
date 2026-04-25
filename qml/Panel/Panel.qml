@@ -46,7 +46,7 @@ Item {
     property alias applicationMenus: __applicationMenus
     property alias indicators: __indicators
     property bool fullscreenMode: false
-    property real panelAreaShowProgress: 1.0
+    property real panelAreaShowProgress: 0.0
     property bool greeterShown: false
     property bool hasKeyboard: false
     property bool supportsMultiColorLed: true
@@ -60,6 +60,17 @@ Item {
     property PanelState panelState
 
     property bool temporarilyShown: false
+
+    NumberAnimation on panelAreaShowProgress {
+        id: panelStartupAnimation
+        from: 0.0
+        to: 1.0
+        duration: LomiriAnimation.BriskDuration
+        easing: LomiriAnimation.StandardEasing
+        running: false
+    }
+
+    Component.onCompleted: panelStartupAnimation.start()
 
     function temporarilyShow() {
         temporarilyShown = true

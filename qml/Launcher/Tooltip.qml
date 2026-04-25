@@ -15,7 +15,7 @@
  */
 
 import QtQuick 2.15
-import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
 import Lomiri.Components 1.3
 
 LomiriShape {
