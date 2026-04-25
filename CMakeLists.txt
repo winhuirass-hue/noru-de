@@ -165,9 +165,6 @@ if (Werror)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 endif()
 
-# gtk and lomiri-core (actually sigc++) do not like Qt defining macros named
-# "signals" and "slots"
-add_definitions(-DQT_NO_KEYWORDS)
 
 # Save a few container detach and conversions
 add_definitions(-DQT_STRICT_ITERATORS)
