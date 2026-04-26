@@ -5,7 +5,7 @@ if (NOT DEFINED CMAKE_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "" FORCE)
 endif()
 
-project(lomiri VERSION 0.5.0 LANGUAGES C CXX)
+project(noru VERSION 0.6.0 LANGUAGES C CXX)
 
 option (ENABLE_UBUNTU_ACCOUNTSSERVICE "Build with Ubuntu's fork of accountsservice" OFF)
 
@@ -111,7 +111,7 @@ pkg_check_modules(LOMIRISCHEMA REQUIRED lomiri-schemas>=0.1.5)
 # Qt6 variant of the LightDM Qt binding
 pkg_check_modules(LIBLIGHTDM REQUIRED liblightdm-qt6-3)
 
-option(WITH_MIR2 "Build against Mir 2" OFF)
+option(WITH_MIR2 "Build against Mir 2" ON)
 
 if (WITH_MIR2)
     # Qt6 Mir server packages
