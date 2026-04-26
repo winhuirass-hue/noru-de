@@ -86,17 +86,20 @@ include(FindPkgConfig)
 find_package(Qt6 6.2 REQUIRED COMPONENTS Core)
 qt_standard_project_setup()
 
-find_package(Qt6Core       6.2 REQUIRED)
-find_package(Qt6Qml        6.2 REQUIRED)
-find_package(Qt6Quick      6.2 REQUIRED)
-find_package(Qt6Gui        6.2 REQUIRED)
-find_package(Qt6DBus       6.2 REQUIRED)
-find_package(Qt6Concurrent 6.2 REQUIRED)
-find_package(Qt6Sql        6.2 REQUIRED)
-find_package(Qt6Test       6.2 REQUIRED)
-find_package(Qt6Svg        6.2 REQUIRED)
-find_package(Qt6Network    6.2 REQUIRED)
-find_package(Qt6Xml        6.2 REQUIRED)
+find_package(Qt6 6.2 REQUIRED COMPONENTS
+    Core
+    Gui
+    Qml
+    Quick
+    DBus
+    Concurrent
+    Sql
+    Test
+    Svg
+    Network
+    Xml
+    Core5Compat
+)
 find_package(Intl REQUIRED)
 
 pkg_check_modules(APPLICATION_API REQUIRED lomiri-shell-application=28)
