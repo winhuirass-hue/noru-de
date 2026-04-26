@@ -27,9 +27,14 @@ add_library(LomiriLauncherAS-qml MODULE
     )
 
 target_link_libraries(LomiriLauncherAS-qml
-    lomiri-private
-    ${GSETTINGS_QT_LDFLAGS}
-    Qt5::DBus Qt5::Qml Qt5::Gui
-    )
+    PRIVATE
+        lomiri-private
+        ${GSETTINGS_QT_LDFLAGS}
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Qml
+        Qt6::DBus
+        Qt6::Core5Compat
+)
 
 add_lomiri_greeter_plugin(Lomiri.Launcher 0.1 Lomiri/Launcher TARGETS LomiriLauncherAS-qml)
