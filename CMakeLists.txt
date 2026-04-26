@@ -7,6 +7,9 @@ endif()
 
 project(noru VERSION 0.6.0 LANGUAGES C CXX)
 
+# This branch — Qt6-only shell
+# Clickable and Qt5 are intentionally not support
+
 option (ENABLE_UBUNTU_ACCOUNTSSERVICE "Build with Ubuntu's fork of accountsservice" OFF)
 
 if (ENABLE_UBUNTU_ACCOUNTSSERVICE)
