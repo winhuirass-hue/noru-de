@@ -116,7 +116,8 @@ pkg_check_modules(DEVICEINFO REQUIRED deviceinfo)
 pkg_check_modules(LOMIRISCHEMA REQUIRED lomiri-schemas>=0.1.5)
 # Qt6 variant of the LightDM Qt binding
 pkg_check_modules(LIBLIGHTDM REQUIRED liblightdm-qt6-3)
-
+# a libinput
+pkg_check_modules(LIBINPUT REQUIRED libinput)
 option(WITH_MIR2 "Build against Mir 2" ON)
 
 if (WITH_MIR2)
