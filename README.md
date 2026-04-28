@@ -1,3 +1,18 @@
+sudo apt install -y \
+  build-essential cmake pkg-config ninja-build \
+  qt6-base-dev qt6-base-private-dev \
+  qt6-declarative-dev qt6-declarative-private-dev \
+  qt6-tools-dev qt6-tools-dev-tools \
+  qml6-module-qtquick qml6-module-qtqml \
+  qml6-module-qtquick-layouts qml6-module-qtquick-controls \
+  qml6-module-qt5compat-graphicaleffects \
+  mir-utils mir-common-dev libmiral-dev qt6mir-dev \
+  lomiri-schemas lomiri-gestures-dev libqmenumodel-dev \
+  libdeviceinfo-dev liblomiri-app-launch-dev \
+  libinput-dev libudev-dev libx11-dev libxcb1-dev libxi-dev \
+  libglib2.0-dev libgio2.0-dev \
+  lightdm liblightdm-qt6-3-dev
+
 # Lomiri
 
 Lomiri is the operating environment for everywhere. It is able to span the gaps between touch, mouse, and keyboard; between phones, tablets, and workstations; and look good doing it.
